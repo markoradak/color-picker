@@ -1,8 +1,20 @@
 import { createContext, useContext } from "react";
+import * as Popover from "@radix-ui/react-popover";
 import type { ColorPickerProps } from "../types";
 import { useColorPicker } from "../hooks/use-color-picker";
+import { ColorPickerTrigger } from "./trigger";
+import { ColorPickerContent } from "./content";
+import { ColorPickerArea } from "./area";
+import { ColorPickerHueSlider } from "./hue-slider";
+import { ColorPickerAlphaSlider } from "./alpha-slider";
+import { ColorPickerInput } from "./input";
+import { ColorPickerFormatToggle } from "./format-toggle";
+import { ColorPickerEyeDropper } from "./eye-dropper";
+import { ColorPickerSwatches } from "./swatches";
 
-type ColorPickerContextValue = ReturnType<typeof useColorPicker>;
+type ColorPickerContextValue = ReturnType<typeof useColorPicker> & {
+  disabled: boolean;
+};
 
 const ColorPickerContext = createContext<ColorPickerContextValue | null>(null);
 
@@ -22,6 +34,7 @@ export function useColorPickerContext(): ColorPickerContextValue {
 
 /**
  * Root compound component for the color picker.
+ * Wraps children in a Radix Popover.Root and provides color picker context.
  *
  * Usage:
  * ```tsx
@@ -38,7 +51,7 @@ export function ColorPicker({
   value,
   onValueChange,
   defaultValue,
-  disabled: _disabled,
+  disabled = false,
   children,
 }: ColorPickerProps) {
   const pickerState = useColorPicker({
@@ -47,9 +60,25 @@ export function ColorPicker({
     defaultValue,
   });
 
+  const contextValue: ColorPickerContextValue = {
+    ...pickerState,
+    disabled,
+  };
+
   return (
-    <ColorPickerContext.Provider value={pickerState}>
-      {children}
+    <ColorPickerContext.Provider value={contextValue}>
+      <Popover.Root>{children}</Popover.Root>
     </ColorPickerContext.Provider>
   );
 }
+
+// Attach compound sub-components as static properties
+ColorPicker.Trigger = ColorPickerTrigger;
+ColorPicker.Content = ColorPickerContent;
+ColorPicker.Area = ColorPickerArea;
+ColorPicker.HueSlider = ColorPickerHueSlider;
+ColorPicker.AlphaSlider = ColorPickerAlphaSlider;
+ColorPicker.Input = ColorPickerInput;
+ColorPicker.FormatToggle = ColorPickerFormatToggle;
+ColorPicker.EyeDropper = ColorPickerEyeDropper;
+ColorPicker.Swatches = ColorPickerSwatches;

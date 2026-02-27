@@ -1,5 +1,14 @@
 // Components
 export { ColorPicker, useColorPickerContext } from "./components/color-picker";
+export { ColorPickerTrigger } from "./components/trigger";
+export { ColorPickerContent } from "./components/content";
+export { ColorPickerArea } from "./components/area";
+export { ColorPickerHueSlider } from "./components/hue-slider";
+export { ColorPickerAlphaSlider } from "./components/alpha-slider";
+export { ColorPickerInput } from "./components/input";
+export { ColorPickerFormatToggle } from "./components/format-toggle";
+export { ColorPickerEyeDropper } from "./components/eye-dropper";
+export { ColorPickerSwatches } from "./components/swatches";
 
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
