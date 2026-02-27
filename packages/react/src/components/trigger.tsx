@@ -37,6 +37,7 @@ export const ColorPickerTrigger = forwardRef<
     <Popover.Trigger
       ref={ref}
       disabled={disabled}
+      aria-label="Open color picker"
       data-disabled={disabled ? "" : undefined}
       className={[
         "cp-trigger",

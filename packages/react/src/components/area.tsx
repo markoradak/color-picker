@@ -75,6 +75,7 @@ export function ColorPickerArea({ className }: ColorPickerAreaProps) {
     <div
       role="slider"
       aria-label="Color"
+      aria-roledescription="2D color picker"
       aria-valuetext={`Saturation ${Math.round(hsva.s)}%, Brightness ${Math.round(hsva.v)}%`}
       tabIndex={disabled ? -1 : 0}
       onPointerDown={handlePointerDown}
