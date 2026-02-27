@@ -111,11 +111,12 @@ export function ColorPicker({
       const stopId = gradientState.activeStopId;
       if (stopId !== prevActiveStopRef.current) {
         prevActiveStopRef.current = stopId;
-        // Load the active stop's color into the HSVA state
-        pickerState.setColorFromString(gradientState.activeStop.color);
+        // Sync HSVA to the active stop's color without propagating
+        // to onValueChange (which would overwrite the gradient with a hex string)
+        pickerState.syncHSVA(gradientState.activeStop.color);
       }
     }
-  }, [inGradientEditMode, gradientState.activeStopId, gradientState.activeStop, pickerState.setColorFromString]);
+  }, [inGradientEditMode, gradientState.activeStopId, gradientState.activeStop, pickerState.syncHSVA]);
 
   // Override color mutation functions to route into the active gradient stop
   const routedSetHue = useCallback(

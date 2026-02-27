@@ -33,12 +33,20 @@ export function useColorPicker(options: UseColorPickerOptions) {
     typeof currentValue === "string" ? detectFormat(currentValue) : "hex"
   );
 
+  // Track whether the current value change was initiated internally.
+  // When we update HSVA via setHue/setSaturationValue/setAlpha, the hex
+  // round-trip (HSVA→hex→HSVA) can lose hue information at s=0 or v=0.
+  // We skip the controlled-value HSVA sync for our own updates.
+  const isInternalUpdateRef = useRef(false);
+
   // Sync external controlled value to internal HSVA
   const prevControlledRef = useRef(controlledValue);
   if (controlledValue !== prevControlledRef.current) {
     prevControlledRef.current = controlledValue;
-    if (typeof controlledValue === "string") {
-      // Only update HSVA if external value changed (not from our own update)
+    if (isInternalUpdateRef.current) {
+      // Skip HSVA sync for our own updates — HSVA is already correct
+      isInternalUpdateRef.current = false;
+    } else if (typeof controlledValue === "string") {
       const newHSVA = toHSVA(controlledValue);
       setHSVA(newHSVA);
     }
@@ -46,6 +54,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
 
   const updateValue = useCallback(
     (newValue: ColorPickerValue) => {
+      isInternalUpdateRef.current = true;
       if (!isControlled) {
         setInternalValue(newValue);
       }
@@ -106,6 +115,16 @@ export function useColorPicker(options: UseColorPickerOptions) {
     [updateValue]
   );
 
+  /**
+   * Update internal HSVA state without propagating to onValueChange.
+   * Used by gradient stop sync to load a stop's color into the picker
+   * without overwriting the parent gradient value with a hex string.
+   */
+  const syncHSVA = useCallback((input: string) => {
+    if (!isValidColor(input)) return;
+    setHSVA(toHSVA(input));
+  }, []);
+
   const toggleFormat = useCallback(() => {
     setFormat((prev) => {
       const formats: ColorFormat[] = ["hex", "rgb", "hsl"];
@@ -134,6 +153,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
     setSaturationValue,
     setAlpha,
     setColorFromString,
+    syncHSVA,
     setFormat,
     toggleFormat,
     updateValue,
