@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getRelativePosition } from "../utils/position";
 
 interface UsePointerDragOptions {
@@ -23,6 +23,7 @@ export function usePointerDrag(
   const elementRef = useRef<HTMLElement | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const listenersRef = useRef<{ move: (e: PointerEvent) => void; up: (e: PointerEvent) => void } | null>(null);
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLElement>) => {
@@ -53,13 +54,25 @@ export function usePointerDrag(
         elementRef.current = null;
         document.removeEventListener("pointermove", handlePointerMove);
         document.removeEventListener("pointerup", handlePointerUp);
+        listenersRef.current = null;
       };
 
       document.addEventListener("pointermove", handlePointerMove);
       document.addEventListener("pointerup", handlePointerUp);
+      listenersRef.current = { move: handlePointerMove, up: handlePointerUp };
     },
     []
   );
+
+  // Clean up document event listeners on unmount
+  useEffect(() => {
+    return () => {
+      if (listenersRef.current) {
+        document.removeEventListener("pointermove", listenersRef.current.move);
+        document.removeEventListener("pointerup", listenersRef.current.up);
+      }
+    };
+  }, []);
 
   return { isDragging, handlePointerDown };
 }

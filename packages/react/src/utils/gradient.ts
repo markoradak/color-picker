@@ -1,13 +1,11 @@
 import type { GradientStop, GradientValue } from "../types";
 import { colord } from "./color";
 
-let stopIdCounter = 0;
-
 /**
  * Generate a unique ID for a gradient stop.
  */
 function generateStopId(): string {
-  return `stop-${++stopIdCounter}-${Date.now().toString(36)}`;
+  return `stop-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 /**

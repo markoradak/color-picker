@@ -4,7 +4,6 @@ import type { ColorPickerProps, GradientValue } from "../types";
 import { useColorPicker } from "../hooks/use-color-picker";
 import { useGradient } from "../hooks/use-gradient";
 import { isGradient } from "../utils/css";
-import { fromHSVA } from "../utils/color";
 import { ColorPickerTrigger } from "./trigger";
 import { ColorPickerContent } from "./content";
 import { ColorPickerArea } from "./area";
@@ -116,41 +115,40 @@ export function ColorPicker({
         pickerState.setColorFromString(gradientState.activeStop.color);
       }
     }
-  }, [inGradientEditMode, gradientState.activeStopId, gradientState.activeStop]);
+  }, [inGradientEditMode, gradientState.activeStopId, gradientState.activeStop, pickerState.setColorFromString]);
 
   // Override color mutation functions to route into the active gradient stop
   const routedSetHue = useCallback(
-    (h: number) => {
-      pickerState.setHue(h);
+    (h: number): string => {
+      const newColor = pickerState.setHue(h);
       if (inGradientEditMode && gradientState.activeStopId) {
-        // Compute the new color from current HSVA with the new hue
-        const newColor = fromHSVA({ ...pickerState.hsva, h });
         gradientState.updateStopColor(gradientState.activeStopId, newColor);
       }
+      return newColor;
     },
-    [pickerState.setHue, pickerState.hsva, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
+    [pickerState.setHue, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
   );
 
   const routedSetSaturationValue = useCallback(
-    (s: number, v: number) => {
-      pickerState.setSaturationValue(s, v);
+    (s: number, v: number): string => {
+      const newColor = pickerState.setSaturationValue(s, v);
       if (inGradientEditMode && gradientState.activeStopId) {
-        const newColor = fromHSVA({ ...pickerState.hsva, s, v });
         gradientState.updateStopColor(gradientState.activeStopId, newColor);
       }
+      return newColor;
     },
-    [pickerState.setSaturationValue, pickerState.hsva, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
+    [pickerState.setSaturationValue, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
   );
 
   const routedSetAlpha = useCallback(
-    (a: number) => {
-      pickerState.setAlpha(a);
+    (a: number): string => {
+      const newColor = pickerState.setAlpha(a);
       if (inGradientEditMode && gradientState.activeStopId) {
-        const newColor = fromHSVA({ ...pickerState.hsva, a });
         gradientState.updateStopColor(gradientState.activeStopId, newColor);
       }
+      return newColor;
     },
-    [pickerState.setAlpha, pickerState.hsva, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
+    [pickerState.setAlpha, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
   );
 
   const routedSetColorFromString = useCallback(

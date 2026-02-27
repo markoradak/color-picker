@@ -23,7 +23,7 @@ export function formatColor(input: string, format: ColorFormat): string {
   const c = colord(input);
   switch (format) {
     case "hex":
-      return c.alpha() < 1 ? c.toHex() : c.toHex();
+      return c.toHex();
     case "rgb":
       return c.toRgbString();
     case "hsl":

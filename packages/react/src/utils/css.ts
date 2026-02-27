@@ -1,5 +1,13 @@
 import type { ColorPickerValue, GradientValue, SolidColor } from "../types";
+import { isValidColor } from "./color";
 import { sortStops } from "./gradient";
+
+/**
+ * Sanitize a color string, returning "transparent" for invalid values.
+ */
+function sanitizeColor(color: string): string {
+  return isValidColor(color) ? color : "transparent";
+}
 
 /**
  * Type guard: is the value a gradient?
@@ -20,12 +28,12 @@ export function isSolidColor(value: ColorPickerValue): value is SolidColor {
  */
 export function toCSS(value: ColorPickerValue): string {
   if (isSolidColor(value)) {
-    return value;
+    return sanitizeColor(value);
   }
 
   const sorted = sortStops(value.stops);
   const stopsCSS = sorted
-    .map((stop) => `${stop.color} ${stop.position}%`)
+    .map((stop) => `${sanitizeColor(stop.color)} ${stop.position}%`)
     .join(", ");
 
   switch (value.type) {
@@ -43,7 +51,7 @@ export function toCSS(value: ColorPickerValue): string {
       return value.stops
         .map(
           (stop) =>
-            `radial-gradient(circle at ${stop.x ?? 50}% ${stop.y ?? 50}%, ${stop.color} 0%, transparent 50%)`
+            `radial-gradient(circle at ${stop.x ?? 50}% ${stop.y ?? 50}%, ${sanitizeColor(stop.color)} 0%, transparent 50%)`
         )
         .join(", ");
 

@@ -55,34 +55,43 @@ export function useColorPicker(options: UseColorPickerOptions) {
   );
 
   const setHue = useCallback(
-    (h: number) => {
+    (h: number): string => {
+      let result = "";
       setHSVA((prev) => {
         const next = { ...prev, h };
-        updateValue(fromHSVA(next));
+        result = fromHSVA(next);
+        updateValue(result);
         return next;
       });
+      return result;
     },
     [updateValue]
   );
 
   const setSaturationValue = useCallback(
-    (s: number, v: number) => {
+    (s: number, v: number): string => {
+      let result = "";
       setHSVA((prev) => {
         const next = { ...prev, s, v };
-        updateValue(fromHSVA(next));
+        result = fromHSVA(next);
+        updateValue(result);
         return next;
       });
+      return result;
     },
     [updateValue]
   );
 
   const setAlpha = useCallback(
-    (a: number) => {
+    (a: number): string => {
+      let result = "";
       setHSVA((prev) => {
         const next = { ...prev, a };
-        updateValue(fromHSVA(next));
+        result = fromHSVA(next);
+        updateValue(result);
         return next;
       });
+      return result;
     },
     [updateValue]
   );
