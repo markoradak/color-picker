@@ -1,6 +1,38 @@
 @import "tailwindcss";
+@source "../../../packages/react/src";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Popover open/close animations (Radix data-state attributes) */
+@keyframes cp-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cp-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+[data-radix-popper-content-wrapper] [data-state="open"] {
+  animation: cp-fade-in 150ms ease-out;
+}
+
+[data-radix-popper-content-wrapper] [data-state="closed"] {
+  animation: cp-fade-out 100ms ease-in;
+}
 
 /* Color picker dark mode overrides */
 .dark .cp-content {
