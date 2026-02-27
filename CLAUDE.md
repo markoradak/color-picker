@@ -1,7 +1,7 @@
 # @markoradak/color-picker
 
 <!-- auto-start: overview -->
-A compound-component React color picker and gradient editor library (`@markoradak/color-picker`), built as a pnpm monorepo with Turborepo orchestration. The library provides a Radix-style composable API for solid color selection (HEX/RGB/HSL) and gradient editing (linear, radial, conic, mesh).
+A production-ready compound-component React color picker and gradient editor library (`@markoradak/color-picker`), built as a pnpm monorepo with Turborepo orchestration. The library provides a Radix-style composable API for solid color selection (HEX/RGB/HSL) and gradient editing (linear, radial, conic, mesh). All 8 implementation phases are complete with 165 tests passing, full accessibility support, and CSS custom properties theming.
 <!-- auto-end: overview -->
 
 ## Quick Reference
@@ -43,20 +43,36 @@ color-picker/
   apps/
     web/                    # Next.js 15 demo/docs site (App Router, Turbopack)
       app/
-        layout.tsx
-        page.tsx
-        playground/page.tsx
+        layout.tsx          # Root layout with ThemeProvider
+        page.tsx            # Landing page with hero demo
+        playground/
+          page.tsx          # Playground server page
+          playground-client.tsx  # Live configurator
+        hero-demo.tsx       # Animated color picker demo
+        nav.tsx             # Navigation bar
+        theme-provider.tsx  # Dark mode context
+        code-block.tsx      # Syntax-highlighted code display
+        copy-button.tsx     # Copy-to-clipboard button
+      components/           # Additional shared web components
+      public/               # Static assets
   packages/
     react/                  # Published library: @markoradak/color-picker
       src/
         components/         # Compound components (ColorPicker.*, presets)
+          shared.ts         # Shared style constants (checkerboard pattern)
+          presets.tsx        # Pre-composed ColorPickerPopover, ColorPickerInline
+          color-picker.tsx  # Root provider + context
+          *.test.tsx        # Component integration tests
         hooks/              # useColorPicker, useGradient, usePointerDrag
         utils/              # Color math, gradient ops, CSS conversion, position
+          *.test.ts         # Utility unit tests
         types.ts            # All public TypeScript types
+        styles.css          # CSS custom properties theme API (light + dark)
         index.ts            # Barrel exports
-      dist/                 # Build output (ESM + CJS + .d.ts)
-      tsup.config.ts
-      vitest.config.ts
+        test-setup.ts       # Vitest setup (@testing-library/jest-dom)
+      dist/                 # Build output (ESM + CJS + .d.ts + styles.css)
+      tsup.config.ts        # Dual-entry: index + presets
+      vitest.config.ts      # jsdom, globals, @/ alias
   tasks/
     plans/                  # Implementation plan files
   turbo.json                # Turborepo pipeline config
@@ -64,10 +80,11 @@ color-picker/
 ```
 
 **Key Paths**:
-- `packages/react/src/components/` -- Compound component files (color-picker, area, sliders, input, trigger, content, swatches, gradient-*)
+- `packages/react/src/components/` -- Compound component files (color-picker, area, sliders, input, trigger, content, swatches, gradient-*, presets)
 - `packages/react/src/hooks/` -- State management hooks (use-color-picker, use-gradient, use-pointer-drag)
 - `packages/react/src/utils/` -- Pure utility functions (color.ts, gradient.ts, css.ts, position.ts)
 - `packages/react/src/types.ts` -- All shared TypeScript types (ColorPickerValue, GradientValue, HSVA, prop interfaces)
+- `packages/react/src/styles.css` -- CSS custom properties theme with light/dark defaults
 - `apps/web/` -- Next.js demo site consuming the library via `workspace:*`
 <!-- auto-end: structure -->
 
@@ -80,13 +97,13 @@ color-picker/
 - Next.js 15.2 with Turbopack (demo site only)
 
 **Build**:
-- tsup 8.4 -- bundles library to ESM (`.js`) + CJS (`.cjs`), tree-shakeable, code-split
+- tsup 8.4 -- dual-entry bundler (`index` + `presets`), ESM (`.js`) + CJS (`.cjs`), tree-shakeable, code-split, sourcemaps
 - tsc -- generates `.d.ts` declaration files (run separately after tsup)
 - Turborepo 2.8 -- orchestrates build/dev/test across workspaces
 
-**Styling**: Tailwind CSS v4 (demo site), CSS custom properties (library theming)
+**Styling**: Tailwind CSS v4 (demo site), CSS custom properties theme API (`styles.css` shipped with library)
 
-**Testing**: Vitest 3.0 + @testing-library/react 16.3 + jsdom
+**Testing**: Vitest 3.0 + @testing-library/react 16.3 + jsdom (165 tests)
 
 **Key Dependencies**:
 - `colord` -- Color parsing, conversion, and manipulation (~1.7kB, with `names` + `a11y` plugins)
@@ -129,13 +146,22 @@ color-picker/
 **Library Exports**:
 - Main entry: `@markoradak/color-picker` -- compound components, hooks, utilities, types
 - Sub-path: `@markoradak/color-picker/presets` -- pre-composed convenience components
+- Sub-path: `@markoradak/color-picker/styles` or `./styles.css` -- CSS custom properties theme
 - Dual format: ESM (`.js`) + CJS (`.cjs`) with `.d.ts` declarations
-- `sideEffects: false` for tree-shaking
+- `sideEffects: ["*.css"]` -- only CSS files have side effects, rest is tree-shakeable
 
 **Testing**:
-- Test files co-located with source: `*.test.ts` next to `*.ts`
+- Test files co-located with source: `*.test.ts` / `*.test.tsx` next to source files
 - Vitest with jsdom environment and global test APIs
 - `@testing-library/jest-dom/vitest` setup for DOM matchers
+- 165 tests across utils (color, gradient, css, position) and components (color-picker, gradient-editor)
+
+**Audit Fixes Applied**:
+- Stale HSVA closure fix in useColorPicker (ref-based sync)
+- Missing effect dependency in useColorPicker
+- `stopIdCounter` SSR safety (module-scoped counter)
+- `usePointerDrag` cleanup (proper event listener removal)
+- `sanitizeColor` guard in `toCSS` for malformed color strings
 <!-- auto-end: patterns -->
 
 ## Development Workflow
@@ -143,7 +169,7 @@ color-picker/
 <!-- auto-start: workflow -->
 **Build Pipeline**:
 - Turborepo ensures `packages/react` builds before `apps/web` (via `dependsOn: ["^build"]`)
-- Library build: `tsup` (JS bundles) then `tsc --emitDeclarationOnly` (declarations)
+- Library build: `tsup` (JS bundles) then `tsc --emitDeclarationOnly` (declarations) then `cp src/styles.css dist/styles.css`
 - Tests depend on `^build` completing first
 
 **Dev Mode**:
@@ -153,7 +179,11 @@ color-picker/
 **Package Publishing**:
 - `prepublishOnly` script runs build automatically
 - `files` field limits published contents to `dist/` and `README.md`
-- Package includes `exports` map with conditional `import`/`require` entries
+- Package includes `exports` map with conditional `import`/`require` entries for `.`, `./presets`, `./styles`, `./styles.css`
+
+**Commit Convention**: Conventional commits (`feat:`, `fix:`, `test:`, `chore:`) with optional scope (e.g., `feat(react):`)
+
+**Branch Strategy**: Single `main` branch
 <!-- auto-end: workflow -->
 
 ## Notes
