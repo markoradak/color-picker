@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import type { GradientValue } from "../types";
 import {
   addStop,
+  addStopWithCoordinates,
   createDefaultGradient,
   removeStop,
   updateStop,
@@ -34,6 +35,28 @@ export function useGradient(options: UseGradientOptions) {
     (color: string, position: number) => {
       const updated = addStop(gradient, color, position);
       update(updated);
+      // Select the newly added stop
+      const newStop = updated.stops.find(
+        (s) => !gradient.stops.some((gs) => gs.id === s.id)
+      );
+      if (newStop) {
+        setActiveStopId(newStop.id);
+      }
+    },
+    [gradient, update]
+  );
+
+  const handleAddStopWithCoordinates = useCallback(
+    (color: string, position: number, x: number, y: number) => {
+      const updated = addStopWithCoordinates(gradient, color, position, x, y);
+      update(updated);
+      // Select the newly added stop
+      const newStop = updated.stops.find(
+        (s) => !gradient.stops.some((gs) => gs.id === s.id)
+      );
+      if (newStop) {
+        setActiveStopId(newStop.id);
+      }
     },
     [gradient, update]
   );
@@ -61,6 +84,14 @@ export function useGradient(options: UseGradientOptions) {
   const updateStopPosition = useCallback(
     (stopId: string, position: number) => {
       const updated = updateStop(gradient, stopId, { position });
+      update(updated);
+    },
+    [gradient, update]
+  );
+
+  const updateStopCoordinates = useCallback(
+    (stopId: string, x: number, y: number) => {
+      const updated = updateStop(gradient, stopId, { x, y });
       update(updated);
     },
     [gradient, update]
@@ -95,9 +126,11 @@ export function useGradient(options: UseGradientOptions) {
     activeStop,
     setActiveStopId: setActiveStopId,
     addStop: handleAddStop,
+    addStopWithCoordinates: handleAddStopWithCoordinates,
     removeStop: handleRemoveStop,
     updateStopColor,
     updateStopPosition,
+    updateStopCoordinates,
     setGradientType,
     setAngle,
     setCenter,

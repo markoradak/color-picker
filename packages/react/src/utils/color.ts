@@ -1,10 +1,11 @@
 import { colord, extend } from "colord";
 import namesPlugin from "colord/plugins/names";
 import a11yPlugin from "colord/plugins/a11y";
+import mixPlugin from "colord/plugins/mix";
 import type { ColorFormat, HSVA } from "../types";
 
 // Register colord plugins
-extend([namesPlugin, a11yPlugin]);
+extend([namesPlugin, a11yPlugin, mixPlugin]);
 
 export { colord };
 

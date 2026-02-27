@@ -1,4 +1,5 @@
 import type { GradientStop, GradientValue } from "../types";
+import { colord } from "./color";
 
 let stopIdCounter = 0;
 
@@ -45,6 +46,23 @@ export function addStop(
 }
 
 /**
+ * Add a stop to a gradient with 2D coordinates (for mesh gradients).
+ */
+export function addStopWithCoordinates(
+  gradient: GradientValue,
+  color: string,
+  position: number,
+  x: number,
+  y: number
+): GradientValue {
+  const stop = { ...createGradientStop(color, position), x, y };
+  return {
+    ...gradient,
+    stops: [...gradient.stops, stop],
+  };
+}
+
+/**
  * Remove a stop from a gradient (minimum 2 stops enforced).
  */
 export function removeStop(
@@ -72,6 +90,37 @@ export function updateStop(
       s.id === stopId ? { ...s, ...updates } : s
     ),
   };
+}
+
+/**
+ * Interpolate a color at a given position (0-100) between sorted stops.
+ * Returns the mixed color as a hex string.
+ */
+export function interpolateColorAt(
+  stops: GradientStop[],
+  position: number
+): string {
+  const sorted = sortStops(stops);
+  if (sorted.length === 0) return "#808080";
+  if (sorted.length === 1) return sorted[0]!.color;
+
+  let left = sorted[0]!;
+  let right = sorted[sorted.length - 1]!;
+
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i]!.position <= position && sorted[i + 1]!.position >= position) {
+      left = sorted[i]!;
+      right = sorted[i + 1]!;
+      break;
+    }
+  }
+
+  if (position <= left.position) return left.color;
+  if (position >= right.position) return right.color;
+
+  const range = right.position - left.position;
+  const t = range === 0 ? 0 : (position - left.position) / range;
+  return colord(left.color).mix(colord(right.color), t).toHex();
 }
 
 /**

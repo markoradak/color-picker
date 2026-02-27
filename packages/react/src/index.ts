@@ -9,11 +9,14 @@ export { ColorPickerInput } from "./components/input";
 export { ColorPickerFormatToggle } from "./components/format-toggle";
 export { ColorPickerEyeDropper } from "./components/eye-dropper";
 export { ColorPickerSwatches } from "./components/swatches";
+export { ColorPickerGradientEditor } from "./components/gradient-editor";
+export { GradientPreview } from "./components/gradient-preview";
+export { GradientStops } from "./components/gradient-stops";
 
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
 export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor } from "./utils/color";
-export { createGradientStop, sortStops, addStop, removeStop, updateStop, createDefaultGradient } from "./utils/gradient";
+export { createGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, createDefaultGradient, interpolateColorAt } from "./utils/gradient";
 export { clamp, getRelativePosition, angleFromPosition } from "./utils/position";
 
 // Hooks
