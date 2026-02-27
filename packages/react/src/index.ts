@@ -13,6 +13,9 @@ export { ColorPickerGradientEditor } from "./components/gradient-editor";
 export { GradientPreview } from "./components/gradient-preview";
 export { GradientStops } from "./components/gradient-stops";
 
+// Pre-composed presets
+export { ColorPickerPopover, ColorPickerInline } from "./components/presets";
+
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
 export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor } from "./utils/color";
@@ -38,5 +41,8 @@ export type {
   ColorPickerSwatchesProps,
   ColorPickerTriggerProps,
   ColorPickerContentProps,
+  ColorPickerPresetProps,
+  ColorPickerPopoverProps,
+  ColorPickerInlineProps,
   HSVA,
 } from "./types";

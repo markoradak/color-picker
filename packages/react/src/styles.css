@@ -1,0 +1,219 @@
+/**
+ * @markoradak/color-picker — CSS Custom Properties Theme API
+ *
+ * Import this stylesheet to apply default theme styling to all color picker
+ * components. All values are driven by CSS custom properties that can be
+ * overridden at any scope to create custom themes.
+ *
+ * Usage:
+ *   import "@markoradak/color-picker/styles";
+ *
+ * Override example:
+ *   .my-theme {
+ *     --cp-bg: #1a1a2e;
+ *     --cp-border: #2a2a4a;
+ *     --cp-radius: 12px;
+ *   }
+ */
+
+/* ------------------------------------------------------------------ */
+/* CSS Custom Properties — Light theme defaults                       */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --cp-bg: #ffffff;
+  --cp-bg-secondary: #fafafa;
+  --cp-border: #e5e5e5;
+  --cp-border-focus: #3b82f6;
+  --cp-radius: 0.75rem;
+  --cp-radius-sm: 0.5rem;
+  --cp-radius-full: 9999px;
+  --cp-text: #171717;
+  --cp-text-muted: #737373;
+  --cp-text-dim: #a3a3a3;
+  --cp-input-bg: #ffffff;
+  --cp-input-border: #d4d4d4;
+  --cp-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --cp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --cp-ring: 0 0 0 2px #3b82f6;
+  --cp-ring-offset: 2px;
+  --cp-hover-bg: #f5f5f5;
+  --cp-active-border: #1f2937;
+  --cp-swatch-size: 1.5rem;
+  --cp-slider-height: 0.75rem;
+  --cp-thumb-size: 1rem;
+  --cp-area-height: 10rem;
+  --cp-width: 16rem;
+  --cp-gap: 0.75rem;
+  --cp-padding: 0.75rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dark mode — automatic via prefers-color-scheme                     */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cp-bg: #1c1c1e;
+    --cp-bg-secondary: #2c2c2e;
+    --cp-border: #3a3a3c;
+    --cp-border-focus: #60a5fa;
+    --cp-text: #f5f5f5;
+    --cp-text-muted: #a1a1aa;
+    --cp-text-dim: #71717a;
+    --cp-input-bg: #27272a;
+    --cp-input-border: #3f3f46;
+    --cp-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+    --cp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --cp-ring: 0 0 0 2px #60a5fa;
+    --cp-hover-bg: #3a3a3c;
+    --cp-active-border: #d4d4d8;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Component styles using CSS custom properties                       */
+/* ------------------------------------------------------------------ */
+
+/* Content / popover panel */
+.cp-content {
+  background-color: var(--cp-bg);
+  border-color: var(--cp-border);
+  border-radius: var(--cp-radius);
+  box-shadow: var(--cp-shadow);
+  width: var(--cp-width);
+  padding: var(--cp-padding);
+  gap: var(--cp-gap);
+}
+
+/* Inline wrapper */
+.cp-inline {
+  background-color: var(--cp-bg);
+  border-color: var(--cp-border);
+  border-radius: var(--cp-radius);
+  width: var(--cp-width);
+  padding: var(--cp-padding);
+  gap: var(--cp-gap);
+}
+
+/* Trigger button */
+.cp-trigger {
+  border-color: var(--cp-border);
+  border-radius: var(--cp-radius-sm);
+}
+
+/* Saturation/value area */
+.cp-area {
+  border-radius: var(--cp-radius-sm);
+  height: var(--cp-area-height);
+}
+
+/* Hue slider */
+.cp-hue-slider {
+  height: var(--cp-slider-height);
+  border-radius: var(--cp-radius-full);
+}
+
+/* Alpha slider */
+.cp-alpha-slider {
+  height: var(--cp-slider-height);
+  border-radius: var(--cp-radius-full);
+}
+
+/* Input container */
+.cp-input {
+  gap: 0.5rem;
+}
+
+.cp-input span {
+  color: var(--cp-text-muted);
+}
+
+.cp-input input {
+  background-color: var(--cp-input-bg);
+  border-color: var(--cp-input-border);
+  border-radius: var(--cp-radius-sm);
+  color: var(--cp-text);
+}
+
+.cp-input input:focus {
+  border-color: var(--cp-border-focus);
+}
+
+/* Format toggle button */
+.cp-format-toggle {
+  background-color: var(--cp-input-bg);
+  border-color: var(--cp-input-border);
+  border-radius: var(--cp-radius-sm);
+  color: var(--cp-text);
+}
+
+.cp-format-toggle:hover:not(:disabled) {
+  background-color: var(--cp-hover-bg);
+}
+
+/* Eye dropper button */
+.cp-eye-dropper {
+  background-color: var(--cp-input-bg);
+  border-color: var(--cp-input-border);
+  border-radius: var(--cp-radius-sm);
+  color: var(--cp-text);
+}
+
+.cp-eye-dropper:hover:not(:disabled) {
+  background-color: var(--cp-hover-bg);
+}
+
+/* Swatches grid */
+.cp-swatches button {
+  border-radius: var(--cp-radius-sm);
+  width: var(--cp-swatch-size);
+  height: var(--cp-swatch-size);
+}
+
+/* Gradient editor */
+.cp-gradient-editor {
+  gap: var(--cp-gap);
+}
+
+.cp-gradient-editor input[type="number"] {
+  background-color: var(--cp-input-bg);
+  border-color: var(--cp-input-border);
+  border-radius: var(--cp-radius-sm);
+  color: var(--cp-text);
+}
+
+.cp-gradient-editor input[type="number"]:focus {
+  border-color: var(--cp-border-focus);
+}
+
+.cp-gradient-editor span {
+  color: var(--cp-text-muted);
+}
+
+/* Gradient type selector */
+.cp-gradient-editor [role="radiogroup"] {
+  background-color: var(--cp-bg-secondary);
+  border-color: var(--cp-border);
+  border-radius: var(--cp-radius-sm);
+}
+
+.cp-gradient-editor [role="radio"][aria-checked="true"] {
+  background-color: var(--cp-bg);
+  color: var(--cp-text);
+  box-shadow: var(--cp-shadow-sm);
+}
+
+.cp-gradient-editor [role="radio"][aria-checked="false"] {
+  color: var(--cp-text-muted);
+}
+
+/* Gradient preview */
+.cp-gradient-preview {
+  border-radius: var(--cp-radius-sm);
+}
+
+/* Gradient stops */
+.cp-gradient-stops [role="group"] {
+  border-radius: var(--cp-radius-full);
+}

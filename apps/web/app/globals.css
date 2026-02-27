@@ -1,1 +1,67 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Color picker dark mode overrides */
+.dark .cp-content {
+  background-color: #1c1c1e;
+  border-color: #333;
+}
+
+.dark .cp-input input {
+  background-color: #2c2c2e;
+  border-color: #444;
+  color: #e5e5e5;
+}
+
+.dark .cp-input input:focus {
+  border-color: #3b82f6;
+}
+
+.dark .cp-format-toggle {
+  background-color: #2c2c2e;
+  border-color: #444;
+  color: #ccc;
+}
+
+.dark .cp-format-toggle:hover {
+  background-color: #3a3a3c;
+}
+
+.dark .cp-eye-dropper {
+  background-color: #2c2c2e;
+  border-color: #444;
+  color: #ccc;
+}
+
+.dark .cp-eye-dropper:hover {
+  background-color: #3a3a3c;
+}
+
+.dark .cp-trigger {
+  border-color: #444;
+}
+
+.dark .cp-swatches button {
+  border-color: #444;
+}
+
+.dark .cp-gradient-editor .flex.gap-1 {
+  background-color: #2c2c2e;
+  border-color: #444;
+}
+
+.dark .cp-gradient-editor .flex.gap-1 button[aria-checked="true"] {
+  background-color: #3a3a3c;
+  color: #e5e5e5;
+}
+
+.dark .cp-gradient-editor input[type="number"] {
+  background-color: #2c2c2e;
+  border-color: #444;
+  color: #e5e5e5;
+}
+
+.dark .cp-gradient-editor input[type="number"]:focus {
+  border-color: #3b82f6;
+}

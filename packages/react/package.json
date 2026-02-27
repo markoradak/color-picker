@@ -27,15 +27,19 @@
         "types": "./dist/components/presets.d.ts",
         "default": "./dist/presets.cjs"
       }
-    }
+    },
+    "./styles": "./dist/styles.css",
+    "./styles.css": "./dist/styles.css"
   },
   "files": [
     "dist",
     "README.md"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
-    "build": "tsup && tsc --emitDeclarationOnly --outDir dist",
+    "build": "tsup && tsc --emitDeclarationOnly --outDir dist && cp src/styles.css dist/styles.css",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",

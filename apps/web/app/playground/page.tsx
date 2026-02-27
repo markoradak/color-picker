@@ -1,10 +1,17 @@
+import { PlaygroundClient } from "./playground-client";
+
 export default function PlaygroundPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 p-8">
-      <h1 className="text-3xl font-bold">Playground</h1>
-      <p className="text-neutral-600 dark:text-neutral-400">
-        Interactive color picker configurator coming soon.
-      </p>
+    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">
+          Playground
+        </h1>
+        <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+          Configure the color picker interactively and copy the generated code.
+        </p>
+      </div>
+      <PlaygroundClient />
     </main>
   );
 }
