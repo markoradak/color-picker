@@ -67,8 +67,8 @@ export function ColorPickerEyeDropper({
       aria-label="Pick a color from the screen"
       className={[
         "cp-eye-dropper",
-        "inline-flex h-8 w-8 items-center justify-center rounded-md border border-neutral-300 bg-white text-neutral-700",
-        "outline-none hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+        "inline-flex h-8 w-8 items-center justify-center rounded-md border",
+        "outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       ]

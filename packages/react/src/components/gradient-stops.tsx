@@ -207,7 +207,7 @@ export function GradientStops({ className }: GradientStopsProps) {
                   side="top"
                   sideOffset={8}
                   align="center"
-                  className="z-50 w-56 rounded-xl border border-neutral-200 bg-white p-3 shadow-lg"
+                  className="cp-content z-50 w-56 rounded-xl border p-3"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                 >
                   <ColorPickerProvider

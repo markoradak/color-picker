@@ -32,6 +32,7 @@ import { ColorPickerGradientSwatches } from "./gradient-swatches";
 function ColorPickerControls({
   enableAlpha = true,
   enableGradient = false,
+  enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
   swatches,
@@ -40,6 +41,7 @@ function ColorPickerControls({
 }: {
   enableAlpha?: boolean;
   enableGradient?: boolean;
+  enableModeSelector?: boolean;
   enableEyeDropper?: boolean;
   enableFormatToggle?: boolean;
   swatches?: string[];
@@ -47,10 +49,11 @@ function ColorPickerControls({
   gradientSwatches?: import("../types").GradientValue[];
 }) {
   const { isGradientMode } = useColorPickerContext();
+  const showModeSelector = enableModeSelector ?? enableGradient;
 
   return (
     <>
-      {enableGradient && <ColorPickerModeSelector />}
+      {showModeSelector && <ColorPickerModeSelector />}
 
       {isGradientMode ? (
         // Gradient mode: show gradient editor (preview, stops with per-stop popovers)
@@ -107,6 +110,7 @@ export function ColorPickerPopover({
   disabled = false,
   enableAlpha = true,
   enableGradient = false,
+  enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
   swatches,
@@ -136,6 +140,7 @@ export function ColorPickerPopover({
         <ColorPickerControls
           enableAlpha={enableAlpha}
           enableGradient={enableGradient}
+          enableModeSelector={enableModeSelector}
           enableEyeDropper={enableEyeDropper}
           enableFormatToggle={enableFormatToggle}
           swatches={swatches}
@@ -171,6 +176,7 @@ export function ColorPickerInline({
   disabled = false,
   enableAlpha = true,
   enableGradient = false,
+  enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
   swatches,
@@ -188,7 +194,7 @@ export function ColorPickerInline({
       <div
         className={[
           "cp-inline",
-          "flex w-64 flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-3",
+          "flex w-64 flex-col gap-3 rounded-xl border p-3",
           className,
         ]
           .filter(Boolean)
@@ -197,6 +203,7 @@ export function ColorPickerInline({
         <ColorPickerControls
           enableAlpha={enableAlpha}
           enableGradient={enableGradient}
+          enableModeSelector={enableModeSelector}
           enableEyeDropper={enableEyeDropper}
           enableFormatToggle={enableFormatToggle}
           swatches={swatches}

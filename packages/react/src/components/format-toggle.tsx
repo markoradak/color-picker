@@ -29,8 +29,8 @@ export function ColorPickerFormatToggle({
       aria-label={`Color format: ${FORMAT_LABELS[format]}. Click to change.`}
       className={[
         "cp-format-toggle",
-        "shrink-0 rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs font-medium text-neutral-700",
-        "outline-none hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+        "shrink-0 rounded-md border px-2 py-1 text-xs font-medium",
+        "outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       ]

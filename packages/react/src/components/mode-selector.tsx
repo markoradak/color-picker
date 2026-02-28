@@ -76,7 +76,7 @@ export function ColorPickerModeSelector({ className }: ColorPickerModeSelectorPr
     <div
       className={[
         "cp-mode-selector",
-        "flex gap-1 rounded-lg border border-neutral-200 bg-neutral-50 p-0.5",
+        "flex gap-1 rounded-lg border p-0.5",
         className,
       ]
         .filter(Boolean)
@@ -99,8 +99,8 @@ export function ColorPickerModeSelector({ className }: ColorPickerModeSelectorPr
               "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
               "disabled:cursor-not-allowed disabled:opacity-50",
               isActive
-                ? "bg-white text-neutral-900 shadow-sm"
-                : "text-neutral-500 hover:text-neutral-700",
+                ? ""
+                : "",
             ]
               .filter(Boolean)
               .join(" ")}

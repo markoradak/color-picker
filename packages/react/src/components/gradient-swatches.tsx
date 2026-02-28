@@ -64,7 +64,7 @@ export function ColorPickerGradientSwatches({
               "relative h-8 w-full rounded-md border outline-none",
               "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
               "disabled:cursor-not-allowed disabled:opacity-50",
-              active ? "border-neutral-800 ring-1 ring-neutral-800" : "border-neutral-300",
+              active ? "ring-1" : "",
             ].join(" ")}
             style={{ background: css }}
           />

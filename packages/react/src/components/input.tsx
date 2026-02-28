@@ -76,7 +76,7 @@ export function ColorPickerInput({ className }: ColorPickerInputProps) {
         .filter(Boolean)
         .join(" ")}
     >
-      <span className="shrink-0 select-none text-xs font-medium text-neutral-500">
+      <span className="shrink-0 select-none text-xs font-medium">
         {formatLabel}
       </span>
       <input
@@ -92,7 +92,7 @@ export function ColorPickerInput({ className }: ColorPickerInputProps) {
         autoComplete="off"
         aria-label={`Color value in ${formatLabel} format`}
         className={[
-          "w-full rounded-md border border-neutral-300 bg-white px-2 py-1 text-sm",
+          "w-full rounded-md border px-2 py-1 text-sm",
           "outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
           "disabled:cursor-not-allowed disabled:opacity-50",
         ].join(" ")}

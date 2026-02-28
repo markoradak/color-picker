@@ -54,7 +54,7 @@ export function ColorPickerSwatches({
               "relative h-6 w-6 rounded-md border outline-none",
               "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
               "disabled:cursor-not-allowed disabled:opacity-50",
-              isActive ? "border-neutral-800 ring-1 ring-neutral-800" : "border-neutral-300",
+              isActive ? "ring-1" : "",
             ].join(" ")}
             style={{ backgroundColor: color }}
           >

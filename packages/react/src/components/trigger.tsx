@@ -41,7 +41,7 @@ export const ColorPickerTrigger = forwardRef<
       data-disabled={disabled ? "" : undefined}
       className={[
         "cp-trigger",
-        "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-300 p-1",
+        "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border p-1",
         "outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,

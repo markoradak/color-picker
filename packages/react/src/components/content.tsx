@@ -23,7 +23,7 @@ export const ColorPickerContent = forwardRef<
         sideOffset={sideOffset}
         className={[
           "cp-content",
-          "z-50 flex w-64 flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-3 shadow-lg",
+          "z-50 flex w-64 flex-col gap-3 rounded-xl border p-3",
           className,
         ]
           .filter(Boolean)

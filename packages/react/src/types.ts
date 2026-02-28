@@ -146,6 +146,8 @@ export interface ColorPickerPresetProps {
   enableAlpha?: boolean;
   /** Show the gradient editor controls (only when value is a GradientValue). Default: false */
   enableGradient?: boolean;
+  /** Show the solid/gradient mode selector. Default: true when enableGradient is true */
+  enableModeSelector?: boolean;
   /** Show the EyeDropper button (auto-hidden if browser unsupported). Default: true */
   enableEyeDropper?: boolean;
   /** Show the color format toggle button. Default: true */

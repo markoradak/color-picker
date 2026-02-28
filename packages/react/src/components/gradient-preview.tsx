@@ -6,6 +6,8 @@ import { ColorPickerArea } from "./area";
 import { ColorPickerHueSlider } from "./hue-slider";
 import { ColorPickerAlphaSlider } from "./alpha-slider";
 import { ColorPickerInput } from "./input";
+import { ColorPickerFormatToggle } from "./format-toggle";
+import { ColorPickerEyeDropper } from "./eye-dropper";
 import { toCSS } from "../utils/css";
 import { interpolateColorAt } from "../utils/gradient";
 import { angleFromPosition, clamp } from "../utils/position";
@@ -374,18 +376,20 @@ export function GradientPreview({ className }: GradientPreviewProps) {
                 side="top"
                 sideOffset={8}
                 align="center"
-                className="z-50 w-56 rounded-xl border border-neutral-200 bg-white p-3 shadow-lg"
+                className="cp-content z-50 flex w-64 flex-col gap-3 rounded-xl border p-3"
                 onOpenAutoFocus={(e) => e.preventDefault()}
               >
                 <ColorPickerProvider
                   value={stop.color}
                   onValueChange={(color) => handleStopColorChange(stop.id, color)}
                 >
-                  <div className="flex flex-col gap-2">
-                    <ColorPickerArea className="!h-32" />
-                    <ColorPickerHueSlider />
-                    <ColorPickerAlphaSlider />
+                  <ColorPickerArea />
+                  <ColorPickerHueSlider />
+                  <ColorPickerAlphaSlider />
+                  <div className="flex items-center gap-2">
                     <ColorPickerInput />
+                    <ColorPickerFormatToggle />
+                    <ColorPickerEyeDropper />
                   </div>
                 </ColorPickerProvider>
               </Popover.Content>

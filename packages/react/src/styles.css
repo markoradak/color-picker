@@ -166,9 +166,15 @@
 
 /* Swatches grid */
 .cp-swatches button {
+  border-color: var(--cp-border);
   border-radius: var(--cp-radius-sm);
   width: var(--cp-swatch-size);
   height: var(--cp-swatch-size);
+}
+
+.cp-swatches button[aria-pressed="true"] {
+  border-color: var(--cp-active-border);
+  --tw-ring-color: var(--cp-active-border);
 }
 
 /* Mode selector */
@@ -195,7 +201,13 @@
 
 /* Gradient swatches */
 .cp-gradient-swatches button {
+  border-color: var(--cp-border);
   border-radius: var(--cp-radius-sm);
+}
+
+.cp-gradient-swatches button[aria-pressed="true"] {
+  border-color: var(--cp-active-border);
+  --tw-ring-color: var(--cp-active-border);
 }
 
 /* Gradient preview */
