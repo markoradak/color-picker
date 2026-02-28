@@ -493,6 +493,32 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         </Popover.Root>
       )}
 
+      {/* Line between first and last stops (linear only) */}
+      {gradientValue.type === "linear" && gradientValue.stops.length >= 2 && (() => {
+        const sorted = [...gradientValue.stops].sort((a, b) => a.position - b.position);
+        const first = getStopDotPosition(sorted[0]!, gradientValue);
+        const last = getStopDotPosition(sorted[sorted.length - 1]!, gradientValue);
+        return (
+          <svg
+            className="absolute inset-0 z-1 pointer-events-none"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <line
+              x1={first.x}
+              y1={first.y}
+              x2={last.x}
+              y2={last.y}
+              stroke="white"
+              strokeWidth="1.5"
+              vectorEffect="non-scaling-stroke"
+              strokeOpacity="0.6"
+            />
+          </svg>
+        );
+      })()}
+
       {/* Stop dots with popovers */}
       {gradientValue.stops.map((stop) => {
         const pos = getStopDotPosition(stop, gradientValue);
