@@ -266,6 +266,83 @@ const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
       { id: "c8e", color: "#FF4E50", position: 100 },
     ],
   },
+  // --- Mesh (8) ---
+  // Coral Reef
+  {
+    type: "mesh",
+    stops: [
+      { id: "m1a", color: "#FF6B6B", position: 0, x: 20, y: 20 },
+      { id: "m1b", color: "#FFC371", position: 50, x: 80, y: 30 },
+      { id: "m1c", color: "#4ECDC4", position: 100, x: 50, y: 80 },
+    ],
+  },
+  // Nebula
+  {
+    type: "mesh",
+    stops: [
+      { id: "m2a", color: "#7B2FBE", position: 0, x: 15, y: 15 },
+      { id: "m2b", color: "#0652DD", position: 33, x: 85, y: 25 },
+      { id: "m2c", color: "#E84393", position: 66, x: 25, y: 85 },
+      { id: "m2d", color: "#00D2D3", position: 100, x: 80, y: 75 },
+    ],
+  },
+  // Tropical
+  {
+    type: "mesh",
+    stops: [
+      { id: "m3a", color: "#F9D423", position: 0, x: 10, y: 10 },
+      { id: "m3b", color: "#FF4E50", position: 50, x: 90, y: 40 },
+      { id: "m3c", color: "#1B9CFC", position: 100, x: 40, y: 90 },
+    ],
+  },
+  // Aurora Mesh
+  {
+    type: "mesh",
+    stops: [
+      { id: "m4a", color: "#A5FECB", position: 0, x: 20, y: 10 },
+      { id: "m4b", color: "#20BDFF", position: 33, x: 80, y: 20 },
+      { id: "m4c", color: "#5433FF", position: 66, x: 50, y: 60 },
+      { id: "m4d", color: "#09203F", position: 100, x: 50, y: 95 },
+    ],
+  },
+  // Peach Blossom
+  {
+    type: "mesh",
+    stops: [
+      { id: "m5a", color: "#FFDEE9", position: 0, x: 25, y: 25 },
+      { id: "m5b", color: "#B5FFFC", position: 50, x: 75, y: 30 },
+      { id: "m5c", color: "#FFC3A0", position: 100, x: 50, y: 80 },
+    ],
+  },
+  // Deep Ocean
+  {
+    type: "mesh",
+    stops: [
+      { id: "m6a", color: "#0F2027", position: 0, x: 10, y: 10 },
+      { id: "m6b", color: "#203A43", position: 33, x: 80, y: 20 },
+      { id: "m6c", color: "#2C5364", position: 66, x: 20, y: 80 },
+      { id: "m6d", color: "#00B4DB", position: 100, x: 85, y: 85 },
+    ],
+  },
+  // Candy Pop
+  {
+    type: "mesh",
+    stops: [
+      { id: "m7a", color: "#FF00FF", position: 0, x: 15, y: 30 },
+      { id: "m7b", color: "#00FFFF", position: 33, x: 85, y: 15 },
+      { id: "m7c", color: "#FFFF00", position: 66, x: 80, y: 85 },
+      { id: "m7d", color: "#FF6B6B", position: 100, x: 20, y: 80 },
+    ],
+  },
+  // Ember
+  {
+    type: "mesh",
+    stops: [
+      { id: "m8a", color: "#1A0010", position: 0, x: 15, y: 15 },
+      { id: "m8b", color: "#FF4500", position: 50, x: 70, y: 40 },
+      { id: "m8c", color: "#FFD700", position: 100, x: 85, y: 85 },
+    ],
+  },
 ];
 
 interface PlaygroundOptions {
