@@ -100,14 +100,14 @@ export function useGradient(options: UseGradientOptions) {
 
   const setGradientType = useCallback(
     (type: GradientValue["type"]) => {
-      update({ ...gradient, type });
+      update({ ...gradient, type, startPoint: undefined, endPoint: undefined });
     },
     [gradient, update]
   );
 
   const setAngle = useCallback(
     (angle: number) => {
-      update({ ...gradient, angle });
+      update({ ...gradient, angle, startPoint: undefined, endPoint: undefined });
     },
     [gradient, update]
   );
@@ -134,6 +134,13 @@ export function useGradient(options: UseGradientOptions) {
     [gradient, update]
   );
 
+  const replaceGradient = useCallback(
+    (newGradient: GradientValue) => {
+      update(newGradient);
+    },
+    [update]
+  );
+
   const activeStop = gradient.stops.find((s) => s.id === activeStopId) ?? null;
 
   return {
@@ -152,5 +159,6 @@ export function useGradient(options: UseGradientOptions) {
     setCenter,
     setBaseColor,
     moveStop: handleMoveStop,
+    replaceGradient,
   };
 }

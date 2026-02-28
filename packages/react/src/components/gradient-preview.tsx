@@ -25,8 +25,56 @@ interface ContextMenuState {
 }
 
 /**
+ * Get the gradient direction unit vector for a linear gradient.
+ * Uses explicit endpoints if set, otherwise derives from angle.
+ */
+function getLinearDirection(gradient: GradientValue): { dx: number; dy: number } {
+  if (gradient.startPoint && gradient.endPoint) {
+    const ddx = gradient.endPoint.x - gradient.startPoint.x;
+    const ddy = gradient.endPoint.y - gradient.startPoint.y;
+    const len = Math.sqrt(ddx * ddx + ddy * ddy);
+    if (len < 1) return { dx: 1, dy: 0 };
+    return { dx: ddx / len, dy: ddy / len };
+  }
+  const rad = (((gradient.angle ?? 90) - 90) * Math.PI) / 180;
+  return { dx: Math.cos(rad), dy: Math.sin(rad) };
+}
+
+/**
+ * Compute the unclamped visual position of a linear gradient stop.
+ * Position values are coordinate-relative: position P maps to the point
+ * on the gradient line where the projection onto the gradient direction
+ * in the 0-100 coordinate space equals P.
+ */
+function getLinearStopVisual(
+  stop: GradientStop,
+  gradient: GradientValue
+): { x: number; y: number } {
+  const { dx, dy } = getLinearDirection(gradient);
+
+  if (gradient.startPoint && gradient.endPoint) {
+    const sp = gradient.startPoint;
+    const ep = gradient.endPoint;
+    const ddx = ep.x - sp.x;
+    const ddy = ep.y - sp.y;
+    const len = Math.sqrt(ddx * ddx + ddy * ddy);
+    if (len < 1) return { x: 50, y: 50 };
+    // spProj = coordinate-space position of the start point
+    const spProj = 50 + (sp.x - 50) * dx + (sp.y - 50) * dy;
+    const t = (stop.position - spProj) / len;
+    return { x: sp.x + t * ddx, y: sp.y + t * ddy };
+  }
+
+  // Default: line through center (50,50)
+  return {
+    x: 50 + (stop.position - 50) * dx,
+    y: 50 + (stop.position - 50) * dy,
+  };
+}
+
+/**
  * Compute the visual (x%, y%) position of a stop dot within the preview square.
- * Returns values in 0-100 range for CSS positioning.
+ * Returns values clamped to 2-98 for CSS positioning (keeps dots visible).
  */
 function getStopDotPosition(
   stop: GradientStop,
@@ -34,15 +82,8 @@ function getStopDotPosition(
 ): { x: number; y: number } {
   switch (gradient.type) {
     case "linear": {
-      const angle = gradient.angle ?? 90;
-      const rad = ((angle - 90) * Math.PI) / 180;
-      const cx = 50;
-      const cy = 50;
-      const t = (stop.position / 100 - 0.5) * 0.8;
-      return {
-        x: clamp(cx + Math.cos(rad) * t * 100, 2, 98),
-        y: clamp(cy + Math.sin(rad) * t * 100, 2, 98),
-      };
+      // No clamping — parent overflow:hidden clips dots at edges.
+      return getLinearStopVisual(stop, gradient);
     }
     case "radial": {
       const cx = gradient.centerX ?? 50;
@@ -87,13 +128,9 @@ function positionFromCoords(
 ): number {
   switch (gradient.type) {
     case "linear": {
-      const angle = gradient.angle ?? 90;
-      const rad = ((angle - 90) * Math.PI) / 180;
-      const dx = Math.cos(rad);
-      const dy = Math.sin(rad);
-      const dot = (mx - 50) * dx + (my - 50) * dy;
-      const t = dot / (50 * 0.8);
-      return clamp((t + 0.5) * 100, 0, 100);
+      // Coordinate-relative: project cursor onto gradient direction from center.
+      const { dx, dy } = getLinearDirection(gradient);
+      return clamp(50 + (mx - 50) * dx + (my - 50) * dy, 0, 100);
     }
     case "radial": {
       const cx = gradient.centerX ?? 50;
@@ -127,9 +164,10 @@ function positionFromCoords(
  * - **Double-click a dot**: remove it (min 2 stops enforced)
  *
  * Drag behavior per gradient type:
- * - **Linear**: rotates the gradient angle; stop positions unchanged
- * - **Radial**: adjusts stop distance from center
- * - **Conic**: rotates the start angle; stop positions unchanged
+ * - **Linear** (endpoints): free 2D drag redefines the gradient line direction
+ * - **Linear** (middle): constrained to move along the current axis
+ * - **Radial**: distance from center sets stop position
+ * - **Conic**: angle around center sets stop position
  * - **Mesh**: free-form 2D positioning
  */
 export function GradientPreview({ className }: GradientPreviewProps) {
@@ -144,9 +182,9 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     updateStopPosition,
     updateStopColor,
     updateStopCoordinates,
-    setAngle,
     setBaseColor,
     moveStop,
+    replaceGradient,
   } = gradientCtx;
 
   const previewRef = useRef<HTMLDivElement>(null);
@@ -200,6 +238,15 @@ export function GradientPreview({ className }: GradientPreviewProps) {
 
   /**
    * Pointer down on a dot → start drag tracking.
+   *
+   * For linear gradients:
+   * - First/last stops are endpoint handles — free 2D drag moves one end of
+   *   the gradient line while the opposite end stays fixed (anchor). All other
+   *   stops stay at their proportional position along the new line.
+   * - Middle stops are axis-locked — only position changes along the line.
+   *
+   * For radial/conic: all stops project onto the gradient geometry.
+   * For mesh: free 2D positioning.
    */
   const handleDotPointerDown = useCallback(
     (stopId: string, e: React.PointerEvent<HTMLButtonElement>) => {
@@ -213,6 +260,29 @@ export function GradientPreview({ className }: GradientPreviewProps) {
 
       e.currentTarget.setPointerCapture(e.pointerId);
 
+      // For linear: determine if this stop is an endpoint (first/last by position).
+      // If so, capture the opposite endpoint's visual position as anchor.
+      let isEndpoint = false;
+      let isFirstStop = false;
+      let anchorPoint: { x: number; y: number } | null = null;
+
+      if (gradientValue.type === "linear" && gradientValue.stops.length >= 2) {
+        const sorted = [...gradientValue.stops].sort(
+          (a, b) => a.position - b.position
+        );
+        const firstStop = sorted[0]!;
+        const lastStop = sorted[sorted.length - 1]!;
+        isFirstStop = firstStop.id === stopId;
+        const isLastStop = lastStop.id === stopId;
+        isEndpoint = isFirstStop || isLastStop;
+
+        if (isEndpoint) {
+          // Use the opposite stop's unclamped visual position as anchor.
+          const oppositeStop = isFirstStop ? lastStop : firstStop;
+          anchorPoint = getLinearStopVisual(oppositeStop, gradientValue);
+        }
+      }
+
       const handleMove = (ev: PointerEvent) => {
         const coords = getPreviewCoords(ev);
         if (!coords || !draggingStopId.current) return;
@@ -220,36 +290,49 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         const { mx, my } = coords;
         const sid = draggingStopId.current;
 
-        switch (gradientValue.type) {
-          case "linear": {
-            const newAngle = angleFromPosition(mx, my, 50, 50);
-            setAngle(Math.round(newAngle));
-            break;
-          }
-          case "radial": {
-            const cx = gradientValue.centerX ?? 50;
-            const cy = gradientValue.centerY ?? 50;
-            const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
-            const newPos = clamp((dist / 40) * 100, 0, 100);
-            updateStopPosition(sid, newPos);
-            break;
-          }
-          case "conic": {
-            const cx = gradientValue.centerX ?? 50;
-            const cy = gradientValue.centerY ?? 50;
-            const mouseAngle = angleFromPosition(mx, my, cx, cy);
-            const stop = gradientValue.stops.find((s) => s.id === sid);
-            if (stop) {
-              const newStart =
-                ((mouseAngle - (stop.position / 100) * 360) % 360 + 360) % 360;
-              setAngle(Math.round(newStart));
-            }
-            break;
-          }
-          case "mesh": {
-            updateStopCoordinates(sid, clamp(mx, 0, 100), clamp(my, 0, 100));
-            break;
-          }
+        if (gradientValue.type === "mesh") {
+          updateStopCoordinates(sid, clamp(mx, 0, 100), clamp(my, 0, 100));
+        } else if (isEndpoint && anchorPoint) {
+          // Endpoint: move this end of the line, anchor the opposite end.
+          const sp = isFirstStop ? { x: mx, y: my } : anchorPoint;
+          const ep = isFirstStop ? anchorPoint : { x: mx, y: my };
+
+          // Derive angle from the line direction
+          const ddx = ep.x - sp.x;
+          const ddy = ep.y - sp.y;
+          const len = Math.sqrt(ddx * ddx + ddy * ddy);
+          const newAngle =
+            len > 1
+              ? (((Math.atan2(ddy, ddx) * 180) / Math.PI + 90) % 360 + 360) % 360
+              : gradientValue.angle ?? 90;
+
+          // New direction unit vector for coordinate-relative projection
+          const newRad = ((newAngle - 90) * Math.PI) / 180;
+          const ndx = Math.cos(newRad);
+          const ndy = Math.sin(newRad);
+
+          // Recalculate every stop's position as its coordinate-space projection
+          // onto the new gradient direction. For the dragged stop, use cursor;
+          // for others, use their original visual position (from stale closure).
+          const newStops = gradientValue.stops.map((s) => {
+            const visual = s.id === sid
+              ? { x: mx, y: my }
+              : getLinearStopVisual(s, gradientValue);
+            const newPos = 50 + (visual.x - 50) * ndx + (visual.y - 50) * ndy;
+            return { ...s, position: newPos };
+          });
+
+          replaceGradient({
+            ...gradientValue,
+            angle: Math.round(newAngle),
+            startPoint: sp,
+            endPoint: ep,
+            stops: newStops,
+          });
+        } else {
+          // Middle stop or non-linear: project onto current line/geometry.
+          const newPos = positionFromCoords(mx, my, gradientValue);
+          updateStopPosition(sid, newPos);
         }
       };
 
@@ -266,9 +349,9 @@ export function GradientPreview({ className }: GradientPreviewProps) {
       disabled,
       gradientValue,
       setActiveStopId,
-      setAngle,
       updateStopPosition,
       updateStopCoordinates,
+      replaceGradient,
       getPreviewCoords,
     ]
   );
