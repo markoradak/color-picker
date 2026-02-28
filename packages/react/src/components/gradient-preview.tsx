@@ -1,6 +1,13 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
 import { useColorPickerContext } from "./color-picker-context";
+import { ColorPickerProvider } from "./color-picker-provider";
+import { ColorPickerArea } from "./area";
+import { ColorPickerHueSlider } from "./hue-slider";
+import { ColorPickerAlphaSlider } from "./alpha-slider";
+import { ColorPickerInput } from "./input";
 import { toCSS } from "../utils/css";
+import { interpolateColorAt } from "../utils/gradient";
 import { angleFromPosition, clamp } from "../utils/position";
 import type { GradientStop, GradientValue } from "../types";
 import { CHECKERBOARD_STYLE } from "./shared";
@@ -62,18 +69,60 @@ function getStopDotPosition(
 }
 
 /**
- * Visual gradient preview with interactive stop dots.
+ * Compute a stop position (0-100) from a 2D click coordinate on the preview,
+ * based on the gradient type's geometry.
+ */
+function positionFromCoords(
+  mx: number,
+  my: number,
+  gradient: GradientValue
+): number {
+  switch (gradient.type) {
+    case "linear": {
+      const angle = gradient.angle ?? 90;
+      const rad = ((angle - 90) * Math.PI) / 180;
+      const dx = Math.cos(rad);
+      const dy = Math.sin(rad);
+      const dot = (mx - 50) * dx + (my - 50) * dy;
+      const t = dot / (50 * 0.8);
+      return clamp((t + 0.5) * 100, 0, 100);
+    }
+    case "radial": {
+      const cx = gradient.centerX ?? 50;
+      const cy = gradient.centerY ?? 50;
+      const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
+      return clamp((dist / 40) * 100, 0, 100);
+    }
+    case "conic": {
+      const cx = gradient.centerX ?? 50;
+      const cy = gradient.centerY ?? 50;
+      const startAngle = gradient.angle ?? 0;
+      const mouseAngle = angleFromPosition(mx, my, cx, cy);
+      const relAngle = ((mouseAngle - startAngle) % 360 + 360) % 360;
+      return clamp((relAngle / 360) * 100, 0, 100);
+    }
+    default:
+      return clamp(mx, 0, 100);
+  }
+}
+
+/**
+ * All-in-one gradient editor preview.
  *
  * Renders the gradient as a CSS background on a square element, with
- * absolutely positioned dots for each gradient stop. Dragging handles
- * controls angle/center/coordinates depending on gradient type:
+ * absolutely positioned dots for each gradient stop.
  *
- * - **Linear**: dragging rotates the gradient angle; stop positions unchanged
- * - **Radial**: dragging adjusts stop distance from center
- * - **Conic**: dragging rotates the start angle; stop positions unchanged
+ * Interactions:
+ * - **Click empty space**: add a new stop (color interpolated, position from geometry)
+ * - **Click a dot**: open a color editing popover
+ * - **Drag a dot**: reposition/rotate depending on gradient type
+ * - **Double-click a dot**: remove it (min 2 stops enforced)
+ *
+ * Drag behavior per gradient type:
+ * - **Linear**: rotates the gradient angle; stop positions unchanged
+ * - **Radial**: adjusts stop distance from center
+ * - **Conic**: rotates the start angle; stop positions unchanged
  * - **Mesh**: free-form 2D positioning
- *
- * Stop position (0-100%) is controlled by the separate GradientStops bar.
  */
 export function GradientPreview({ className }: GradientPreviewProps) {
   const { gradient: gradientCtx, disabled } = useColorPickerContext();
@@ -81,18 +130,19 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     gradient: gradientValue,
     activeStopId,
     setActiveStopId,
+    addStop,
+    addStopWithCoordinates,
     removeStop,
     updateStopPosition,
+    updateStopColor,
     updateStopCoordinates,
     setAngle,
   } = gradientCtx;
 
   const previewRef = useRef<HTMLDivElement>(null);
   const draggingStopId = useRef<string | null>(null);
-  const listenersRef = useRef<{
-    move: (e: PointerEvent) => void;
-    up: (e: PointerEvent) => void;
-  } | null>(null);
+  const didDragRef = useRef(false);
+  const [openStopId, setOpenStopId] = useState<string | null>(null);
 
   const gradientCSS = toCSS(gradientValue);
 
@@ -100,7 +150,7 @@ export function GradientPreview({ className }: GradientPreviewProps) {
    * Get mouse position in 0-100 coordinates relative to the preview element.
    */
   const getPreviewCoords = useCallback(
-    (ev: PointerEvent | React.PointerEvent): { mx: number; my: number } | null => {
+    (ev: PointerEvent | React.PointerEvent | React.MouseEvent): { mx: number; my: number } | null => {
       const el = previewRef.current;
       if (!el) return null;
       const rect = el.getBoundingClientRect();
@@ -112,6 +162,32 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     []
   );
 
+  /**
+   * Click on empty space in the preview → add a new stop.
+   */
+  const handlePreviewClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (disabled) return;
+
+      const coords = getPreviewCoords(e);
+      if (!coords) return;
+      const { mx, my } = coords;
+
+      if (gradientValue.type === "mesh") {
+        const color = interpolateColorAt(gradientValue.stops, 50);
+        addStopWithCoordinates(color, 50, mx, my);
+      } else {
+        const position = positionFromCoords(mx, my, gradientValue);
+        const color = interpolateColorAt(gradientValue.stops, position);
+        addStop(color, position);
+      }
+    },
+    [disabled, gradientValue, addStop, addStopWithCoordinates, getPreviewCoords]
+  );
+
+  /**
+   * Pointer down on a dot → start drag tracking.
+   */
   const handleDotPointerDown = useCallback(
     (stopId: string, e: React.PointerEvent<HTMLButtonElement>) => {
       if (disabled) return;
@@ -119,26 +195,25 @@ export function GradientPreview({ className }: GradientPreviewProps) {
       e.stopPropagation();
 
       draggingStopId.current = stopId;
+      didDragRef.current = false;
       setActiveStopId(stopId);
 
-      // Capture on the button itself so we get pointermove/up even outside
       e.currentTarget.setPointerCapture(e.pointerId);
 
       const handleMove = (ev: PointerEvent) => {
         const coords = getPreviewCoords(ev);
         if (!coords || !draggingStopId.current) return;
+        didDragRef.current = true;
         const { mx, my } = coords;
         const sid = draggingStopId.current;
 
         switch (gradientValue.type) {
           case "linear": {
-            // Rotate the gradient angle to point from center toward cursor
             const newAngle = angleFromPosition(mx, my, 50, 50);
             setAngle(Math.round(newAngle));
             break;
           }
           case "radial": {
-            // Change stop position based on distance from center
             const cx = gradientValue.centerX ?? 50;
             const cy = gradientValue.centerY ?? 50;
             const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
@@ -147,7 +222,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
             break;
           }
           case "conic": {
-            // Rotate start angle based on cursor angle from center
             const cx = gradientValue.centerX ?? 50;
             const cy = gradientValue.centerY ?? 50;
             const mouseAngle = angleFromPosition(mx, my, cx, cy);
@@ -170,12 +244,10 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         draggingStopId.current = null;
         document.removeEventListener("pointermove", handleMove);
         document.removeEventListener("pointerup", handleUp);
-        listenersRef.current = null;
       };
 
       document.addEventListener("pointermove", handleMove);
       document.addEventListener("pointerup", handleUp);
-      listenersRef.current = { move: handleMove, up: handleUp };
     },
     [
       disabled,
@@ -188,13 +260,40 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     ]
   );
 
+  /**
+   * Click on a dot → open color popover (only if we didn't drag).
+   */
+  const handleDotClick = useCallback(
+    (stopId: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (disabled) return;
+      if (!didDragRef.current) {
+        setOpenStopId((prev) => (prev === stopId ? null : stopId));
+      }
+    },
+    [disabled]
+  );
+
+  /**
+   * Double-click on a dot → remove it.
+   */
   const handleDotDoubleClick = useCallback(
     (stopId: string, e: React.MouseEvent) => {
       e.stopPropagation();
       if (disabled) return;
       removeStop(stopId);
+      if (openStopId === stopId) {
+        setOpenStopId(null);
+      }
     },
-    [disabled, removeStop]
+    [disabled, removeStop, openStopId]
+  );
+
+  const handleStopColorChange = useCallback(
+    (stopId: string, color: string) => {
+      updateStopColor(stopId, color);
+    },
+    [updateStopColor]
   );
 
   return (
@@ -214,44 +313,84 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         style={CHECKERBOARD_STYLE}
         aria-hidden="true"
       />
-      {/* Gradient background */}
+      {/* Gradient background — click to add stop */}
       <div
         ref={previewRef}
-        className="absolute inset-0 rounded-lg"
+        onClick={handlePreviewClick}
+        className={[
+          "absolute inset-0 rounded-lg",
+          disabled ? "" : "cursor-crosshair",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         style={{ background: gradientCSS }}
         role="img"
         aria-label={`${gradientValue.type} gradient preview`}
       />
-      {/* Stop dots overlay */}
+      {/* Stop dots with popovers */}
       {gradientValue.stops.map((stop) => {
         const pos = getStopDotPosition(stop, gradientValue);
         const isActive = stop.id === activeStopId;
+        const isOpen = openStopId === stop.id;
+
         return (
-          <button
+          <Popover.Root
             key={stop.id}
-            type="button"
-            data-stop-dot
-            onPointerDown={(e) => handleDotPointerDown(stop.id, e)}
-            onDoubleClick={(e) => handleDotDoubleClick(stop.id, e)}
-            disabled={disabled}
-            aria-label={`Stop ${stop.color} at ${Math.round(stop.position)}%`}
-            className={[
-              "absolute -translate-x-1/2 -translate-y-1/2",
-              "h-4 w-4 rounded-full border-2 outline-none",
-              "focus-visible:ring-2 focus-visible:ring-blue-500",
-              isActive
-                ? "border-white shadow-[0_0_0_2px_rgba(59,130,246,0.8),0_1px_4px_rgba(0,0,0,0.4)] z-10"
-                : "border-white/80 shadow-[0_0_0_1px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.3)]",
-              disabled ? "cursor-not-allowed" : "cursor-grab",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            style={{
-              left: `${pos.x}%`,
-              top: `${pos.y}%`,
-              backgroundColor: stop.color,
+            open={isOpen}
+            onOpenChange={(open) => {
+              if (!open) setOpenStopId(null);
             }}
-          />
+          >
+            <Popover.Trigger asChild>
+              <button
+                type="button"
+                data-stop-dot
+                onPointerDown={(e) => handleDotPointerDown(stop.id, e)}
+                onClick={(e) => handleDotClick(stop.id, e)}
+                onDoubleClick={(e) => handleDotDoubleClick(stop.id, e)}
+                disabled={disabled}
+                aria-label={`Stop ${stop.color} at ${Math.round(stop.position)}%`}
+                className={[
+                  "absolute -translate-x-1/2 -translate-y-1/2",
+                  "h-4 w-4 rounded-full border-2 outline-none",
+                  "focus-visible:ring-2 focus-visible:ring-blue-500",
+                  isActive
+                    ? "border-white shadow-[0_0_0_2px_rgba(59,130,246,0.8),0_1px_4px_rgba(0,0,0,0.4)] z-10"
+                    : "border-white/80 shadow-[0_0_0_1px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.3)]",
+                  disabled ? "cursor-not-allowed" : "cursor-grab",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                style={{
+                  left: `${pos.x}%`,
+                  top: `${pos.y}%`,
+                  backgroundColor: stop.color,
+                }}
+              />
+            </Popover.Trigger>
+
+            <Popover.Portal>
+              <Popover.Content
+                side="top"
+                sideOffset={8}
+                align="center"
+                className="z-50 w-56 rounded-xl border border-neutral-200 bg-white p-3 shadow-lg"
+                onOpenAutoFocus={(e) => e.preventDefault()}
+              >
+                <ColorPickerProvider
+                  value={stop.color}
+                  onValueChange={(color) => handleStopColorChange(stop.id, color)}
+                >
+                  <div className="flex flex-col gap-2">
+                    <ColorPickerArea className="!h-32" />
+                    <ColorPickerHueSlider />
+                    <ColorPickerAlphaSlider />
+                    <ColorPickerInput />
+                  </div>
+                </ColorPickerProvider>
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
         );
       })}
     </div>

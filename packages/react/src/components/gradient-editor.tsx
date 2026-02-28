@@ -1,6 +1,5 @@
 import { useColorPickerContext } from "./color-picker-context";
 import { GradientPreview } from "./gradient-preview";
-import { GradientStops } from "./gradient-stops";
 
 interface GradientEditorProps {
   className?: string;
@@ -9,13 +8,13 @@ interface GradientEditorProps {
 /**
  * Self-contained gradient editing UI.
  *
- * Includes a visual gradient preview with interactive stop dots
- * and a horizontal stop bar with per-stop color editing popovers.
+ * Renders a visual gradient preview that serves as the complete editing
+ * interface. All stop manipulation happens directly on the preview:
  *
- * Angle and center-point are controlled by dragging handles in the preview:
- * - **Linear/Conic**: dragging a handle rotates the gradient, other stops follow
- * - **Radial**: dragging a handle adjusts the center position
- * - **Mesh**: handles move freely in 2D
+ * - **Click empty space**: add a new stop
+ * - **Click a stop dot**: open a color editing popover
+ * - **Drag a stop dot**: reposition/rotate depending on gradient type
+ * - **Double-click a stop dot**: remove it
  *
  * The gradient type is selected via the separate `ColorPickerModeSelector`.
  *
@@ -32,17 +31,13 @@ export function ColorPickerGradientEditor({ className }: GradientEditorProps) {
     <div
       className={[
         "cp-gradient-editor",
-        "flex flex-col gap-3",
+        "flex flex-col",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      {/* Gradient preview with draggable stop handles */}
       <GradientPreview />
-
-      {/* Gradient stops bar with per-stop color popovers */}
-      <GradientStops />
     </div>
   );
 }

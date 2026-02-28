@@ -41,18 +41,21 @@ describe("GradientEditor", () => {
     expect(preview).not.toBeNull();
   });
 
-  it("renders the gradient stops bar", () => {
-    const gradient = createDefaultGradient("linear");
-    const { container } = renderGradientEditor(gradient);
-    const stops = container.querySelector(".cp-gradient-stops");
-    expect(stops).not.toBeNull();
-  });
-
-  it("renders stop markers for each gradient stop", () => {
+  it("renders stop dots for each gradient stop", () => {
     const gradient = createDefaultGradient("linear");
     renderGradientEditor(gradient);
     // Default gradient has 2 stops
-    const stopButtons = screen.getAllByRole("button", { name: /gradient stop/i });
+    const stopButtons = screen.getAllByRole("button", { name: /stop/i });
     expect(stopButtons.length).toBe(2);
+  });
+
+  it("renders for all gradient types", () => {
+    for (const type of ["linear", "radial", "conic", "mesh"] as const) {
+      const gradient = createDefaultGradient(type);
+      const { container } = renderGradientEditor(gradient);
+      const preview = container.querySelector(".cp-gradient-preview");
+      expect(preview).not.toBeNull();
+      container.remove();
+    }
   });
 });
