@@ -35,128 +35,146 @@ const DEFAULT_SWATCHES = [
 
 const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
   // --- Linear (8) ---
+  // Sunset Glow
   {
     type: "linear",
     angle: 135,
     stops: [
-      { id: "l1a", color: "#667eea", position: 0 },
-      { id: "l1b", color: "#764ba2", position: 100 },
+      { id: "l1a", color: "#FF512F", position: 0 },
+      { id: "l1b", color: "#DD2476", position: 100 },
     ],
   },
+  // Ocean Breeze
   {
     type: "linear",
     angle: 90,
     stops: [
-      { id: "l2a", color: "#f093fb", position: 0 },
-      { id: "l2b", color: "#f5576c", position: 100 },
+      { id: "l2a", color: "#2193B0", position: 0 },
+      { id: "l2b", color: "#6DD5ED", position: 100 },
     ],
   },
+  // Aurora
   {
     type: "linear",
     angle: 135,
     stops: [
-      { id: "l3a", color: "#4facfe", position: 0 },
-      { id: "l3b", color: "#00f2fe", position: 100 },
+      { id: "l3a", color: "#5433FF", position: 0 },
+      { id: "l3b", color: "#20BDFF", position: 50 },
+      { id: "l3c", color: "#A5FECB", position: 100 },
     ],
   },
-  {
-    type: "linear",
-    angle: 135,
-    stops: [
-      { id: "l4a", color: "#43e97b", position: 0 },
-      { id: "l4b", color: "#38f9d7", position: 100 },
-    ],
-  },
-  {
-    type: "linear",
-    angle: 135,
-    stops: [
-      { id: "l5a", color: "#fa709a", position: 0 },
-      { id: "l5b", color: "#fee140", position: 100 },
-    ],
-  },
+  // Soft Blossom
   {
     type: "linear",
     angle: 90,
     stops: [
-      { id: "l6a", color: "#a18cd1", position: 0 },
-      { id: "l6b", color: "#fbc2eb", position: 100 },
+      { id: "l4a", color: "#FF9A9E", position: 0 },
+      { id: "l4b", color: "#FECFEF", position: 100 },
     ],
   },
+  // Midnight
+  {
+    type: "linear",
+    angle: 180,
+    stops: [
+      { id: "l5a", color: "#09203F", position: 0 },
+      { id: "l5b", color: "#537895", position: 100 },
+    ],
+  },
+  // Emerald Forest
+  {
+    type: "linear",
+    angle: 135,
+    stops: [
+      { id: "l6a", color: "#56AB2F", position: 0 },
+      { id: "l6b", color: "#A8E063", position: 100 },
+    ],
+  },
+  // Orchid Dusk
   {
     type: "linear",
     angle: 45,
     stops: [
-      { id: "l7a", color: "#ff9a9e", position: 0 },
-      { id: "l7b", color: "#fad0c4", position: 100 },
+      { id: "l7a", color: "#614385", position: 0 },
+      { id: "l7b", color: "#516395", position: 100 },
     ],
   },
+  // Platinum
   {
     type: "linear",
-    angle: 135,
+    angle: 90,
     stops: [
-      { id: "l8a", color: "#0c0c0c", position: 0 },
-      { id: "l8b", color: "#434343", position: 100 },
+      { id: "l8a", color: "#BDC3C7", position: 0 },
+      { id: "l8b", color: "#2C3E50", position: 100 },
     ],
   },
   // --- Radial (8) ---
+  // Solar Glow
   {
     type: "radial",
     stops: [
-      { id: "r1a", color: "#ffecd2", position: 0 },
-      { id: "r1b", color: "#fcb69f", position: 100 },
+      { id: "r1a", color: "#FFD700", position: 0 },
+      { id: "r1b", color: "#FF4500", position: 100 },
     ],
   },
+  // Violet Orb
   {
     type: "radial",
     stops: [
-      { id: "r2a", color: "#a1c4fd", position: 0 },
-      { id: "r2b", color: "#c2e9fb", position: 100 },
+      { id: "r2a", color: "#BF5AE0", position: 0 },
+      { id: "r2b", color: "#2D0845", position: 100 },
     ],
   },
+  // Cyan Pulse
   {
     type: "radial",
     stops: [
-      { id: "r3a", color: "#fbc2eb", position: 0 },
-      { id: "r3b", color: "#a6c1ee", position: 100 },
+      { id: "r3a", color: "#00F5A0", position: 0 },
+      { id: "r3b", color: "#00408A", position: 100 },
     ],
   },
+  // Crimson Spot
   {
     type: "radial",
     stops: [
-      { id: "r4a", color: "#fddb92", position: 0 },
-      { id: "r4b", color: "#d1fdff", position: 100 },
+      { id: "r4a", color: "#FF758C", position: 0 },
+      { id: "r4b", color: "#1A0010", position: 100 },
     ],
   },
+  // Arctic Glow
   {
     type: "radial",
     stops: [
-      { id: "r5a", color: "#ffffff", position: 0 },
-      { id: "r5b", color: "#e6e6e6", position: 100 },
+      { id: "r5a", color: "#E0F4FF", position: 0 },
+      { id: "r5b", color: "#1B3A5C", position: 100 },
     ],
   },
+  // Rose Vignette
   {
     type: "radial",
     stops: [
-      { id: "r6a", color: "#c1dfc4", position: 0 },
-      { id: "r6b", color: "#deecdd", position: 100 },
+      { id: "r6a", color: "#FFC3A0", position: 0 },
+      { id: "r6b", color: "#870057", position: 100 },
     ],
   },
+  // Emerald Lens
   {
     type: "radial",
     stops: [
-      { id: "r7a", color: "#f5f7fa", position: 0 },
-      { id: "r7b", color: "#c3cfe2", position: 100 },
+      { id: "r7a", color: "#93F9B9", position: 0 },
+      { id: "r7b", color: "#1D976C", position: 100 },
     ],
   },
+  // Obsidian
   {
     type: "radial",
     stops: [
-      { id: "r8a", color: "#e0c3fc", position: 0 },
-      { id: "r8b", color: "#8ec5fc", position: 100 },
+      { id: "r8a", color: "#485563", position: 0 },
+      { id: "r8b", color: "#0D0D0D", position: 100 },
     ],
   },
   // --- Conic (8) ---
+  // Color Wheel
   {
     type: "conic",
     angle: 0,
@@ -170,69 +188,82 @@ const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
       { id: "c1g", color: "#ff0000", position: 100 },
     ],
   },
+  // Sunset Cone
   {
     type: "conic",
     angle: 0,
     stops: [
-      { id: "c2a", color: "#f5af19", position: 0 },
-      { id: "c2b", color: "#f12711", position: 50 },
-      { id: "c2c", color: "#f5af19", position: 100 },
+      { id: "c2a", color: "#F5AF19", position: 0 },
+      { id: "c2b", color: "#F12711", position: 50 },
+      { id: "c2c", color: "#F5AF19", position: 100 },
     ],
   },
+  // Holographic
   {
     type: "conic",
     angle: 0,
     stops: [
-      { id: "c3a", color: "#667eea", position: 0 },
-      { id: "c3b", color: "#764ba2", position: 50 },
-      { id: "c3c", color: "#667eea", position: 100 },
+      { id: "c3a", color: "#FF6B6B", position: 0 },
+      { id: "c3b", color: "#4ECDC4", position: 25 },
+      { id: "c3c", color: "#45B7D1", position: 50 },
+      { id: "c3d", color: "#96E6A1", position: 75 },
+      { id: "c3e", color: "#FF6B6B", position: 100 },
     ],
   },
+  // Chrome
   {
     type: "conic",
     angle: 0,
     stops: [
-      { id: "c4a", color: "#00c6ff", position: 0 },
-      { id: "c4b", color: "#0072ff", position: 50 },
-      { id: "c4c", color: "#00c6ff", position: 100 },
+      { id: "c4a", color: "#E8E8E8", position: 0 },
+      { id: "c4b", color: "#7F7F7F", position: 25 },
+      { id: "c4c", color: "#E8E8E8", position: 50 },
+      { id: "c4d", color: "#7F7F7F", position: 75 },
+      { id: "c4e", color: "#E8E8E8", position: 100 },
     ],
   },
+  // Neon Pie
   {
     type: "conic",
     angle: 0,
     stops: [
-      { id: "c5a", color: "#f8f9fa", position: 0 },
-      { id: "c5b", color: "#dee2e6", position: 25 },
-      { id: "c5c", color: "#adb5bd", position: 50 },
-      { id: "c5d", color: "#dee2e6", position: 75 },
-      { id: "c5e", color: "#f8f9fa", position: 100 },
+      { id: "c5a", color: "#FF00FF", position: 0 },
+      { id: "c5b", color: "#00FFFF", position: 50 },
+      { id: "c5c", color: "#FF00FF", position: 100 },
     ],
   },
+  // Royal Spectrum
   {
     type: "conic",
     angle: 0,
     stops: [
-      { id: "c6a", color: "#43e97b", position: 0 },
-      { id: "c6b", color: "#38f9d7", position: 50 },
-      { id: "c6c", color: "#43e97b", position: 100 },
+      { id: "c6a", color: "#2D0845", position: 0 },
+      { id: "c6b", color: "#614385", position: 25 },
+      { id: "c6c", color: "#516395", position: 50 },
+      { id: "c6d", color: "#614385", position: 75 },
+      { id: "c6e", color: "#2D0845", position: 100 },
     ],
   },
+  // Forest Mandala
   {
     type: "conic",
     angle: 0,
     stops: [
-      { id: "c7a", color: "#fa709a", position: 0 },
-      { id: "c7b", color: "#fee140", position: 50 },
-      { id: "c7c", color: "#fa709a", position: 100 },
+      { id: "c7a", color: "#134E5E", position: 0 },
+      { id: "c7b", color: "#71B280", position: 50 },
+      { id: "c7c", color: "#134E5E", position: 100 },
     ],
   },
+  // Lava Sweep
   {
     type: "conic",
     angle: 0,
     stops: [
-      { id: "c8a", color: "#0c0c0c", position: 0 },
-      { id: "c8b", color: "#444444", position: 50 },
-      { id: "c8c", color: "#0c0c0c", position: 100 },
+      { id: "c8a", color: "#FF4E50", position: 0 },
+      { id: "c8b", color: "#FC913A", position: 25 },
+      { id: "c8c", color: "#F9D423", position: 50 },
+      { id: "c8d", color: "#FC913A", position: 75 },
+      { id: "c8e", color: "#FF4E50", position: 100 },
     ],
   },
 ];
