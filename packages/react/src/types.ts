@@ -91,6 +91,15 @@ export interface ColorPickerSwatchesProps {
 }
 
 /**
+ * Props for the ColorPicker.GradientSwatches component.
+ */
+export interface ColorPickerGradientSwatchesProps {
+  gradients: GradientValue[];
+  columns?: number;
+  className?: string;
+}
+
+/**
  * Props for the ColorPicker.Trigger component.
  */
 export interface ColorPickerTriggerProps {
@@ -141,10 +150,12 @@ export interface ColorPickerPresetProps {
   enableEyeDropper?: boolean;
   /** Show the color format toggle button. Default: true */
   enableFormatToggle?: boolean;
-  /** Preset swatch colors to display */
+  /** Preset swatch colors to display (solid mode) */
   swatches?: string[];
   /** Number of columns for the swatch grid. Default: 8 */
   swatchColumns?: number;
+  /** Preset gradient swatches to display (gradient mode) */
+  gradientSwatches?: GradientValue[];
   /** Additional CSS class for the outer wrapper */
   className?: string;
 }

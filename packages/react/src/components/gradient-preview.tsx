@@ -1,9 +1,7 @@
 import { useCallback, useRef } from "react";
 import { useColorPickerContext } from "./color-picker-context";
-import { usePointerDrag } from "../hooks/use-pointer-drag";
 import { toCSS } from "../utils/css";
-import { interpolateColorAt } from "../utils/gradient";
-import { clamp } from "../utils/position";
+import { angleFromPosition, clamp } from "../utils/position";
 import type { GradientStop, GradientValue } from "../types";
 import { CHECKERBOARD_STYLE } from "./shared";
 
@@ -21,45 +19,38 @@ function getStopDotPosition(
 ): { x: number; y: number } {
   switch (gradient.type) {
     case "linear": {
-      // Position along the angle axis, centered in the preview
       const angle = gradient.angle ?? 90;
       const rad = ((angle - 90) * Math.PI) / 180;
       const cx = 50;
       const cy = 50;
-      // Map position 0-100 to a line from start to end through center
-      const t = (stop.position / 100 - 0.5) * 0.8; // scale to 80% of preview
+      const t = (stop.position / 100 - 0.5) * 0.8;
       return {
         x: clamp(cx + Math.cos(rad) * t * 100, 2, 98),
         y: clamp(cy + Math.sin(rad) * t * 100, 2, 98),
       };
     }
     case "radial": {
-      // Stops radiate outward from the center
       const cx = gradient.centerX ?? 50;
       const cy = gradient.centerY ?? 50;
-      // Distance from center proportional to stop position
-      const dist = (stop.position / 100) * 40; // max 40% of preview from center
-      // Default direction: rightward from center
+      const dist = (stop.position / 100) * 40;
       return {
         x: clamp(cx + dist, 2, 98),
         y: clamp(cy, 2, 98),
       };
     }
     case "conic": {
-      // Stops arranged around a circle
       const cx = gradient.centerX ?? 50;
       const cy = gradient.centerY ?? 50;
       const startAngle = gradient.angle ?? 0;
       const stopAngle = startAngle + (stop.position / 100) * 360;
       const rad = ((stopAngle - 90) * Math.PI) / 180;
-      const radius = 30; // 30% of preview
+      const radius = 30;
       return {
         x: clamp(cx + Math.cos(rad) * radius, 2, 98),
         y: clamp(cy + Math.sin(rad) * radius, 2, 98),
       };
     }
     case "mesh": {
-      // Free-form 2D placement using x, y coordinates
       return {
         x: clamp(stop.x ?? 50, 2, 98),
         y: clamp(stop.y ?? 50, 2, 98),
@@ -74,13 +65,15 @@ function getStopDotPosition(
  * Visual gradient preview with interactive stop dots.
  *
  * Renders the gradient as a CSS background on a square element, with
- * absolutely positioned dots for each gradient stop. Supports:
+ * absolutely positioned dots for each gradient stop. Dragging handles
+ * controls angle/center/coordinates depending on gradient type:
  *
- * - Click a stop dot to select it
- * - Drag stop dots to reposition them
- * - Click empty area to add a new stop
- * - Double-click a stop to remove it (minimum 2 enforced)
- * - Handles all gradient types (linear, radial, conic, mesh)
+ * - **Linear**: dragging rotates the gradient angle; stop positions unchanged
+ * - **Radial**: dragging adjusts stop distance from center
+ * - **Conic**: dragging rotates the start angle; stop positions unchanged
+ * - **Mesh**: free-form 2D positioning
+ *
+ * Stop position (0-100%) is controlled by the separate GradientStops bar.
  */
 export function GradientPreview({ className }: GradientPreviewProps) {
   const { gradient: gradientCtx, disabled } = useColorPickerContext();
@@ -88,89 +81,116 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     gradient: gradientValue,
     activeStopId,
     setActiveStopId,
-    addStop,
-    addStopWithCoordinates,
     removeStop,
     updateStopPosition,
     updateStopCoordinates,
+    setAngle,
   } = gradientCtx;
 
   const previewRef = useRef<HTMLDivElement>(null);
   const draggingStopId = useRef<string | null>(null);
+  const listenersRef = useRef<{
+    move: (e: PointerEvent) => void;
+    up: (e: PointerEvent) => void;
+  } | null>(null);
 
-  // The CSS background for the gradient
   const gradientCSS = toCSS(gradientValue);
 
-  // Handle click on empty area to add a stop
-  const handlePreviewClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (disabled) return;
-      if ((e.target as HTMLElement).closest("[data-stop-dot]")) return;
-
+  /**
+   * Get mouse position in 0-100 coordinates relative to the preview element.
+   */
+  const getPreviewCoords = useCallback(
+    (ev: PointerEvent | React.PointerEvent): { mx: number; my: number } | null => {
       const el = previewRef.current;
-      if (!el) return;
-
+      if (!el) return null;
       const rect = el.getBoundingClientRect();
-      const x = clamp(((e.clientX - rect.left) / rect.width) * 100, 0, 100);
-      const y = clamp(((e.clientY - rect.top) / rect.height) * 100, 0, 100);
-
-      if (gradientValue.type === "mesh") {
-        // For mesh, add at the clicked x, y position
-        const color = interpolateColorAt(gradientValue.stops, 50);
-        addStopWithCoordinates(color, 50, x, y);
-      } else {
-        // For linear/radial/conic, estimate position from x coordinate
-        const position = clamp(x, 0, 100);
-        const color = interpolateColorAt(gradientValue.stops, position);
-        addStop(color, position);
-      }
+      return {
+        mx: clamp(((ev.clientX - rect.left) / rect.width) * 100, 0, 100),
+        my: clamp(((ev.clientY - rect.top) / rect.height) * 100, 0, 100),
+      };
     },
-    [disabled, gradientValue.type, gradientValue.stops, addStop, addStopWithCoordinates]
+    []
   );
 
-  // Drag handling for stop dots
-  const { handlePointerDown: handleDotPointerDown } = usePointerDrag({
-    onDrag: useCallback(
-      (pos: { x: number; y: number }) => {
-        if (disabled || !draggingStopId.current) return;
-
-        if (gradientValue.type === "mesh") {
-          // For mesh, update both x and y coordinates
-          const x = clamp(pos.x * 100, 0, 100);
-          const y = clamp(pos.y * 100, 0, 100);
-          updateStopCoordinates(draggingStopId.current, x, y);
-        } else {
-          // For linear/radial/conic, position maps to the x-axis of the bar
-          const position = clamp(pos.x * 100, 0, 100);
-          updateStopPosition(draggingStopId.current, position);
-        }
-      },
-      [disabled, gradientValue.type, updateStopPosition, updateStopCoordinates]
-    ),
-    onDragEnd: useCallback(() => {
-      draggingStopId.current = null;
-    }, []),
-  });
-
-  const handleDotMouseDown = useCallback(
+  const handleDotPointerDown = useCallback(
     (stopId: string, e: React.PointerEvent<HTMLButtonElement>) => {
       if (disabled) return;
+      e.preventDefault();
+      e.stopPropagation();
+
       draggingStopId.current = stopId;
       setActiveStopId(stopId);
-      if (previewRef.current) {
-        const syntheticEvent = {
-          ...e,
-          currentTarget: previewRef.current,
-          button: 0,
-        } as unknown as React.PointerEvent<HTMLElement>;
-        handleDotPointerDown(syntheticEvent);
-      }
+
+      // Capture on the button itself so we get pointermove/up even outside
+      e.currentTarget.setPointerCapture(e.pointerId);
+
+      const handleMove = (ev: PointerEvent) => {
+        const coords = getPreviewCoords(ev);
+        if (!coords || !draggingStopId.current) return;
+        const { mx, my } = coords;
+        const sid = draggingStopId.current;
+
+        switch (gradientValue.type) {
+          case "linear": {
+            // Rotate the gradient angle to point from center toward cursor
+            const newAngle = angleFromPosition(mx, my, 50, 50);
+            setAngle(Math.round(newAngle));
+            break;
+          }
+          case "radial": {
+            // Change stop position based on distance from center
+            const cx = gradientValue.centerX ?? 50;
+            const cy = gradientValue.centerY ?? 50;
+            const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
+            const newPos = clamp((dist / 40) * 100, 0, 100);
+            updateStopPosition(sid, newPos);
+            break;
+          }
+          case "conic": {
+            // Rotate start angle based on cursor angle from center
+            const cx = gradientValue.centerX ?? 50;
+            const cy = gradientValue.centerY ?? 50;
+            const mouseAngle = angleFromPosition(mx, my, cx, cy);
+            const stop = gradientValue.stops.find((s) => s.id === sid);
+            if (stop) {
+              const newStart =
+                ((mouseAngle - (stop.position / 100) * 360) % 360 + 360) % 360;
+              setAngle(Math.round(newStart));
+            }
+            break;
+          }
+          case "mesh": {
+            updateStopCoordinates(sid, clamp(mx, 0, 100), clamp(my, 0, 100));
+            break;
+          }
+        }
+      };
+
+      const handleUp = () => {
+        draggingStopId.current = null;
+        document.removeEventListener("pointermove", handleMove);
+        document.removeEventListener("pointerup", handleUp);
+        listenersRef.current = null;
+      };
+
+      document.addEventListener("pointermove", handleMove);
+      document.addEventListener("pointerup", handleUp);
+      listenersRef.current = { move: handleMove, up: handleUp };
     },
-    [disabled, setActiveStopId, handleDotPointerDown]
+    [
+      disabled,
+      gradientValue,
+      setActiveStopId,
+      setAngle,
+      updateStopPosition,
+      updateStopCoordinates,
+      getPreviewCoords,
+    ]
   );
 
   const handleDotDoubleClick = useCallback(
-    (stopId: string) => {
+    (stopId: string, e: React.MouseEvent) => {
+      e.stopPropagation();
       if (disabled) return;
       removeStop(stopId);
     },
@@ -197,8 +217,7 @@ export function GradientPreview({ className }: GradientPreviewProps) {
       {/* Gradient background */}
       <div
         ref={previewRef}
-        onClick={handlePreviewClick}
-        className="absolute inset-0 cursor-crosshair rounded-lg"
+        className="absolute inset-0 rounded-lg"
         style={{ background: gradientCSS }}
         role="img"
         aria-label={`${gradientValue.type} gradient preview`}
@@ -212,8 +231,8 @@ export function GradientPreview({ className }: GradientPreviewProps) {
             key={stop.id}
             type="button"
             data-stop-dot
-            onPointerDown={(e) => handleDotMouseDown(stop.id, e)}
-            onDoubleClick={() => handleDotDoubleClick(stop.id)}
+            onPointerDown={(e) => handleDotPointerDown(stop.id, e)}
+            onDoubleClick={(e) => handleDotDoubleClick(stop.id, e)}
             disabled={disabled}
             aria-label={`Stop ${stop.color} at ${Math.round(stop.position)}%`}
             className={[

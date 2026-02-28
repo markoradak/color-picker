@@ -34,19 +34,6 @@ describe("GradientEditor", () => {
     expect(editor).not.toBeNull();
   });
 
-  it("shows angle input for linear gradient", () => {
-    const gradient = createDefaultGradient("linear");
-    renderGradientEditor(gradient);
-    expect(screen.getByLabelText(/angle/i)).toBeInTheDocument();
-  });
-
-  it("shows center inputs for radial gradient", () => {
-    const gradient = createDefaultGradient("radial");
-    renderGradientEditor(gradient);
-    expect(screen.getByLabelText(/center x/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/center y/i)).toBeInTheDocument();
-  });
-
   it("renders the gradient preview", () => {
     const gradient = createDefaultGradient("linear");
     const { container } = renderGradientEditor(gradient);
@@ -67,20 +54,5 @@ describe("GradientEditor", () => {
     // Default gradient has 2 stops
     const stopButtons = screen.getAllByRole("button", { name: /gradient stop/i });
     expect(stopButtons.length).toBe(2);
-  });
-
-  it("shows angle and center for conic gradient", () => {
-    const gradient = createDefaultGradient("conic");
-    renderGradientEditor(gradient);
-    expect(screen.getByLabelText(/angle/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/center x/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/center y/i)).toBeInTheDocument();
-  });
-
-  it("hides angle/center controls for mesh gradient", () => {
-    const gradient = createDefaultGradient("mesh");
-    renderGradientEditor(gradient);
-    expect(screen.queryByLabelText(/angle/i)).toBeNull();
-    expect(screen.queryByLabelText(/center x/i)).toBeNull();
   });
 });

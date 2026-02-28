@@ -11,12 +11,13 @@ import {
   ColorPickerEyeDropper,
   ColorPickerSwatches,
   ColorPickerGradientEditor,
+  ColorPickerGradientSwatches,
   ColorPickerModeSelector,
   ColorPickerTrigger,
   ColorPickerContent,
   toCSS,
 } from "@markoradak/color-picker";
-import type { ColorPickerValue } from "@markoradak/color-picker";
+import type { ColorPickerValue, GradientValue } from "@markoradak/color-picker";
 import { CopyButton } from "../copy-button";
 
 const DEFAULT_COLOR = "#3b82f6";
@@ -30,6 +31,75 @@ const DEFAULT_SWATCHES = [
   "#3b82f6",
   "#8b5cf6",
   "#ec4899",
+];
+
+const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
+  {
+    type: "linear",
+    angle: 135,
+    stops: [
+      { id: "gs1a", color: "#667eea", position: 0 },
+      { id: "gs1b", color: "#764ba2", position: 100 },
+    ],
+  },
+  {
+    type: "linear",
+    angle: 90,
+    stops: [
+      { id: "gs2a", color: "#f093fb", position: 0 },
+      { id: "gs2b", color: "#f5576c", position: 100 },
+    ],
+  },
+  {
+    type: "linear",
+    angle: 135,
+    stops: [
+      { id: "gs3a", color: "#4facfe", position: 0 },
+      { id: "gs3b", color: "#00f2fe", position: 100 },
+    ],
+  },
+  {
+    type: "linear",
+    angle: 135,
+    stops: [
+      { id: "gs4a", color: "#43e97b", position: 0 },
+      { id: "gs4b", color: "#38f9d7", position: 100 },
+    ],
+  },
+  {
+    type: "linear",
+    angle: 135,
+    stops: [
+      { id: "gs5a", color: "#fa709a", position: 0 },
+      { id: "gs5b", color: "#fee140", position: 100 },
+    ],
+  },
+  {
+    type: "linear",
+    angle: 90,
+    stops: [
+      { id: "gs6a", color: "#a18cd1", position: 0 },
+      { id: "gs6b", color: "#fbc2eb", position: 100 },
+    ],
+  },
+  {
+    type: "radial",
+    stops: [
+      { id: "gs7a", color: "#ffecd2", position: 0 },
+      { id: "gs7b", color: "#fcb69f", position: 100 },
+    ],
+  },
+  {
+    type: "conic",
+    angle: 0,
+    stops: [
+      { id: "gs8a", color: "#ff0000", position: 0 },
+      { id: "gs8b", color: "#ffff00", position: 25 },
+      { id: "gs8c", color: "#00ff00", position: 50 },
+      { id: "gs8d", color: "#0000ff", position: 75 },
+      { id: "gs8e", color: "#ff0000", position: 100 },
+    ],
+  },
 ];
 
 interface PlaygroundOptions {
@@ -372,7 +442,12 @@ function InlinePicker({
         <div className="flex flex-col gap-3">
           {options.enableGradient && <ColorPickerModeSelector />}
           {isGradientMode ? (
-            <ColorPickerGradientEditor />
+            <>
+              <ColorPickerGradientEditor />
+              {options.showSwatches && (
+                <ColorPickerGradientSwatches gradients={DEFAULT_GRADIENT_SWATCHES} />
+              )}
+            </>
           ) : (
             <>
               <ColorPickerArea />
@@ -415,7 +490,12 @@ function PopoverPicker({
       <ColorPickerContent>
         {options.enableGradient && <ColorPickerModeSelector />}
         {isGradientMode ? (
-          <ColorPickerGradientEditor />
+          <>
+            <ColorPickerGradientEditor />
+            {options.showSwatches && (
+              <ColorPickerGradientSwatches gradients={DEFAULT_GRADIENT_SWATCHES} />
+            )}
+          </>
         ) : (
           <>
             <ColorPickerArea />

@@ -4,7 +4,7 @@ import type { ColorPickerProps, GradientValue } from "../types";
 import { useColorPicker } from "../hooks/use-color-picker";
 import { useGradient } from "../hooks/use-gradient";
 import { isGradient } from "../utils/css";
-import { ColorPickerContext, useColorPickerContext } from "./color-picker-context";
+import { ColorPickerContext } from "./color-picker-context";
 import { ColorPickerTrigger } from "./trigger";
 import { ColorPickerContent } from "./content";
 import { ColorPickerArea } from "./area";
@@ -17,6 +17,7 @@ import { ColorPickerSwatches } from "./swatches";
 import { ColorPickerGradientEditor } from "./gradient-editor";
 import { ColorPickerModeSelector } from "./mode-selector";
 import { ColorPickerProvider } from "./color-picker-provider";
+import { ColorPickerGradientSwatches } from "./gradient-swatches";
 
 // Re-export for backward compatibility
 export { useColorPickerContext } from "./color-picker-context";
@@ -101,4 +102,5 @@ ColorPicker.EyeDropper = ColorPickerEyeDropper;
 ColorPicker.Swatches = ColorPickerSwatches;
 ColorPicker.GradientEditor = ColorPickerGradientEditor;
 ColorPicker.ModeSelector = ColorPickerModeSelector;
+ColorPicker.GradientSwatches = ColorPickerGradientSwatches;
 ColorPicker.Provider = ColorPickerProvider;

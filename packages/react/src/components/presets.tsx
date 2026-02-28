@@ -18,6 +18,7 @@ import { ColorPickerEyeDropper } from "./eye-dropper";
 import { ColorPickerSwatches } from "./swatches";
 import { ColorPickerGradientEditor } from "./gradient-editor";
 import { ColorPickerModeSelector } from "./mode-selector";
+import { ColorPickerGradientSwatches } from "./gradient-swatches";
 
 /**
  * Shared inner controls rendered by both popover and inline presets.
@@ -35,6 +36,7 @@ function ColorPickerControls({
   enableFormatToggle = true,
   swatches,
   swatchColumns = 8,
+  gradientSwatches,
 }: {
   enableAlpha?: boolean;
   enableGradient?: boolean;
@@ -42,6 +44,7 @@ function ColorPickerControls({
   enableFormatToggle?: boolean;
   swatches?: string[];
   swatchColumns?: number;
+  gradientSwatches?: import("../types").GradientValue[];
 }) {
   const { isGradientMode } = useColorPickerContext();
 
@@ -50,8 +53,13 @@ function ColorPickerControls({
       {enableGradient && <ColorPickerModeSelector />}
 
       {isGradientMode ? (
-        // Gradient mode: show gradient editor (preview, stops with per-stop popovers, angle/center)
-        <ColorPickerGradientEditor />
+        // Gradient mode: show gradient editor (preview, stops with per-stop popovers)
+        <>
+          <ColorPickerGradientEditor />
+          {gradientSwatches && gradientSwatches.length > 0 && (
+            <ColorPickerGradientSwatches gradients={gradientSwatches} />
+          )}
+        </>
       ) : (
         // Solid mode: show standard color picker controls
         <>
@@ -103,6 +111,7 @@ export function ColorPickerPopover({
   enableFormatToggle = true,
   swatches,
   swatchColumns = 8,
+  gradientSwatches,
   side = "bottom",
   align = "center",
   sideOffset = 4,
@@ -131,6 +140,7 @@ export function ColorPickerPopover({
           enableFormatToggle={enableFormatToggle}
           swatches={swatches}
           swatchColumns={swatchColumns}
+          gradientSwatches={gradientSwatches}
         />
       </ColorPickerContent>
     </ColorPicker>
@@ -165,6 +175,7 @@ export function ColorPickerInline({
   enableFormatToggle = true,
   swatches,
   swatchColumns = 8,
+  gradientSwatches,
   className,
 }: ColorPickerInlineProps) {
   return (
@@ -190,6 +201,7 @@ export function ColorPickerInline({
           enableFormatToggle={enableFormatToggle}
           swatches={swatches}
           swatchColumns={swatchColumns}
+          gradientSwatches={gradientSwatches}
         />
       </div>
     </ColorPicker>

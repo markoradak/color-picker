@@ -6,7 +6,6 @@ import { ColorPickerArea } from "./area";
 import { ColorPickerHueSlider } from "./hue-slider";
 import { ColorPickerAlphaSlider } from "./alpha-slider";
 import { ColorPickerInput } from "./input";
-import { usePointerDrag } from "../hooks/use-pointer-drag";
 import { interpolateColorAt, sortStops } from "../utils/gradient";
 import { clamp } from "../utils/position";
 
@@ -71,43 +70,43 @@ export function GradientStops({ className }: GradientStopsProps) {
     [disabled, gradientValue.stops, addStop]
   );
 
-  // Drag handling for stop markers
-  const { handlePointerDown: handleStopPointerDown } = usePointerDrag({
-    onDrag: useCallback(
-      (pos: { x: number }) => {
-        if (disabled || !draggingStopId.current) return;
-        didDragRef.current = true;
-        const position = clamp(pos.x * 100, 0, 100);
-        updateStopPosition(draggingStopId.current, position);
-      },
-      [disabled, updateStopPosition]
-    ),
-    onDragEnd: useCallback(() => {
-      draggingStopId.current = null;
-    }, []),
-  });
-
-  const handleStopMouseDown = useCallback(
+  const handleStopPointerDown = useCallback(
     (stopId: string, e: React.PointerEvent<HTMLButtonElement>) => {
       if (disabled) return;
+      e.preventDefault();
+      e.stopPropagation();
+
       draggingStopId.current = stopId;
       didDragRef.current = false;
       setActiveStopId(stopId);
-      // Forward the pointer event to the bar element for drag tracking
-      if (barRef.current) {
-        const syntheticEvent = {
-          ...e,
-          currentTarget: barRef.current,
-          button: 0,
-        } as unknown as React.PointerEvent<HTMLElement>;
-        handleStopPointerDown(syntheticEvent);
-      }
+
+      // Capture on the button itself
+      e.currentTarget.setPointerCapture(e.pointerId);
+
+      const handleMove = (ev: PointerEvent) => {
+        const bar = barRef.current;
+        if (!bar || !draggingStopId.current) return;
+        didDragRef.current = true;
+        const rect = bar.getBoundingClientRect();
+        const position = clamp(((ev.clientX - rect.left) / rect.width) * 100, 0, 100);
+        updateStopPosition(draggingStopId.current, position);
+      };
+
+      const handleUp = () => {
+        draggingStopId.current = null;
+        document.removeEventListener("pointermove", handleMove);
+        document.removeEventListener("pointerup", handleUp);
+      };
+
+      document.addEventListener("pointermove", handleMove);
+      document.addEventListener("pointerup", handleUp);
     },
-    [disabled, setActiveStopId, handleStopPointerDown]
+    [disabled, setActiveStopId, updateStopPosition]
   );
 
   const handleStopClick = useCallback(
-    (stopId: string) => {
+    (stopId: string, e: React.MouseEvent) => {
+      e.stopPropagation();
       if (disabled) return;
       // Only open popover if we didn't drag
       if (!didDragRef.current) {
@@ -118,7 +117,8 @@ export function GradientStops({ className }: GradientStopsProps) {
   );
 
   const handleStopDoubleClick = useCallback(
-    (stopId: string) => {
+    (stopId: string, e: React.MouseEvent) => {
+      e.stopPropagation();
       if (disabled) return;
       removeStop(stopId);
       if (openStopId === stopId) {
@@ -178,9 +178,9 @@ export function GradientStops({ className }: GradientStopsProps) {
                 <button
                   type="button"
                   data-stop-id={stop.id}
-                  onPointerDown={(e) => handleStopMouseDown(stop.id, e)}
-                  onClick={() => handleStopClick(stop.id)}
-                  onDoubleClick={() => handleStopDoubleClick(stop.id)}
+                  onPointerDown={(e) => handleStopPointerDown(stop.id, e)}
+                  onClick={(e) => handleStopClick(stop.id, e)}
+                  onDoubleClick={(e) => handleStopDoubleClick(stop.id, e)}
                   disabled={disabled}
                   aria-label={`Gradient stop at ${Math.round(stop.position)}%, color ${stop.color}`}
                   aria-pressed={isActive}

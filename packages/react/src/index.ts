@@ -12,6 +12,7 @@ export { ColorPickerFormatToggle } from "./components/format-toggle";
 export { ColorPickerEyeDropper } from "./components/eye-dropper";
 export { ColorPickerSwatches } from "./components/swatches";
 export { ColorPickerGradientEditor } from "./components/gradient-editor";
+export { ColorPickerGradientSwatches } from "./components/gradient-swatches";
 export { GradientPreview } from "./components/gradient-preview";
 export { GradientStops } from "./components/gradient-stops";
 
@@ -44,6 +45,7 @@ export type {
   ColorPickerSliderProps,
   ColorPickerInputProps,
   ColorPickerSwatchesProps,
+  ColorPickerGradientSwatchesProps,
   ColorPickerTriggerProps,
   ColorPickerContentProps,
   ColorPickerPresetProps,

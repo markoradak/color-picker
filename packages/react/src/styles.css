@@ -171,41 +171,31 @@
   height: var(--cp-swatch-size);
 }
 
-/* Gradient editor */
-.cp-gradient-editor {
-  gap: var(--cp-gap);
-}
-
-.cp-gradient-editor input[type="number"] {
-  background-color: var(--cp-input-bg);
-  border-color: var(--cp-input-border);
-  border-radius: var(--cp-radius-sm);
-  color: var(--cp-text);
-}
-
-.cp-gradient-editor input[type="number"]:focus {
-  border-color: var(--cp-border-focus);
-}
-
-.cp-gradient-editor span {
-  color: var(--cp-text-muted);
-}
-
-/* Gradient type selector */
-.cp-gradient-editor [role="radiogroup"] {
+/* Mode selector */
+.cp-mode-selector {
   background-color: var(--cp-bg-secondary);
   border-color: var(--cp-border);
   border-radius: var(--cp-radius-sm);
 }
 
-.cp-gradient-editor [role="radio"][aria-checked="true"] {
+.cp-mode-selector [role="radio"][aria-checked="true"] {
   background-color: var(--cp-bg);
   color: var(--cp-text);
   box-shadow: var(--cp-shadow-sm);
 }
 
-.cp-gradient-editor [role="radio"][aria-checked="false"] {
+.cp-mode-selector [role="radio"][aria-checked="false"] {
   color: var(--cp-text-muted);
+}
+
+/* Gradient editor */
+.cp-gradient-editor {
+  gap: var(--cp-gap);
+}
+
+/* Gradient swatches */
+.cp-gradient-swatches button {
+  border-radius: var(--cp-radius-sm);
 }
 
 /* Gradient preview */
