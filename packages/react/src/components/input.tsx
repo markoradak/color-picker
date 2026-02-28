@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ColorPickerInputProps } from "../types";
-import { useColorPickerContext } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 import { isValidColor } from "../utils/color";
 
 /**

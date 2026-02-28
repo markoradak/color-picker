@@ -1,5 +1,11 @@
-import { useCallback, useRef } from "react";
-import { useColorPickerContext } from "./color-picker";
+import { useCallback, useRef, useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
+import { useColorPickerContext } from "./color-picker-context";
+import { ColorPickerProvider } from "./color-picker-provider";
+import { ColorPickerArea } from "./area";
+import { ColorPickerHueSlider } from "./hue-slider";
+import { ColorPickerAlphaSlider } from "./alpha-slider";
+import { ColorPickerInput } from "./input";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
 import { interpolateColorAt, sortStops } from "../utils/gradient";
 import { clamp } from "../utils/position";
@@ -12,10 +18,12 @@ interface GradientStopsProps {
  * Horizontal gradient stop bar.
  *
  * Renders the current gradient as a horizontal bar background with
- * draggable stop markers along the bottom edge. Supports:
+ * draggable stop markers along the bottom edge. Each stop marker
+ * opens a popover with a mini color picker for editing the stop's color.
  *
- * - Click a stop marker to select it (sets activeStopId)
- * - Drag a stop marker to reposition it (0-100)
+ * Supports:
+ * - Click a stop marker to open its color editing popover
+ * - Drag a stop marker to reposition it (0-100) -- popover stays closed
  * - Click empty space on the bar to add a new stop (color interpolated from neighbours)
  * - Double-click a stop marker to remove it (minimum 2 stops enforced)
  * - Active stop is highlighted with a ring indicator
@@ -29,10 +37,13 @@ export function GradientStops({ className }: GradientStopsProps) {
     addStop,
     removeStop,
     updateStopPosition,
+    updateStopColor,
   } = gradient;
 
   const barRef = useRef<HTMLDivElement>(null);
   const draggingStopId = useRef<string | null>(null);
+  const didDragRef = useRef(false);
+  const [openStopId, setOpenStopId] = useState<string | null>(null);
 
   // Build the gradient CSS for the bar background (always render as linear left-to-right)
   const barCSS = (() => {
@@ -65,6 +76,7 @@ export function GradientStops({ className }: GradientStopsProps) {
     onDrag: useCallback(
       (pos: { x: number }) => {
         if (disabled || !draggingStopId.current) return;
+        didDragRef.current = true;
         const position = clamp(pos.x * 100, 0, 100);
         updateStopPosition(draggingStopId.current, position);
       },
@@ -79,6 +91,7 @@ export function GradientStops({ className }: GradientStopsProps) {
     (stopId: string, e: React.PointerEvent<HTMLButtonElement>) => {
       if (disabled) return;
       draggingStopId.current = stopId;
+      didDragRef.current = false;
       setActiveStopId(stopId);
       // Forward the pointer event to the bar element for drag tracking
       if (barRef.current) {
@@ -93,12 +106,33 @@ export function GradientStops({ className }: GradientStopsProps) {
     [disabled, setActiveStopId, handleStopPointerDown]
   );
 
+  const handleStopClick = useCallback(
+    (stopId: string) => {
+      if (disabled) return;
+      // Only open popover if we didn't drag
+      if (!didDragRef.current) {
+        setOpenStopId((prev) => (prev === stopId ? null : stopId));
+      }
+    },
+    [disabled]
+  );
+
   const handleStopDoubleClick = useCallback(
     (stopId: string) => {
       if (disabled) return;
       removeStop(stopId);
+      if (openStopId === stopId) {
+        setOpenStopId(null);
+      }
     },
-    [disabled, removeStop]
+    [disabled, removeStop, openStopId]
+  );
+
+  const handleStopColorChange = useCallback(
+    (stopId: string, color: string) => {
+      updateStopColor(stopId, color);
+    },
+    [updateStopColor]
   );
 
   return (
@@ -130,32 +164,66 @@ export function GradientStops({ className }: GradientStopsProps) {
       <div className="relative h-5 w-full">
         {gradientValue.stops.map((stop) => {
           const isActive = stop.id === activeStopId;
+          const isOpen = openStopId === stop.id;
+
           return (
-            <button
+            <Popover.Root
               key={stop.id}
-              type="button"
-              data-stop-id={stop.id}
-              onPointerDown={(e) => handleStopMouseDown(stop.id, e)}
-              onDoubleClick={() => handleStopDoubleClick(stop.id)}
-              disabled={disabled}
-              aria-label={`Gradient stop at ${Math.round(stop.position)}%, color ${stop.color}`}
-              aria-pressed={isActive}
-              className={[
-                "absolute top-0 -translate-x-1/2",
-                "h-4 w-4 rounded-full border-2 outline-none",
-                "focus-visible:ring-2 focus-visible:ring-blue-500",
-                isActive
-                  ? "border-white shadow-[0_0_0_2px_rgba(59,130,246,0.8),0_1px_3px_rgba(0,0,0,0.3)] z-10"
-                  : "border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.2)]",
-                disabled ? "cursor-not-allowed" : "cursor-grab",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              style={{
-                left: `${stop.position}%`,
-                backgroundColor: stop.color,
+              open={isOpen}
+              onOpenChange={(open) => {
+                if (!open) setOpenStopId(null);
               }}
-            />
+            >
+              <Popover.Trigger asChild>
+                <button
+                  type="button"
+                  data-stop-id={stop.id}
+                  onPointerDown={(e) => handleStopMouseDown(stop.id, e)}
+                  onClick={() => handleStopClick(stop.id)}
+                  onDoubleClick={() => handleStopDoubleClick(stop.id)}
+                  disabled={disabled}
+                  aria-label={`Gradient stop at ${Math.round(stop.position)}%, color ${stop.color}`}
+                  aria-pressed={isActive}
+                  className={[
+                    "absolute top-0 -translate-x-1/2",
+                    "h-4 w-4 rounded-full border-2 outline-none",
+                    "focus-visible:ring-2 focus-visible:ring-blue-500",
+                    isActive
+                      ? "border-white shadow-[0_0_0_2px_rgba(59,130,246,0.8),0_1px_3px_rgba(0,0,0,0.3)] z-10"
+                      : "border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.2)]",
+                    disabled ? "cursor-not-allowed" : "cursor-grab",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  style={{
+                    left: `${stop.position}%`,
+                    backgroundColor: stop.color,
+                  }}
+                />
+              </Popover.Trigger>
+
+              <Popover.Portal>
+                <Popover.Content
+                  side="top"
+                  sideOffset={8}
+                  align="center"
+                  className="z-50 w-56 rounded-xl border border-neutral-200 bg-white p-3 shadow-lg"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <ColorPickerProvider
+                    value={stop.color}
+                    onValueChange={(color) => handleStopColorChange(stop.id, color)}
+                  >
+                    <div className="flex flex-col gap-2">
+                      <ColorPickerArea className="!h-32" />
+                      <ColorPickerHueSlider />
+                      <ColorPickerAlphaSlider />
+                      <ColorPickerInput />
+                    </div>
+                  </ColorPickerProvider>
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
           );
         })}
       </div>

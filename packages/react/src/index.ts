@@ -1,5 +1,7 @@
 // Components
 export { ColorPicker, useColorPickerContext } from "./components/color-picker";
+export { ColorPickerProvider } from "./components/color-picker-provider";
+export { ColorPickerModeSelector } from "./components/mode-selector";
 export { ColorPickerTrigger } from "./components/trigger";
 export { ColorPickerContent } from "./components/content";
 export { ColorPickerArea } from "./components/area";
@@ -19,7 +21,7 @@ export { ColorPickerPopover, ColorPickerInline } from "./components/presets";
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
 export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor } from "./utils/color";
-export { createGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, createDefaultGradient, interpolateColorAt } from "./utils/gradient";
+export { createGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, createDefaultGradient, createDefaultGradientFromColor, interpolateColorAt } from "./utils/gradient";
 export { clamp, getRelativePosition, angleFromPosition } from "./utils/position";
 
 // Hooks
@@ -31,10 +33,13 @@ export { useGradient } from "./hooks/use-gradient";
 export type {
   SolidColor,
   ColorFormat,
+  ColorPickerMode,
   GradientStop,
   GradientValue,
   ColorPickerValue,
   ColorPickerProps,
+  ColorPickerProviderProps,
+  ColorPickerModeSelectorProps,
   ColorPickerAreaProps,
   ColorPickerSliderProps,
   ColorPickerInputProps,

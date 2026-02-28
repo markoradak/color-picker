@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import type { ColorPickerTriggerProps } from "../types";
-import { useColorPickerContext } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 import { fromHSVA } from "../utils/color";
 import { CHECKERBOARD_STYLE } from "./shared";
 

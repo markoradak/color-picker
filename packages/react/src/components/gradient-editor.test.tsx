@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { ColorPicker } from "./color-picker";
 import { createDefaultGradient } from "../utils/gradient";
-import type { ColorPickerValue, GradientValue } from "../types";
+import type { ColorPickerValue } from "../types";
 
 /**
  * Helper to render a gradient editor inside the ColorPicker context.
@@ -32,36 +32,6 @@ describe("GradientEditor", () => {
     const { container } = renderGradientEditor(gradient);
     const editor = container.querySelector(".cp-gradient-editor");
     expect(editor).not.toBeNull();
-  });
-
-  it("renders gradient type selector with all four types", () => {
-    const gradient = createDefaultGradient("linear");
-    renderGradientEditor(gradient);
-    expect(screen.getByRole("radio", { name: /linear/i })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /radial/i })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /conic/i })).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: /mesh/i })).toBeInTheDocument();
-  });
-
-  it("marks the active gradient type", () => {
-    const gradient = createDefaultGradient("linear");
-    renderGradientEditor(gradient);
-    const linearBtn = screen.getByRole("radio", { name: /linear/i });
-    expect(linearBtn).toHaveAttribute("aria-checked", "true");
-    const radialBtn = screen.getByRole("radio", { name: /radial/i });
-    expect(radialBtn).toHaveAttribute("aria-checked", "false");
-  });
-
-  it("switches gradient type on click", () => {
-    const onChange = vi.fn();
-    const gradient = createDefaultGradient("linear");
-    renderGradientEditor(gradient, onChange);
-
-    fireEvent.click(screen.getByRole("radio", { name: /radial/i }));
-
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "radial" })
-    );
   });
 
   it("shows angle input for linear gradient", () => {

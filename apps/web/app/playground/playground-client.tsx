@@ -11,24 +11,15 @@ import {
   ColorPickerEyeDropper,
   ColorPickerSwatches,
   ColorPickerGradientEditor,
+  ColorPickerModeSelector,
   ColorPickerTrigger,
   ColorPickerContent,
   toCSS,
 } from "@markoradak/color-picker";
-import type { ColorPickerValue, GradientValue } from "@markoradak/color-picker";
+import type { ColorPickerValue } from "@markoradak/color-picker";
 import { CopyButton } from "../copy-button";
 
-const DEFAULT_SOLID = "#3b82f6";
-
-const DEFAULT_GRADIENT: GradientValue = {
-  type: "linear",
-  angle: 135,
-  stops: [
-    { id: "s1", color: "#3b82f6", position: 0 },
-    { id: "s2", color: "#8b5cf6", position: 50 },
-    { id: "s3", color: "#ec4899", position: 100 },
-  ],
-};
+const DEFAULT_COLOR = "#3b82f6";
 
 const DEFAULT_SWATCHES = [
   "#ef4444",
@@ -42,13 +33,13 @@ const DEFAULT_SWATCHES = [
 ];
 
 interface PlaygroundOptions {
-  mode: "solid" | "gradient";
   variant: "inline" | "popover";
   showAlpha: boolean;
   showEyeDropper: boolean;
   showSwatches: boolean;
   showFormatToggle: boolean;
   showInput: boolean;
+  enableGradient: boolean;
   swatchColors: string[];
 }
 
@@ -140,31 +131,36 @@ function generateCode(options: PlaygroundOptions): string {
   if (options.showFormatToggle) imports.push("ColorPickerFormatToggle");
   if (options.showEyeDropper) imports.push("ColorPickerEyeDropper");
   if (options.showSwatches) imports.push("ColorPickerSwatches");
-  if (options.mode === "gradient") imports.push("ColorPickerGradientEditor");
+  if (options.enableGradient) {
+    imports.push("ColorPickerModeSelector");
+    imports.push("ColorPickerGradientEditor");
+  }
   if (options.variant === "popover") {
     imports.push("ColorPickerTrigger");
     imports.push("ColorPickerContent");
   }
-  if (options.mode === "gradient") imports.push("toCSS");
 
   const importLine = `import {\n  ${imports.join(",\n  ")},\n} from "@markoradak/color-picker";`;
 
   let typeLine = "";
-  if (options.mode === "gradient") {
+  if (options.enableGradient) {
     typeLine = `\nimport type { ColorPickerValue } from "@markoradak/color-picker";\n`;
   }
 
   let stateLine: string;
-  if (options.mode === "gradient") {
-    stateLine = `const [value, setValue] = useState<ColorPickerValue>({\n    type: "linear",\n    angle: 135,\n    stops: [\n      { id: "1", color: "#3b82f6", position: 0 },\n      { id: "2", color: "#ec4899", position: 100 },\n    ],\n  });`;
+  if (options.enableGradient) {
+    stateLine = `const [value, setValue] = useState<ColorPickerValue>("${DEFAULT_COLOR}");`;
   } else {
-    stateLine = `const [color, setColor] = useState("${DEFAULT_SOLID}");`;
+    stateLine = `const [color, setColor] = useState("${DEFAULT_COLOR}");`;
   }
 
-  const valueVar = options.mode === "gradient" ? "value" : "color";
-  const setterVar = options.mode === "gradient" ? "setValue" : "setColor";
+  const valueVar = options.enableGradient ? "value" : "color";
+  const setterVar = options.enableGradient ? "setValue" : "setColor";
 
   const parts: string[] = [];
+  if (options.enableGradient) {
+    parts.push("    <ColorPickerModeSelector />");
+  }
   parts.push("    <ColorPickerArea />");
   parts.push("    <ColorPickerHueSlider />");
   if (options.showAlpha) parts.push("    <ColorPickerAlphaSlider />");
@@ -183,7 +179,7 @@ function generateCode(options: PlaygroundOptions): string {
     parts.push(`    <ColorPickerSwatches colors={[${swatchesStr}]} />`);
   }
 
-  if (options.mode === "gradient") {
+  if (options.enableGradient) {
     parts.push("    <ColorPickerGradientEditor />");
   }
 
@@ -216,22 +212,17 @@ ${jsx}
 
 export function PlaygroundClient() {
   const [options, setOptions] = useState<PlaygroundOptions>({
-    mode: "solid",
     variant: "inline",
     showAlpha: true,
     showEyeDropper: true,
     showSwatches: true,
     showFormatToggle: true,
     showInput: true,
+    enableGradient: true,
     swatchColors: DEFAULT_SWATCHES,
   });
 
-  const [solidColor, setSolidColor] = useState<ColorPickerValue>(DEFAULT_SOLID);
-  const [gradientColor, setGradientColor] =
-    useState<ColorPickerValue>(DEFAULT_GRADIENT);
-
-  const value = options.mode === "gradient" ? gradientColor : solidColor;
-  const setValue = options.mode === "gradient" ? setGradientColor : setSolidColor;
+  const [value, setValue] = useState<ColorPickerValue>(DEFAULT_COLOR);
   const cssValue = typeof value === "string" ? value : toCSS(value);
 
   const generatedCode = useMemo(() => generateCode(options), [options]);
@@ -295,17 +286,6 @@ export function PlaygroundClient() {
           </h2>
           <div className="flex flex-col gap-4">
             <SegmentedControl
-              label="Mode"
-              options={[
-                { value: "solid", label: "Solid" },
-                { value: "gradient", label: "Gradient" },
-              ]}
-              value={options.mode}
-              onChange={(v) =>
-                updateOption("mode", v as "solid" | "gradient")
-              }
-            />
-            <SegmentedControl
               label="Variant"
               options={[
                 { value: "inline", label: "Inline" },
@@ -319,6 +299,11 @@ export function PlaygroundClient() {
 
             <hr className="border-neutral-200 dark:border-neutral-700" />
 
+            <Toggle
+              label="Gradient mode"
+              checked={options.enableGradient}
+              onChange={(v) => updateOption("enableGradient", v)}
+            />
             <Toggle
               label="Alpha slider"
               checked={options.showAlpha}
@@ -379,26 +364,34 @@ function InlinePicker({
   onValueChange: (v: ColorPickerValue) => void;
   options: PlaygroundOptions;
 }) {
+  const isGradientMode = typeof value !== "string";
+
   return (
     <div className="w-full max-w-[272px]">
       <ColorPicker value={value} onValueChange={onValueChange}>
         <div className="flex flex-col gap-3">
-          <ColorPickerArea />
-          <ColorPickerHueSlider />
-          {options.showAlpha && <ColorPickerAlphaSlider />}
-          {(options.showInput ||
-            options.showFormatToggle ||
-            options.showEyeDropper) && (
-            <div className="flex items-center gap-2">
-              {options.showInput && <ColorPickerInput className="flex-1" />}
-              {options.showFormatToggle && <ColorPickerFormatToggle />}
-              {options.showEyeDropper && <ColorPickerEyeDropper />}
-            </div>
+          {options.enableGradient && <ColorPickerModeSelector />}
+          {isGradientMode ? (
+            <ColorPickerGradientEditor />
+          ) : (
+            <>
+              <ColorPickerArea />
+              <ColorPickerHueSlider />
+              {options.showAlpha && <ColorPickerAlphaSlider />}
+              {(options.showInput ||
+                options.showFormatToggle ||
+                options.showEyeDropper) && (
+                <div className="flex items-center gap-2">
+                  {options.showInput && <ColorPickerInput className="flex-1" />}
+                  {options.showFormatToggle && <ColorPickerFormatToggle />}
+                  {options.showEyeDropper && <ColorPickerEyeDropper />}
+                </div>
+              )}
+              {options.showSwatches && (
+                <ColorPickerSwatches colors={options.swatchColors} />
+              )}
+            </>
           )}
-          {options.showSwatches && (
-            <ColorPickerSwatches colors={options.swatchColors} />
-          )}
-          {options.mode === "gradient" && <ColorPickerGradientEditor />}
         </div>
       </ColorPicker>
     </div>
@@ -414,26 +407,34 @@ function PopoverPicker({
   onValueChange: (v: ColorPickerValue) => void;
   options: PlaygroundOptions;
 }) {
+  const isGradientMode = typeof value !== "string";
+
   return (
     <ColorPicker value={value} onValueChange={onValueChange}>
       <ColorPickerTrigger />
       <ColorPickerContent>
-        <ColorPickerArea />
-        <ColorPickerHueSlider />
-        {options.showAlpha && <ColorPickerAlphaSlider />}
-        {(options.showInput ||
-          options.showFormatToggle ||
-          options.showEyeDropper) && (
-          <div className="flex items-center gap-2">
-            {options.showInput && <ColorPickerInput className="flex-1" />}
-            {options.showFormatToggle && <ColorPickerFormatToggle />}
-            {options.showEyeDropper && <ColorPickerEyeDropper />}
-          </div>
+        {options.enableGradient && <ColorPickerModeSelector />}
+        {isGradientMode ? (
+          <ColorPickerGradientEditor />
+        ) : (
+          <>
+            <ColorPickerArea />
+            <ColorPickerHueSlider />
+            {options.showAlpha && <ColorPickerAlphaSlider />}
+            {(options.showInput ||
+              options.showFormatToggle ||
+              options.showEyeDropper) && (
+              <div className="flex items-center gap-2">
+                {options.showInput && <ColorPickerInput className="flex-1" />}
+                {options.showFormatToggle && <ColorPickerFormatToggle />}
+                {options.showEyeDropper && <ColorPickerEyeDropper />}
+              </div>
+            )}
+            {options.showSwatches && (
+              <ColorPickerSwatches colors={options.swatchColors} />
+            )}
+          </>
         )}
-        {options.showSwatches && (
-          <ColorPickerSwatches colors={options.swatchColors} />
-        )}
-        {options.mode === "gradient" && <ColorPickerGradientEditor />}
       </ColorPickerContent>
     </ColorPicker>
   );

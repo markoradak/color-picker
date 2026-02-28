@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { useColorPickerContext } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
 import { toCSS } from "../utils/css";
 import { interpolateColorAt } from "../utils/gradient";

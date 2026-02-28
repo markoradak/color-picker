@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useColorPickerContext } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 import { GradientPreview } from "./gradient-preview";
 import { GradientStops } from "./gradient-stops";
 import type { GradientValue } from "../types";
@@ -9,21 +9,15 @@ interface GradientEditorProps {
   className?: string;
 }
 
-const GRADIENT_TYPES: { value: GradientValue["type"]; label: string }[] = [
-  { value: "linear", label: "Linear" },
-  { value: "radial", label: "Radial" },
-  { value: "conic", label: "Conic" },
-  { value: "mesh", label: "Mesh" },
-];
-
 /**
  * Self-contained gradient editing UI.
  *
- * Includes a gradient type selector, angle/center-point controls,
- * a visual gradient preview with interactive stop dots, and a
- * horizontal stop bar. When a gradient stop is selected, the
- * parent Area / HueSlider / AlphaSlider components automatically
- * edit that stop's color through the context routing system.
+ * Includes angle/center-point controls, a visual gradient preview
+ * with interactive stop dots, and a horizontal stop bar with
+ * per-stop color editing popovers.
+ *
+ * The gradient type is selected via the separate `ColorPickerModeSelector`
+ * component, which handles Solid/Linear/Radial/Conic/Mesh transitions.
  *
  * Only renders content when the current value is a gradient.
  * If the value is a solid color, renders nothing.
@@ -37,7 +31,6 @@ export function ColorPickerGradientEditor({ className }: GradientEditorProps) {
 
   const {
     gradient: gradientValue,
-    setGradientType,
     setAngle,
     setCenter,
   } = gradientCtx;
@@ -55,13 +48,6 @@ export function ColorPickerGradientEditor({ className }: GradientEditorProps) {
         .filter(Boolean)
         .join(" ")}
     >
-      {/* Gradient type selector */}
-      <GradientTypeSelector
-        value={gradientValue.type}
-        onChange={setGradientType}
-        disabled={disabled}
-      />
-
       {/* Gradient preview */}
       <GradientPreview />
 
@@ -93,50 +79,6 @@ export function ColorPickerGradientEditor({ className }: GradientEditorProps) {
 }
 
 // --- Sub-components ---
-
-function GradientTypeSelector({
-  value,
-  onChange,
-  disabled,
-}: {
-  value: GradientValue["type"];
-  onChange: (type: GradientValue["type"]) => void;
-  disabled: boolean;
-}) {
-  return (
-    <div
-      className="flex gap-1 rounded-lg border border-neutral-200 bg-neutral-50 p-0.5"
-      role="radiogroup"
-      aria-label="Gradient type"
-    >
-      {GRADIENT_TYPES.map((gt) => {
-        const isActive = gt.value === value;
-        return (
-          <button
-            key={gt.value}
-            type="button"
-            role="radio"
-            aria-checked={isActive}
-            onClick={() => onChange(gt.value)}
-            disabled={disabled}
-            className={[
-              "flex-1 rounded-md px-2 py-1 text-xs font-medium outline-none transition-colors",
-              "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              isActive
-                ? "bg-white text-neutral-900 shadow-sm"
-                : "text-neutral-500 hover:text-neutral-700",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {gt.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
 
 function AngleInput({
   value,

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import type { ColorPickerAreaProps } from "../types";
-import { useColorPickerContext } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
 import { fromHSVA } from "../utils/color";
 import { clamp } from "../utils/position";

@@ -1,5 +1,5 @@
 import type { ColorFormat } from "../types";
-import { useColorPickerContext } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 
 interface ColorPickerFormatToggleProps {
   className?: string;

@@ -122,6 +122,42 @@ export function interpolateColorAt(
 }
 
 /**
+ * Create a gradient of the specified type using an existing color as
+ * the first stop and white as the second stop.
+ */
+export function createDefaultGradientFromColor(
+  type: GradientValue["type"],
+  color: string
+): GradientValue {
+  const base: GradientValue = {
+    type,
+    stops: [
+      createGradientStop(color, 0),
+      createGradientStop("#ffffff", 100),
+    ],
+  };
+
+  switch (type) {
+    case "linear":
+      return { ...base, angle: 90 };
+    case "radial":
+      return { ...base, centerX: 50, centerY: 50 };
+    case "conic":
+      return { ...base, angle: 0, centerX: 50, centerY: 50 };
+    case "mesh":
+      return {
+        ...base,
+        stops: [
+          { ...base.stops[0]!, x: 25, y: 25 },
+          { ...base.stops[1]!, x: 75, y: 75 },
+        ],
+      };
+    default:
+      return base;
+  }
+}
+
+/**
  * Create a default gradient of the specified type.
  */
 export function createDefaultGradient(

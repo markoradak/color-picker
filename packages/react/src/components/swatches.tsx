@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import type { ColorPickerSwatchesProps } from "../types";
-import { useColorPickerContext } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 import { fromHSVA, getContrastColor } from "../utils/color";
 
 /**

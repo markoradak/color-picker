@@ -6,6 +6,7 @@
 
 import type { ColorPickerPopoverProps, ColorPickerInlineProps } from "../types";
 import { ColorPicker } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerTrigger } from "./trigger";
 import { ColorPickerContent } from "./content";
 import { ColorPickerArea } from "./area";
@@ -16,10 +17,16 @@ import { ColorPickerFormatToggle } from "./format-toggle";
 import { ColorPickerEyeDropper } from "./eye-dropper";
 import { ColorPickerSwatches } from "./swatches";
 import { ColorPickerGradientEditor } from "./gradient-editor";
+import { ColorPickerModeSelector } from "./mode-selector";
 
 /**
  * Shared inner controls rendered by both popover and inline presets.
  * Conditionally renders each section based on the enable* flags.
+ *
+ * When `enableGradient` is true, renders:
+ * - Mode selector at the top
+ * - Solid controls (Area, HueSlider, AlphaSlider, Input) in solid mode
+ * - Gradient controls (GradientEditor) in gradient mode
  */
 function ColorPickerControls({
   enableAlpha = true,
@@ -36,19 +43,30 @@ function ColorPickerControls({
   swatches?: string[];
   swatchColumns?: number;
 }) {
+  const { isGradientMode } = useColorPickerContext();
+
   return (
     <>
-      <ColorPickerArea />
-      <ColorPickerHueSlider />
-      {enableAlpha && <ColorPickerAlphaSlider />}
-      {enableGradient && <ColorPickerGradientEditor />}
-      <div className="flex items-center gap-2">
-        <ColorPickerInput />
-        {enableFormatToggle && <ColorPickerFormatToggle />}
-        {enableEyeDropper && <ColorPickerEyeDropper />}
-      </div>
-      {swatches && swatches.length > 0 && (
-        <ColorPickerSwatches colors={swatches} columns={swatchColumns} />
+      {enableGradient && <ColorPickerModeSelector />}
+
+      {isGradientMode ? (
+        // Gradient mode: show gradient editor (preview, stops with per-stop popovers, angle/center)
+        <ColorPickerGradientEditor />
+      ) : (
+        // Solid mode: show standard color picker controls
+        <>
+          <ColorPickerArea />
+          <ColorPickerHueSlider />
+          {enableAlpha && <ColorPickerAlphaSlider />}
+          <div className="flex items-center gap-2">
+            <ColorPickerInput />
+            {enableFormatToggle && <ColorPickerFormatToggle />}
+            {enableEyeDropper && <ColorPickerEyeDropper />}
+          </div>
+          {swatches && swatches.length > 0 && (
+            <ColorPickerSwatches colors={swatches} columns={swatchColumns} />
+          )}
+        </>
       )}
     </>
   );
@@ -59,7 +77,8 @@ function ColorPickerControls({
  *
  * Renders a trigger button that opens a popover containing all standard
  * color picker controls: area, hue slider, alpha slider, input, format
- * toggle, eye dropper, swatches, and optionally a gradient editor.
+ * toggle, eye dropper, swatches, and optionally a gradient editor with
+ * unified mode selector.
  *
  * Usage:
  * ```tsx
@@ -68,6 +87,7 @@ function ColorPickerControls({
  *   onValueChange={setColor}
  *   enableAlpha
  *   enableEyeDropper
+ *   enableGradient
  *   swatches={["#ff0000", "#00ff00", "#0000ff"]}
  * />
  * ```

@@ -1,0 +1,54 @@
+import { useCallback, useMemo } from "react";
+import type { ColorPickerProviderProps, ColorPickerValue } from "../types";
+import { useColorPicker } from "../hooks/use-color-picker";
+import { useGradient } from "../hooks/use-gradient";
+import { ColorPickerContext } from "./color-picker-context";
+
+/**
+ * Context-only color picker provider (no Popover.Root).
+ *
+ * Provides an isolated `ColorPickerContext` so that Area, HueSlider,
+ * AlphaSlider, and Input can operate on a single solid color.
+ * Used inside per-stop popovers to give each stop its own HSVA state.
+ */
+export function ColorPickerProvider({
+  value,
+  onValueChange,
+  defaultValue = "#000000",
+  disabled = false,
+  children,
+}: ColorPickerProviderProps) {
+  // Wrap the string-typed callback for the generic useColorPicker hook
+  const handleValueChange = useCallback(
+    (v: ColorPickerValue) => {
+      if (typeof v === "string") {
+        onValueChange?.(v);
+      }
+    },
+    [onValueChange]
+  );
+
+  const pickerState = useColorPicker({
+    value,
+    onValueChange: handleValueChange,
+    defaultValue,
+  });
+
+  // No-op gradient state — this provider is solid-color only
+  const gradientState = useGradient({});
+
+  const contextValue = useMemo(
+    () => ({
+      ...pickerState,
+      disabled,
+      gradient: gradientState,
+    }),
+    [pickerState, disabled, gradientState]
+  );
+
+  return (
+    <ColorPickerContext.Provider value={contextValue}>
+      {children}
+    </ColorPickerContext.Provider>
+  );
+}

@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useColorPickerContext } from "./color-picker";
+import { useColorPickerContext } from "./color-picker-context";
 
 interface ColorPickerEyeDropperProps {
   className?: string;

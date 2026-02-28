@@ -5,6 +5,12 @@
 export type SolidColor = string;
 
 /**
+ * The active mode of the color picker.
+ * "solid" for a flat color string, or a gradient type.
+ */
+export type ColorPickerMode = "solid" | "linear" | "radial" | "conic" | "mesh";
+
+/**
  * Supported color format identifiers.
  */
 export type ColorFormat = "hex" | "rgb" | "hsl";
@@ -163,3 +169,28 @@ export interface ColorPickerPopoverProps extends ColorPickerPresetProps {
  * Uses all shared preset props (no popover-specific options).
  */
 export type ColorPickerInlineProps = ColorPickerPresetProps;
+
+/**
+ * Props for the ColorPickerModeSelector component.
+ */
+export interface ColorPickerModeSelectorProps {
+  className?: string;
+}
+
+/**
+ * Props for the ColorPickerProvider component.
+ * A context-only wrapper (no Popover.Root) for embedding picker controls
+ * inside per-stop popovers or other isolated contexts.
+ */
+export interface ColorPickerProviderProps {
+  /** Controlled solid color value */
+  value?: string;
+  /** Callback fired when the color changes */
+  onValueChange?: (value: string) => void;
+  /** Default value for uncontrolled mode */
+  defaultValue?: string;
+  /** Whether the picker is disabled */
+  disabled?: boolean;
+  /** Children (compound components) */
+  children: React.ReactNode;
+}

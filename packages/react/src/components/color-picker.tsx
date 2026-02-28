@@ -1,9 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import type { ColorPickerProps, GradientValue } from "../types";
 import { useColorPicker } from "../hooks/use-color-picker";
 import { useGradient } from "../hooks/use-gradient";
 import { isGradient } from "../utils/css";
+import { ColorPickerContext, useColorPickerContext } from "./color-picker-context";
 import { ColorPickerTrigger } from "./trigger";
 import { ColorPickerContent } from "./content";
 import { ColorPickerArea } from "./area";
@@ -14,50 +15,26 @@ import { ColorPickerFormatToggle } from "./format-toggle";
 import { ColorPickerEyeDropper } from "./eye-dropper";
 import { ColorPickerSwatches } from "./swatches";
 import { ColorPickerGradientEditor } from "./gradient-editor";
+import { ColorPickerModeSelector } from "./mode-selector";
+import { ColorPickerProvider } from "./color-picker-provider";
 
-/**
- * The full context value exposed to all child components.
- * Includes the core color picker state plus gradient editing state.
- *
- * When in gradient mode with an active stop, `hsva` / `setHue` /
- * `setSaturationValue` / `setAlpha` / `setColorFromString` are "routed"
- * to the active stop's color so that Area, HueSlider, AlphaSlider,
- * and Input automatically edit the selected gradient stop.
- */
-type ColorPickerContextValue = ReturnType<typeof useColorPicker> & {
-  disabled: boolean;
-  gradient: ReturnType<typeof useGradient>;
-};
-
-const ColorPickerContext = createContext<ColorPickerContextValue | null>(null);
-
-/**
- * Hook to access the color picker context.
- * Must be used within a <ColorPicker> component.
- */
-export function useColorPickerContext(): ColorPickerContextValue {
-  const ctx = useContext(ColorPickerContext);
-  if (!ctx) {
-    throw new Error(
-      "useColorPickerContext must be used within a <ColorPicker> component."
-    );
-  }
-  return ctx;
-}
+// Re-export for backward compatibility
+export { useColorPickerContext } from "./color-picker-context";
 
 /**
  * Root compound component for the color picker.
  * Wraps children in a Radix Popover.Root and provides color picker context.
  *
  * When the value is a GradientValue, gradient editing state is automatically
- * managed. Selecting a gradient stop routes the Area / HueSlider / AlphaSlider
- * to edit that stop's color.
+ * managed. Individual gradient stop colors are edited via per-stop popovers
+ * in the GradientStops component.
  *
  * Usage:
  * ```tsx
  * <ColorPicker value={color} onValueChange={setColor}>
  *   <ColorPicker.Trigger />
  *   <ColorPicker.Content>
+ *     <ColorPicker.ModeSelector />
  *     <ColorPicker.Area />
  *     <ColorPicker.HueSlider />
  *     <ColorPicker.AlphaSlider />
@@ -96,84 +73,13 @@ export function ColorPicker({
     onValueChange: handleGradientChange,
   });
 
-  // --- Stop-color routing ---
-  // When in gradient mode with an active stop, we need the HSVA state
-  // to reflect the active stop's color, and color mutations to flow
-  // back into the gradient stop rather than the top-level value.
-
-  const inGradientEditMode = pickerState.isGradientMode && gradientState.activeStop !== null;
-
-  // Track the active stop color to sync HSVA when the selected stop changes
-  const prevActiveStopRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (inGradientEditMode && gradientState.activeStop) {
-      const stopId = gradientState.activeStopId;
-      if (stopId !== prevActiveStopRef.current) {
-        prevActiveStopRef.current = stopId;
-        // Sync HSVA to the active stop's color without propagating
-        // to onValueChange (which would overwrite the gradient with a hex string)
-        pickerState.syncHSVA(gradientState.activeStop.color);
-      }
-    }
-  }, [inGradientEditMode, gradientState.activeStopId, gradientState.activeStop, pickerState.syncHSVA]);
-
-  // Override color mutation functions to route into the active gradient stop
-  const routedSetHue = useCallback(
-    (h: number): string => {
-      const newColor = pickerState.setHue(h);
-      if (inGradientEditMode && gradientState.activeStopId) {
-        gradientState.updateStopColor(gradientState.activeStopId, newColor);
-      }
-      return newColor;
-    },
-    [pickerState.setHue, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
-  );
-
-  const routedSetSaturationValue = useCallback(
-    (s: number, v: number): string => {
-      const newColor = pickerState.setSaturationValue(s, v);
-      if (inGradientEditMode && gradientState.activeStopId) {
-        gradientState.updateStopColor(gradientState.activeStopId, newColor);
-      }
-      return newColor;
-    },
-    [pickerState.setSaturationValue, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
-  );
-
-  const routedSetAlpha = useCallback(
-    (a: number): string => {
-      const newColor = pickerState.setAlpha(a);
-      if (inGradientEditMode && gradientState.activeStopId) {
-        gradientState.updateStopColor(gradientState.activeStopId, newColor);
-      }
-      return newColor;
-    },
-    [pickerState.setAlpha, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
-  );
-
-  const routedSetColorFromString = useCallback(
-    (input: string) => {
-      pickerState.setColorFromString(input);
-      if (inGradientEditMode && gradientState.activeStopId) {
-        gradientState.updateStopColor(gradientState.activeStopId, input);
-      }
-    },
-    [pickerState.setColorFromString, inGradientEditMode, gradientState.activeStopId, gradientState.updateStopColor]
-  );
-
-  const contextValue: ColorPickerContextValue = useMemo(
+  const contextValue = useMemo(
     () => ({
       ...pickerState,
-      // Override routed functions when in gradient mode
-      setHue: routedSetHue,
-      setSaturationValue: routedSetSaturationValue,
-      setAlpha: routedSetAlpha,
-      setColorFromString: routedSetColorFromString,
       disabled,
       gradient: gradientState,
     }),
-    [pickerState, routedSetHue, routedSetSaturationValue, routedSetAlpha, routedSetColorFromString, disabled, gradientState]
+    [pickerState, disabled, gradientState]
   );
 
   return (
@@ -194,3 +100,5 @@ ColorPicker.FormatToggle = ColorPickerFormatToggle;
 ColorPicker.EyeDropper = ColorPickerEyeDropper;
 ColorPicker.Swatches = ColorPickerSwatches;
 ColorPicker.GradientEditor = ColorPickerGradientEditor;
+ColorPicker.ModeSelector = ColorPickerModeSelector;
+ColorPicker.Provider = ColorPickerProvider;
