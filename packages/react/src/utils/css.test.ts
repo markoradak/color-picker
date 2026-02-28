@@ -148,6 +148,34 @@ describe("css utilities", () => {
       expect(result).toContain("radial-gradient(circle at 75% 75%, blue 0%, transparent 50%)");
     });
 
+    it("appends baseColor as the last background layer for mesh gradients", () => {
+      const gradient: GradientValue = {
+        type: "mesh",
+        baseColor: "#ffffff",
+        stops: [
+          { id: "1", color: "red", position: 0, x: 25, y: 25 },
+          { id: "2", color: "blue", position: 100, x: 75, y: 75 },
+        ],
+      };
+      const result = toCSS(gradient);
+      expect(result).toContain("radial-gradient(circle at 25% 25%, red 0%, transparent 50%)");
+      expect(result).toContain("radial-gradient(circle at 75% 75%, blue 0%, transparent 50%)");
+      // baseColor should be the last layer
+      expect(result).toMatch(/, #ffffff$/);
+    });
+
+    it("does not append baseColor when not set on mesh gradient", () => {
+      const gradient: GradientValue = {
+        type: "mesh",
+        stops: [
+          { id: "1", color: "red", position: 0, x: 25, y: 25 },
+        ],
+      };
+      const result = toCSS(gradient);
+      expect(result).not.toContain("#ffffff");
+      expect(result).toBe("radial-gradient(circle at 25% 25%, red 0%, transparent 50%)");
+    });
+
     it("sorts stops by position before generating CSS", () => {
       const gradient: GradientValue = {
         type: "linear",

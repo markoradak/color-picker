@@ -5,6 +5,7 @@ import {
   createDefaultGradient,
   createGradientStop,
   interpolateColorAt,
+  moveStop,
   removeStop,
   sortStops,
   updateStop,
@@ -320,6 +321,79 @@ describe("gradient utilities", () => {
       // Should not throw, should return one of the colors
       const result = interpolateColorAt(stops, 50);
       expect(result).toMatch(/^#[0-9a-f]{6}$/);
+    });
+  });
+
+  describe("moveStop", () => {
+    function makeMesh(): GradientValue {
+      return {
+        type: "mesh",
+        stops: [
+          { id: "a", color: "#ff0000", position: 0, x: 20, y: 20 },
+          { id: "b", color: "#00ff00", position: 50, x: 50, y: 50 },
+          { id: "c", color: "#0000ff", position: 100, x: 80, y: 80 },
+        ],
+      };
+    }
+
+    it("moves a stop forward (toward index 0)", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "b", "forward");
+      expect(result.stops.map((s) => s.id)).toEqual(["b", "a", "c"]);
+    });
+
+    it("moves a stop backward (toward last index)", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "b", "backward");
+      expect(result.stops.map((s) => s.id)).toEqual(["a", "c", "b"]);
+    });
+
+    it("moves a stop to front (index 0)", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "c", "front");
+      expect(result.stops.map((s) => s.id)).toEqual(["c", "a", "b"]);
+    });
+
+    it("moves a stop to back (last index)", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "a", "back");
+      expect(result.stops.map((s) => s.id)).toEqual(["b", "c", "a"]);
+    });
+
+    it("is a noop when moving first stop forward", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "a", "forward");
+      expect(result).toBe(g);
+    });
+
+    it("is a noop when moving first stop to front", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "a", "front");
+      expect(result).toBe(g);
+    });
+
+    it("is a noop when moving last stop backward", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "c", "backward");
+      expect(result).toBe(g);
+    });
+
+    it("is a noop when moving last stop to back", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "c", "back");
+      expect(result).toBe(g);
+    });
+
+    it("returns original gradient for non-existent stopId", () => {
+      const g = makeMesh();
+      const result = moveStop(g, "nonexistent", "forward");
+      expect(result).toBe(g);
+    });
+
+    it("does not mutate the original gradient", () => {
+      const g = makeMesh();
+      moveStop(g, "b", "forward");
+      expect(g.stops.map((s) => s.id)).toEqual(["a", "b", "c"]);
     });
   });
 

@@ -46,14 +46,18 @@ export function toCSS(value: ColorPickerValue): string {
     case "conic":
       return `conic-gradient(from ${value.angle ?? 0}deg at ${value.centerX ?? 50}% ${value.centerY ?? 50}%, ${stopsCSS})`;
 
-    case "mesh":
+    case "mesh": {
       // Mesh gradients are simulated as layered radial gradients
-      return value.stops
+      const layers = value.stops
         .map(
           (stop) =>
             `radial-gradient(circle at ${stop.x ?? 50}% ${stop.y ?? 50}%, ${sanitizeColor(stop.color)} 0%, transparent 50%)`
-        )
-        .join(", ");
+        );
+      if (value.baseColor) {
+        layers.push(sanitizeColor(value.baseColor));
+      }
+      return layers.join(", ");
+    }
 
     default:
       return stopsCSS;

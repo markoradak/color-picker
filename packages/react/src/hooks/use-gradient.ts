@@ -4,6 +4,7 @@ import {
   addStop,
   addStopWithCoordinates,
   createDefaultGradient,
+  moveStop as moveStopUtil,
   removeStop,
   updateStop,
 } from "../utils/gradient";
@@ -118,6 +119,21 @@ export function useGradient(options: UseGradientOptions) {
     [gradient, update]
   );
 
+  const setBaseColor = useCallback(
+    (color: string) => {
+      update({ ...gradient, baseColor: color });
+    },
+    [gradient, update]
+  );
+
+  const handleMoveStop = useCallback(
+    (stopId: string, direction: "forward" | "backward" | "front" | "back") => {
+      const updated = moveStopUtil(gradient, stopId, direction);
+      update(updated);
+    },
+    [gradient, update]
+  );
+
   const activeStop = gradient.stops.find((s) => s.id === activeStopId) ?? null;
 
   return {
@@ -134,5 +150,7 @@ export function useGradient(options: UseGradientOptions) {
     setGradientType,
     setAngle,
     setCenter,
+    setBaseColor,
+    moveStop: handleMoveStop,
   };
 }

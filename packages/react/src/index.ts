@@ -22,7 +22,7 @@ export { ColorPickerPopover, ColorPickerInline } from "./components/presets";
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
 export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor } from "./utils/color";
-export { createGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, createDefaultGradient, createDefaultGradientFromColor, interpolateColorAt } from "./utils/gradient";
+export { createGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, moveStop, createDefaultGradient, createDefaultGradientFromColor, interpolateColorAt } from "./utils/gradient";
 export { clamp, getRelativePosition, angleFromPosition } from "./utils/position";
 
 // Hooks

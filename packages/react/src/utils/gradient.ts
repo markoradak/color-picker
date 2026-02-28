@@ -91,6 +91,50 @@ export function updateStop(
 }
 
 /**
+ * Move a stop within the array to change its z-ordering (paint order).
+ * For mesh gradients, array order determines CSS layer stacking (first = top).
+ *
+ * @param direction - "forward" moves toward index 0 (front), "backward" moves toward last (back),
+ *   "front" moves to index 0, "back" moves to last index
+ */
+export function moveStop(
+  gradient: GradientValue,
+  stopId: string,
+  direction: "forward" | "backward" | "front" | "back"
+): GradientValue {
+  const index = gradient.stops.findIndex((s) => s.id === stopId);
+  if (index === -1) return gradient;
+
+  const stops = [...gradient.stops];
+  const [stop] = stops.splice(index, 1);
+
+  switch (direction) {
+    case "forward": {
+      if (index === 0) return gradient;
+      stops.splice(index - 1, 0, stop!);
+      break;
+    }
+    case "backward": {
+      if (index === gradient.stops.length - 1) return gradient;
+      stops.splice(index + 1, 0, stop!);
+      break;
+    }
+    case "front": {
+      if (index === 0) return gradient;
+      stops.unshift(stop!);
+      break;
+    }
+    case "back": {
+      if (index === gradient.stops.length - 1) return gradient;
+      stops.push(stop!);
+      break;
+    }
+  }
+
+  return { ...gradient, stops };
+}
+
+/**
  * Interpolate a color at a given position (0-100) between sorted stops.
  * Returns the mixed color as a hex string.
  */
@@ -147,6 +191,7 @@ export function createDefaultGradientFromColor(
     case "mesh":
       return {
         ...base,
+        baseColor: "#ffffff",
         stops: [
           { ...base.stops[0]!, x: 25, y: 25 },
           { ...base.stops[1]!, x: 75, y: 75 },
@@ -181,6 +226,7 @@ export function createDefaultGradient(
     case "mesh":
       return {
         ...base,
+        baseColor: "#ffffff",
         stops: [
           { ...base.stops[0]!, x: 25, y: 25 },
           { ...base.stops[1]!, x: 75, y: 75 },

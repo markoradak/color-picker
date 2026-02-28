@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerProvider } from "./color-picker-provider";
@@ -16,6 +16,12 @@ import { CHECKERBOARD_STYLE } from "./shared";
 
 interface GradientPreviewProps {
   className?: string;
+}
+
+interface ContextMenuState {
+  x: number;
+  y: number;
+  stopId: string;
 }
 
 /**
@@ -139,12 +145,17 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     updateStopColor,
     updateStopCoordinates,
     setAngle,
+    setBaseColor,
+    moveStop,
   } = gradientCtx;
 
   const previewRef = useRef<HTMLDivElement>(null);
   const draggingStopId = useRef<string | null>(null);
   const didDragRef = useRef(false);
   const [openStopId, setOpenStopId] = useState<string | null>(null);
+  const [baseColorOpen, setBaseColorOpen] = useState(false);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   const gradientCSS = toCSS(gradientValue);
 
@@ -298,6 +309,30 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     [updateStopColor]
   );
 
+  const handleContextMenu = useCallback(
+    (stopId: string, e: React.MouseEvent) => {
+      if (disabled || gradientValue.type !== "mesh") return;
+      e.preventDefault();
+      e.stopPropagation();
+      setContextMenu({ x: e.clientX, y: e.clientY, stopId });
+    },
+    [disabled, gradientValue.type]
+  );
+
+  // Close context menu on click outside
+  useEffect(() => {
+    if (!contextMenu) return;
+    const handleClick = (e: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+        setContextMenu(null);
+      }
+    };
+    document.addEventListener("pointerdown", handleClick);
+    return () => document.removeEventListener("pointerdown", handleClick);
+  }, [contextMenu]);
+
+  const isMesh = gradientValue.type === "mesh";
+
   return (
     <div
       className={[
@@ -329,6 +364,52 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         role="img"
         aria-label={`${gradientValue.type} gradient preview`}
       />
+      {/* Base color swatch (mesh only) */}
+      {isMesh && (
+        <Popover.Root open={baseColorOpen} onOpenChange={setBaseColorOpen}>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setBaseColorOpen((prev) => !prev);
+              }}
+              disabled={disabled}
+              aria-label="Edit base color"
+              title="Base color"
+              className={[
+                "absolute bottom-2 left-2 z-20",
+                "h-5 w-5 rounded border-2 border-white/80 shadow-[0_0_0_1px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.3)]",
+                disabled ? "cursor-not-allowed" : "cursor-pointer",
+              ].join(" ")}
+              style={{ backgroundColor: gradientValue.baseColor || "#ffffff" }}
+            />
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              side="top"
+              sideOffset={8}
+              align="start"
+              className="cp-content z-50 flex w-64 flex-col gap-3 rounded-xl border p-3"
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
+              <ColorPickerProvider
+                value={gradientValue.baseColor || "#ffffff"}
+                onValueChange={(color) => setBaseColor(color)}
+              >
+                <ColorPickerArea />
+                <ColorPickerHueSlider />
+                <div className="flex items-center gap-2">
+                  <ColorPickerInput />
+                  <ColorPickerFormatToggle />
+                  <ColorPickerEyeDropper />
+                </div>
+              </ColorPickerProvider>
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+      )}
+
       {/* Stop dots with popovers */}
       {gradientValue.stops.map((stop) => {
         const pos = getStopDotPosition(stop, gradientValue);
@@ -350,6 +431,7 @@ export function GradientPreview({ className }: GradientPreviewProps) {
                 onPointerDown={(e) => handleDotPointerDown(stop.id, e)}
                 onClick={(e) => handleDotClick(stop.id, e)}
                 onDoubleClick={(e) => handleDotDoubleClick(stop.id, e)}
+                onContextMenu={(e) => handleContextMenu(stop.id, e)}
                 disabled={disabled}
                 aria-label={`Stop ${stop.color} at ${Math.round(stop.position)}%`}
                 className={[
@@ -397,6 +479,46 @@ export function GradientPreview({ className }: GradientPreviewProps) {
           </Popover.Root>
         );
       })}
+
+      {/* Right-click context menu (mesh only) */}
+      {contextMenu && isMesh && (
+        <div
+          ref={contextMenuRef}
+          className="fixed z-50 flex flex-col rounded-lg border py-1 shadow-lg"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y,
+            background: "var(--cp-bg, #ffffff)",
+            borderColor: "var(--cp-border, #e5e5e5)",
+            minWidth: 160,
+          }}
+        >
+          {([
+            { label: "Bring to Front", direction: "front" as const, disabledAt: 0 },
+            { label: "Move Forward", direction: "forward" as const, disabledAt: 0 },
+            { label: "Move Backward", direction: "backward" as const, disabledAt: gradientValue.stops.length - 1 },
+            { label: "Send to Back", direction: "back" as const, disabledAt: gradientValue.stops.length - 1 },
+          ]).map((item) => {
+            const stopIndex = gradientValue.stops.findIndex((s) => s.id === contextMenu.stopId);
+            const isDisabled = stopIndex === item.disabledAt;
+            return (
+              <button
+                key={item.direction}
+                type="button"
+                disabled={isDisabled}
+                className="px-3 py-1.5 text-left text-xs disabled:opacity-30"
+                style={{ color: "var(--cp-text, #171717)" }}
+                onClick={() => {
+                  moveStop(contextMenu.stopId, item.direction);
+                  setContextMenu(null);
+                }}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

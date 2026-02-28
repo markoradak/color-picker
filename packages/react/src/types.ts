@@ -35,6 +35,8 @@ export interface GradientValue {
   angle?: number; // degrees, for linear and conic
   centerX?: number; // 0-100, for radial and conic
   centerY?: number; // 0-100, for radial and conic
+  /** Solid color behind all radial blobs (mesh gradients only). */
+  baseColor?: string;
 }
 
 /**
