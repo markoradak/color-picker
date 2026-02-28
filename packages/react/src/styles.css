@@ -42,7 +42,7 @@
   --cp-swatch-size: 1.5rem;
   --cp-slider-height: 0.75rem;
   --cp-thumb-size: 1rem;
-  --cp-area-height: 10rem;
+  --cp-area-height: 11rem;
   --cp-width: 16rem;
   --cp-gap: 0.75rem;
   --cp-padding: 0.75rem;
@@ -199,16 +199,6 @@
   gap: var(--cp-gap);
 }
 
-/* Gradient swatches */
-.cp-gradient-swatches button {
-  border-color: var(--cp-border);
-  border-radius: var(--cp-radius-sm);
-}
-
-.cp-gradient-swatches button[aria-pressed="true"] {
-  border-color: var(--cp-active-border);
-  --tw-ring-color: var(--cp-active-border);
-}
 
 /* Gradient preview */
 .cp-gradient-preview {

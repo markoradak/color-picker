@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type { ColorPickerGradientSwatchesProps, GradientValue } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { toCSS } from "../utils/css";
@@ -6,13 +6,35 @@ import { toCSS } from "../utils/css";
 /**
  * Grid of preset gradient swatch buttons.
  * Clicking a swatch sets the picker value to that gradient.
+ *
+ * Automatically filters to show only gradients matching the current
+ * gradient type (linear, radial, conic, mesh). Pass all gradient
+ * presets and the component handles filtering.
+ *
+ * Reuses the same `cp-swatches` CSS class and button markup as the
+ * solid color swatches for a consistent appearance.
  */
 export function ColorPickerGradientSwatches({
   gradients,
-  columns = 4,
+  columns = 8,
   className,
 }: ColorPickerGradientSwatchesProps) {
   const { value, updateValue, disabled } = useColorPickerContext();
+
+  // Current gradient type for filtering
+  const currentType =
+    typeof value === "object" && value !== null
+      ? (value as GradientValue).type
+      : null;
+
+  // Filter gradients to match current type
+  const filtered = useMemo(
+    () =>
+      currentType
+        ? gradients.filter((g) => g.type === currentType)
+        : gradients,
+    [gradients, currentType]
+  );
 
   const handleClick = useCallback(
     (gradient: GradientValue) => {
@@ -35,20 +57,22 @@ export function ColorPickerGradientSwatches({
     );
   };
 
+  if (filtered.length === 0) return null;
+
   return (
     <div
       role="group"
       aria-label="Gradient swatches"
       className={[
-        "cp-gradient-swatches",
-        "grid gap-1.5",
+        "cp-swatches",
+        "grid gap-1",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
       style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
-      {gradients.map((gradient, i) => {
+      {filtered.map((gradient, i) => {
         const css = toCSS(gradient);
         const active = isActive(gradient);
 
@@ -61,7 +85,7 @@ export function ColorPickerGradientSwatches({
             aria-label={`Select ${gradient.type} gradient`}
             aria-pressed={active}
             className={[
-              "relative h-8 w-full rounded-md border outline-none",
+              "relative h-6 w-6 rounded-md border outline-none",
               "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
               "disabled:cursor-not-allowed disabled:opacity-50",
               active ? "ring-1" : "",

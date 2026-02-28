@@ -34,70 +34,205 @@ const DEFAULT_SWATCHES = [
 ];
 
 const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
+  // --- Linear (8) ---
   {
     type: "linear",
     angle: 135,
     stops: [
-      { id: "gs1a", color: "#667eea", position: 0 },
-      { id: "gs1b", color: "#764ba2", position: 100 },
+      { id: "l1a", color: "#667eea", position: 0 },
+      { id: "l1b", color: "#764ba2", position: 100 },
     ],
   },
   {
     type: "linear",
     angle: 90,
     stops: [
-      { id: "gs2a", color: "#f093fb", position: 0 },
-      { id: "gs2b", color: "#f5576c", position: 100 },
+      { id: "l2a", color: "#f093fb", position: 0 },
+      { id: "l2b", color: "#f5576c", position: 100 },
     ],
   },
   {
     type: "linear",
     angle: 135,
     stops: [
-      { id: "gs3a", color: "#4facfe", position: 0 },
-      { id: "gs3b", color: "#00f2fe", position: 100 },
+      { id: "l3a", color: "#4facfe", position: 0 },
+      { id: "l3b", color: "#00f2fe", position: 100 },
     ],
   },
   {
     type: "linear",
     angle: 135,
     stops: [
-      { id: "gs4a", color: "#43e97b", position: 0 },
-      { id: "gs4b", color: "#38f9d7", position: 100 },
+      { id: "l4a", color: "#43e97b", position: 0 },
+      { id: "l4b", color: "#38f9d7", position: 100 },
     ],
   },
   {
     type: "linear",
     angle: 135,
     stops: [
-      { id: "gs5a", color: "#fa709a", position: 0 },
-      { id: "gs5b", color: "#fee140", position: 100 },
+      { id: "l5a", color: "#fa709a", position: 0 },
+      { id: "l5b", color: "#fee140", position: 100 },
     ],
   },
   {
     type: "linear",
     angle: 90,
     stops: [
-      { id: "gs6a", color: "#a18cd1", position: 0 },
-      { id: "gs6b", color: "#fbc2eb", position: 100 },
+      { id: "l6a", color: "#a18cd1", position: 0 },
+      { id: "l6b", color: "#fbc2eb", position: 100 },
+    ],
+  },
+  {
+    type: "linear",
+    angle: 45,
+    stops: [
+      { id: "l7a", color: "#ff9a9e", position: 0 },
+      { id: "l7b", color: "#fad0c4", position: 100 },
+    ],
+  },
+  {
+    type: "linear",
+    angle: 135,
+    stops: [
+      { id: "l8a", color: "#0c0c0c", position: 0 },
+      { id: "l8b", color: "#434343", position: 100 },
+    ],
+  },
+  // --- Radial (8) ---
+  {
+    type: "radial",
+    stops: [
+      { id: "r1a", color: "#ffecd2", position: 0 },
+      { id: "r1b", color: "#fcb69f", position: 100 },
     ],
   },
   {
     type: "radial",
     stops: [
-      { id: "gs7a", color: "#ffecd2", position: 0 },
-      { id: "gs7b", color: "#fcb69f", position: 100 },
+      { id: "r2a", color: "#a1c4fd", position: 0 },
+      { id: "r2b", color: "#c2e9fb", position: 100 },
+    ],
+  },
+  {
+    type: "radial",
+    stops: [
+      { id: "r3a", color: "#fbc2eb", position: 0 },
+      { id: "r3b", color: "#a6c1ee", position: 100 },
+    ],
+  },
+  {
+    type: "radial",
+    stops: [
+      { id: "r4a", color: "#fddb92", position: 0 },
+      { id: "r4b", color: "#d1fdff", position: 100 },
+    ],
+  },
+  {
+    type: "radial",
+    stops: [
+      { id: "r5a", color: "#ffffff", position: 0 },
+      { id: "r5b", color: "#e6e6e6", position: 100 },
+    ],
+  },
+  {
+    type: "radial",
+    stops: [
+      { id: "r6a", color: "#c1dfc4", position: 0 },
+      { id: "r6b", color: "#deecdd", position: 100 },
+    ],
+  },
+  {
+    type: "radial",
+    stops: [
+      { id: "r7a", color: "#f5f7fa", position: 0 },
+      { id: "r7b", color: "#c3cfe2", position: 100 },
+    ],
+  },
+  {
+    type: "radial",
+    stops: [
+      { id: "r8a", color: "#e0c3fc", position: 0 },
+      { id: "r8b", color: "#8ec5fc", position: 100 },
+    ],
+  },
+  // --- Conic (8) ---
+  {
+    type: "conic",
+    angle: 0,
+    stops: [
+      { id: "c1a", color: "#ff0000", position: 0 },
+      { id: "c1b", color: "#ffff00", position: 17 },
+      { id: "c1c", color: "#00ff00", position: 33 },
+      { id: "c1d", color: "#00ffff", position: 50 },
+      { id: "c1e", color: "#0000ff", position: 67 },
+      { id: "c1f", color: "#ff00ff", position: 83 },
+      { id: "c1g", color: "#ff0000", position: 100 },
     ],
   },
   {
     type: "conic",
     angle: 0,
     stops: [
-      { id: "gs8a", color: "#ff0000", position: 0 },
-      { id: "gs8b", color: "#ffff00", position: 25 },
-      { id: "gs8c", color: "#00ff00", position: 50 },
-      { id: "gs8d", color: "#0000ff", position: 75 },
-      { id: "gs8e", color: "#ff0000", position: 100 },
+      { id: "c2a", color: "#f5af19", position: 0 },
+      { id: "c2b", color: "#f12711", position: 50 },
+      { id: "c2c", color: "#f5af19", position: 100 },
+    ],
+  },
+  {
+    type: "conic",
+    angle: 0,
+    stops: [
+      { id: "c3a", color: "#667eea", position: 0 },
+      { id: "c3b", color: "#764ba2", position: 50 },
+      { id: "c3c", color: "#667eea", position: 100 },
+    ],
+  },
+  {
+    type: "conic",
+    angle: 0,
+    stops: [
+      { id: "c4a", color: "#00c6ff", position: 0 },
+      { id: "c4b", color: "#0072ff", position: 50 },
+      { id: "c4c", color: "#00c6ff", position: 100 },
+    ],
+  },
+  {
+    type: "conic",
+    angle: 0,
+    stops: [
+      { id: "c5a", color: "#f8f9fa", position: 0 },
+      { id: "c5b", color: "#dee2e6", position: 25 },
+      { id: "c5c", color: "#adb5bd", position: 50 },
+      { id: "c5d", color: "#dee2e6", position: 75 },
+      { id: "c5e", color: "#f8f9fa", position: 100 },
+    ],
+  },
+  {
+    type: "conic",
+    angle: 0,
+    stops: [
+      { id: "c6a", color: "#43e97b", position: 0 },
+      { id: "c6b", color: "#38f9d7", position: 50 },
+      { id: "c6c", color: "#43e97b", position: 100 },
+    ],
+  },
+  {
+    type: "conic",
+    angle: 0,
+    stops: [
+      { id: "c7a", color: "#fa709a", position: 0 },
+      { id: "c7b", color: "#fee140", position: 50 },
+      { id: "c7c", color: "#fa709a", position: 100 },
+    ],
+  },
+  {
+    type: "conic",
+    angle: 0,
+    stops: [
+      { id: "c8a", color: "#0c0c0c", position: 0 },
+      { id: "c8b", color: "#444444", position: 50 },
+      { id: "c8c", color: "#0c0c0c", position: 100 },
     ],
   },
 ];
@@ -445,7 +580,7 @@ function InlinePicker({
             <>
               <ColorPickerGradientEditor />
               {options.showSwatches && (
-                <ColorPickerGradientSwatches gradients={DEFAULT_GRADIENT_SWATCHES} />
+                <ColorPickerGradientSwatches gradients={DEFAULT_GRADIENT_SWATCHES} className="mt-0.5" />
               )}
             </>
           ) : (
@@ -493,7 +628,7 @@ function PopoverPicker({
           <>
             <ColorPickerGradientEditor />
             {options.showSwatches && (
-              <ColorPickerGradientSwatches gradients={DEFAULT_GRADIENT_SWATCHES} />
+              <ColorPickerGradientSwatches gradients={DEFAULT_GRADIENT_SWATCHES} className="mt-0.5" />
             )}
           </>
         ) : (

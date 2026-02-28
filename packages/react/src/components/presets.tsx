@@ -60,7 +60,7 @@ function ColorPickerControls({
         <>
           <ColorPickerGradientEditor />
           {gradientSwatches && gradientSwatches.length > 0 && (
-            <ColorPickerGradientSwatches gradients={gradientSwatches} />
+            <ColorPickerGradientSwatches gradients={gradientSwatches} className="mt-0.5" />
           )}
         </>
       ) : (

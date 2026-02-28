@@ -88,14 +88,6 @@
   --tw-ring-color: #d4d4d8;
 }
 
-.dark .cp-gradient-swatches button {
-  border-color: #444;
-}
-
-.dark .cp-gradient-swatches button[aria-pressed="true"] {
-  border-color: #d4d4d8;
-  --tw-ring-color: #d4d4d8;
-}
 
 .dark .cp-mode-selector {
   background-color: #2c2c2e;

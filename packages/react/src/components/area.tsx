@@ -84,7 +84,7 @@ export function ColorPickerArea({ className }: ColorPickerAreaProps) {
       data-dragging={isDragging ? "" : undefined}
       className={[
         "cp-area",
-        "relative h-40 w-full cursor-crosshair rounded-lg outline-none",
+        "relative h-44 w-full cursor-crosshair rounded-lg outline-none",
         "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         className,
