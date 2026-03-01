@@ -10,7 +10,7 @@ import { ColorPickerFormatToggle } from "./format-toggle";
 import { ColorPickerEyeDropper } from "./eye-dropper";
 import { toCSS } from "../utils/css";
 import { interpolateColorAt } from "../utils/gradient";
-import { angleFromPosition, clamp } from "../utils/position";
+import { clamp } from "../utils/position";
 import type { GradientStop, GradientValue } from "../types";
 import { CHECKERBOARD_STYLE } from "./shared";
 
@@ -25,10 +25,10 @@ interface ContextMenuState {
 }
 
 /**
- * Get the gradient direction unit vector for a linear gradient.
- * Uses explicit endpoints if set, otherwise derives from angle.
+ * Get the gradient direction unit vector for linear, radial, or conic gradients.
+ * Uses explicit endpoints if set, otherwise derives from type-specific defaults.
  */
-function getLinearDirection(gradient: GradientValue): { dx: number; dy: number } {
+function getLineDirection(gradient: GradientValue): { dx: number; dy: number } {
   if (gradient.startPoint && gradient.endPoint) {
     const ddx = gradient.endPoint.x - gradient.startPoint.x;
     const ddy = gradient.endPoint.y - gradient.startPoint.y;
@@ -36,39 +36,65 @@ function getLinearDirection(gradient: GradientValue): { dx: number; dy: number }
     if (len < 1) return { dx: 1, dy: 0 };
     return { dx: ddx / len, dy: ddy / len };
   }
-  const rad = (((gradient.angle ?? 90) - 90) * Math.PI) / 180;
-  return { dx: Math.cos(rad), dy: Math.sin(rad) };
+  switch (gradient.type) {
+    case "radial": {
+      // Default: horizontal line from center
+      return { dx: 1, dy: 0 };
+    }
+    case "conic": {
+      // Default: direction from start angle
+      const rad = (((gradient.angle ?? 0) - 90) * Math.PI) / 180;
+      return { dx: Math.cos(rad), dy: Math.sin(rad) };
+    }
+    default: {
+      // Linear: direction from angle (default 90°)
+      const rad = (((gradient.angle ?? 90) - 90) * Math.PI) / 180;
+      return { dx: Math.cos(rad), dy: Math.sin(rad) };
+    }
+  }
 }
 
 /**
- * Compute the unclamped visual position of a linear gradient stop.
- * Position values are coordinate-relative: position P maps to the point
- * on the gradient line where the projection onto the gradient direction
- * in the 0-100 coordinate space equals P.
+ * Compute the unclamped visual position of a gradient stop on the gradient line.
+ * Works for linear, radial, and conic gradients.
+ *
+ * Linear: position 50 = center at (50,50), extends both directions.
+ * Radial/Conic: position 0 = center at (centerX,centerY), extends outward.
+ * This matches CSS where radial/conic position 0% is at the center.
  */
-function getLinearStopVisual(
+function getLineStopVisual(
   stop: GradientStop,
   gradient: GradientValue
 ): { x: number; y: number } {
-  const { dx, dy } = getLinearDirection(gradient);
+  const { dx, dy } = getLineDirection(gradient);
 
-  if (gradient.startPoint && gradient.endPoint) {
-    const sp = gradient.startPoint;
-    const ep = gradient.endPoint;
-    const ddx = ep.x - sp.x;
-    const ddy = ep.y - sp.y;
-    const len = Math.sqrt(ddx * ddx + ddy * ddy);
-    if (len < 1) return { x: 50, y: 50 };
-    // spProj = coordinate-space position of the start point
-    const spProj = 50 + (sp.x - 50) * dx + (sp.y - 50) * dy;
-    const t = (stop.position - spProj) / len;
-    return { x: sp.x + t * ddx, y: sp.y + t * ddy };
+  if (gradient.type === "linear") {
+    if (gradient.startPoint && gradient.endPoint) {
+      const sp = gradient.startPoint;
+      const ep = gradient.endPoint;
+      const ddx = ep.x - sp.x;
+      const ddy = ep.y - sp.y;
+      const len = Math.sqrt(ddx * ddx + ddy * ddy);
+      if (len < 1) return { x: 50, y: 50 };
+      const spProj = 50 + (sp.x - 50) * dx + (sp.y - 50) * dy;
+      const t = (stop.position - spProj) / len;
+      return { x: sp.x + t * ddx, y: sp.y + t * ddy };
+    }
+    return {
+      x: 50 + (stop.position - 50) * dx,
+      y: 50 + (stop.position - 50) * dy,
+    };
   }
 
-  // Default: line through center (50,50)
+  // Radial/Conic: position 0 = center, 50 coordinate units = position 100.
+  // Same formula for default and endpoint cases — centerX/centerY tracks
+  // the center, and getLineDirection provides the correct direction.
+  const cx = gradient.centerX ?? 50;
+  const cy = gradient.centerY ?? 50;
+
   return {
-    x: 50 + (stop.position - 50) * dx,
-    y: 50 + (stop.position - 50) * dy,
+    x: cx + (stop.position / 100) * 50 * dx,
+    y: cy + (stop.position / 100) * 50 * dy,
   };
 }
 
@@ -81,31 +107,12 @@ function getStopDotPosition(
   gradient: GradientValue
 ): { x: number; y: number } {
   switch (gradient.type) {
-    case "linear": {
+    case "linear":
+    case "radial":
+    case "conic":
+      // All three types use the same gradient-line model.
       // No clamping — parent overflow:hidden clips dots at edges.
-      return getLinearStopVisual(stop, gradient);
-    }
-    case "radial": {
-      const cx = gradient.centerX ?? 50;
-      const cy = gradient.centerY ?? 50;
-      const dist = (stop.position / 100) * 40;
-      return {
-        x: clamp(cx + dist, 2, 98),
-        y: clamp(cy, 2, 98),
-      };
-    }
-    case "conic": {
-      const cx = gradient.centerX ?? 50;
-      const cy = gradient.centerY ?? 50;
-      const startAngle = gradient.angle ?? 0;
-      const stopAngle = startAngle + (stop.position / 100) * 360;
-      const rad = ((stopAngle - 90) * Math.PI) / 180;
-      const radius = 30;
-      return {
-        x: clamp(cx + Math.cos(rad) * radius, 2, 98),
-        y: clamp(cy + Math.sin(rad) * radius, 2, 98),
-      };
-    }
+      return getLineStopVisual(stop, gradient);
     case "mesh": {
       return {
         x: clamp(stop.x ?? 50, 2, 98),
@@ -128,23 +135,16 @@ function positionFromCoords(
 ): number {
   switch (gradient.type) {
     case "linear": {
-      // Coordinate-relative: project cursor onto gradient direction from center.
-      const { dx, dy } = getLinearDirection(gradient);
+      const { dx, dy } = getLineDirection(gradient);
       return clamp(50 + (mx - 50) * dx + (my - 50) * dy, 0, 100);
     }
-    case "radial": {
-      const cx = gradient.centerX ?? 50;
-      const cy = gradient.centerY ?? 50;
-      const dist = Math.sqrt((mx - cx) ** 2 + (my - cy) ** 2);
-      return clamp((dist / 40) * 100, 0, 100);
-    }
+    case "radial":
     case "conic": {
+      // Position 0 = center, 50 coordinate units = position 100.
+      const { dx, dy } = getLineDirection(gradient);
       const cx = gradient.centerX ?? 50;
       const cy = gradient.centerY ?? 50;
-      const startAngle = gradient.angle ?? 0;
-      const mouseAngle = angleFromPosition(mx, my, cx, cy);
-      const relAngle = ((mouseAngle - startAngle) % 360 + 360) % 360;
-      return clamp((relAngle / 360) * 100, 0, 100);
+      return clamp(((mx - cx) * dx + (my - cy) * dy) * 2, 0, 100);
     }
     default:
       return clamp(mx, 0, 100);
@@ -266,7 +266,10 @@ export function GradientPreview({ className }: GradientPreviewProps) {
       let isFirstStop = false;
       let anchorPoint: { x: number; y: number } | null = null;
 
-      if (gradientValue.type === "linear" && gradientValue.stops.length >= 2) {
+      if (
+        (gradientValue.type === "linear" || gradientValue.type === "radial" || gradientValue.type === "conic") &&
+        gradientValue.stops.length >= 2
+      ) {
         const sorted = [...gradientValue.stops].sort(
           (a, b) => a.position - b.position
         );
@@ -279,7 +282,7 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         if (isEndpoint) {
           // Use the opposite stop's unclamped visual position as anchor.
           const oppositeStop = isFirstStop ? lastStop : firstStop;
-          anchorPoint = getLinearStopVisual(oppositeStop, gradientValue);
+          anchorPoint = getLineStopVisual(oppositeStop, gradientValue);
         }
       }
 
@@ -304,31 +307,54 @@ export function GradientPreview({ className }: GradientPreviewProps) {
           const newAngle =
             len > 1
               ? (((Math.atan2(ddy, ddx) * 180) / Math.PI + 90) % 360 + 360) % 360
-              : gradientValue.angle ?? 90;
+              : gradientValue.angle ?? (gradientValue.type === "linear" ? 90 : 0);
 
-          // New direction unit vector for coordinate-relative projection
-          const newRad = ((newAngle - 90) * Math.PI) / 180;
-          const ndx = Math.cos(newRad);
-          const ndy = Math.sin(newRad);
+          if (gradientValue.type === "linear") {
+            // Linear: position 50 = center at (50,50)
+            const newRad = ((newAngle - 90) * Math.PI) / 180;
+            const ndx = Math.cos(newRad);
+            const ndy = Math.sin(newRad);
 
-          // Recalculate every stop's position as its coordinate-space projection
-          // onto the new gradient direction. For the dragged stop, use cursor;
-          // for others, use their original visual position (from stale closure).
-          const newStops = gradientValue.stops.map((s) => {
-            const visual = s.id === sid
-              ? { x: mx, y: my }
-              : getLinearStopVisual(s, gradientValue);
-            const newPos = 50 + (visual.x - 50) * ndx + (visual.y - 50) * ndy;
-            return { ...s, position: newPos };
-          });
+            const newStops = gradientValue.stops.map((s) => {
+              const visual = s.id === sid
+                ? { x: mx, y: my }
+                : getLineStopVisual(s, gradientValue);
+              const newPos = 50 + (visual.x - 50) * ndx + (visual.y - 50) * ndy;
+              return { ...s, position: newPos };
+            });
 
-          replaceGradient({
-            ...gradientValue,
-            angle: Math.round(newAngle),
-            startPoint: sp,
-            endPoint: ep,
-            stops: newStops,
-          });
+            replaceGradient({
+              ...gradientValue,
+              angle: Math.round(newAngle),
+              startPoint: sp,
+              endPoint: ep,
+              stops: newStops,
+            });
+          } else {
+            // Radial/Conic: sp = center, positions relative to coordinate system
+            // (50 coordinate units = position 100). Update centerX/centerY
+            // so CSS `circle at` tracks the first stop.
+            const ndx = len > 1 ? ddx / len : 1;
+            const ndy = len > 1 ? ddy / len : 0;
+
+            const newStops = gradientValue.stops.map((s) => {
+              const visual = s.id === sid
+                ? { x: mx, y: my }
+                : getLineStopVisual(s, gradientValue);
+              const newPos = ((visual.x - sp.x) * ndx + (visual.y - sp.y) * ndy) * 2;
+              return { ...s, position: newPos };
+            });
+
+            replaceGradient({
+              ...gradientValue,
+              angle: Math.round(newAngle),
+              centerX: sp.x,
+              centerY: sp.y,
+              startPoint: sp,
+              endPoint: ep,
+              stops: newStops,
+            });
+          }
         } else {
           // Middle stop or non-linear: project onto current line/geometry.
           const newPos = positionFromCoords(mx, my, gradientValue);
@@ -493,8 +519,8 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         </Popover.Root>
       )}
 
-      {/* Line between first and last stops (linear only) */}
-      {gradientValue.type === "linear" && gradientValue.stops.length >= 2 && (() => {
+      {/* Line between first and last stops (linear, radial, conic) */}
+      {(gradientValue.type === "linear" || gradientValue.type === "radial" || gradientValue.type === "conic") && gradientValue.stops.length >= 2 && (() => {
         const sorted = [...gradientValue.stops].sort((a, b) => a.position - b.position);
         const first = getStopDotPosition(sorted[0]!, gradientValue);
         const last = getStopDotPosition(sorted[sorted.length - 1]!, gradientValue);

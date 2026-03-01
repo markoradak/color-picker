@@ -37,9 +37,9 @@ export interface GradientValue {
   centerY?: number; // 0-100, for radial and conic
   /** Solid color behind all radial blobs (mesh gradients only). */
   baseColor?: string;
-  /** Explicit gradient line start point in preview coordinates (0-100). Linear only. */
+  /** Explicit gradient line start point in preview coordinates (0-100). Used by linear, radial, and conic. */
   startPoint?: { x: number; y: number };
-  /** Explicit gradient line end point in preview coordinates (0-100). Linear only. */
+  /** Explicit gradient line end point in preview coordinates (0-100). Used by linear, radial, and conic. */
   endPoint?: { x: number; y: number };
 }
 

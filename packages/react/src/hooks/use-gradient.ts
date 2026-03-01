@@ -114,7 +114,7 @@ export function useGradient(options: UseGradientOptions) {
 
   const setCenter = useCallback(
     (centerX: number, centerY: number) => {
-      update({ ...gradient, centerX, centerY });
+      update({ ...gradient, centerX, centerY, startPoint: undefined, endPoint: undefined });
     },
     [gradient, update]
   );
