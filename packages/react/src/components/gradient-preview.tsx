@@ -260,11 +260,13 @@ export function GradientPreview({ className }: GradientPreviewProps) {
 
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      // For linear: determine if this stop is an endpoint (first/last by position).
-      // If so, capture the opposite endpoint's visual position as anchor.
+      // Determine if this stop is an endpoint (first/last by position).
+      // If so, capture the opposite endpoint's visual position as anchor
+      // and each stop's proportional position (t) for smooth interpolation.
       let isEndpoint = false;
       let isFirstStop = false;
       let anchorPoint: { x: number; y: number } | null = null;
+      let stopProportions: Map<string, number> | null = null;
 
       if (
         (gradientValue.type === "linear" || gradientValue.type === "radial" || gradientValue.type === "conic") &&
@@ -283,6 +285,15 @@ export function GradientPreview({ className }: GradientPreviewProps) {
           // Use the opposite stop's unclamped visual position as anchor.
           const oppositeStop = isFirstStop ? lastStop : firstStop;
           anchorPoint = getLineStopVisual(oppositeStop, gradientValue);
+
+          // Capture proportional positions so middle stops move with endpoints.
+          const range = lastStop.position - firstStop.position;
+          if (range > 0) {
+            stopProportions = new Map();
+            for (const s of gradientValue.stops) {
+              stopProportions.set(s.id, (s.position - firstStop.position) / range);
+            }
+          }
         }
       }
 
@@ -310,16 +321,17 @@ export function GradientPreview({ className }: GradientPreviewProps) {
               : gradientValue.angle ?? (gradientValue.type === "linear" ? 90 : 0);
 
           if (gradientValue.type === "linear") {
-            // Linear: position 50 = center at (50,50)
+            // Linear: interpolate middle stops proportionally along sp→ep,
+            // then project onto the new gradient direction.
             const newRad = ((newAngle - 90) * Math.PI) / 180;
             const ndx = Math.cos(newRad);
             const ndy = Math.sin(newRad);
 
             const newStops = gradientValue.stops.map((s) => {
-              const visual = s.id === sid
-                ? { x: mx, y: my }
-                : getLineStopVisual(s, gradientValue);
-              const newPos = 50 + (visual.x - 50) * ndx + (visual.y - 50) * ndy;
+              const t = stopProportions?.get(s.id) ?? 0.5;
+              const vx = sp.x + t * ddx;
+              const vy = sp.y + t * ddy;
+              const newPos = 50 + (vx - 50) * ndx + (vy - 50) * ndy;
               return { ...s, position: newPos };
             });
 
@@ -331,18 +343,12 @@ export function GradientPreview({ className }: GradientPreviewProps) {
               stops: newStops,
             });
           } else {
-            // Radial/Conic: sp = center, positions relative to coordinate system
-            // (50 coordinate units = position 100). Update centerX/centerY
-            // so CSS `circle at` tracks the first stop.
-            const ndx = len > 1 ? ddx / len : 1;
-            const ndy = len > 1 ? ddy / len : 0;
-
+            // Radial/Conic: interpolate middle stops proportionally along
+            // sp→ep. Position = distance from center * 2 (coordinate-relative).
             const newStops = gradientValue.stops.map((s) => {
-              const visual = s.id === sid
-                ? { x: mx, y: my }
-                : getLineStopVisual(s, gradientValue);
-              const newPos = ((visual.x - sp.x) * ndx + (visual.y - sp.y) * ndy) * 2;
-              return { ...s, position: newPos };
+              const t = stopProportions?.get(s.id) ?? 0.5;
+              // t * len = distance from sp, position = distance * 2
+              return { ...s, position: t * len * 2 };
             });
 
             replaceGradient({
