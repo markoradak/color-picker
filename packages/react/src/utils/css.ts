@@ -33,7 +33,7 @@ export function toCSS(value: ColorPickerValue): string {
 
   const sorted = sortStops(value.stops);
   const stopsCSS = sorted
-    .map((stop) => `${sanitizeColor(stop.color)} ${stop.position}%`)
+    .map((stop) => `${sanitizeColor(stop.color)} ${Math.min(100, Math.max(0, stop.position))}%`)
     .join(", ");
 
   switch (value.type) {
