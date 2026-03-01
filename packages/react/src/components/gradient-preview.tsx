@@ -124,6 +124,11 @@ function getStopDotPosition(
   }
 }
 
+/** Round to 2 decimal places. */
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
 /**
  * Compute a stop position (0-100) from a 2D click coordinate on the preview,
  * based on the gradient type's geometry.
@@ -136,7 +141,7 @@ function positionFromCoords(
   switch (gradient.type) {
     case "linear": {
       const { dx, dy } = getLineDirection(gradient);
-      return clamp(50 + (mx - 50) * dx + (my - 50) * dy, 0, 100);
+      return round2(clamp(50 + (mx - 50) * dx + (my - 50) * dy, 0, 100));
     }
     case "radial":
     case "conic": {
@@ -144,10 +149,10 @@ function positionFromCoords(
       const { dx, dy } = getLineDirection(gradient);
       const cx = gradient.centerX ?? 50;
       const cy = gradient.centerY ?? 50;
-      return clamp(((mx - cx) * dx + (my - cy) * dy) * 2, 0, 100);
+      return round2(clamp(((mx - cx) * dx + (my - cy) * dy) * 2, 0, 100));
     }
     default:
-      return clamp(mx, 0, 100);
+      return round2(clamp(mx, 0, 100));
   }
 }
 
@@ -331,15 +336,15 @@ export function GradientPreview({ className }: GradientPreviewProps) {
               const t = stopProportions?.get(s.id) ?? 0.5;
               const vx = sp.x + t * ddx;
               const vy = sp.y + t * ddy;
-              const newPos = 50 + (vx - 50) * ndx + (vy - 50) * ndy;
+              const newPos = round2(50 + (vx - 50) * ndx + (vy - 50) * ndy);
               return { ...s, position: newPos };
             });
 
             replaceGradient({
               ...gradientValue,
               angle: Math.round(newAngle),
-              startPoint: sp,
-              endPoint: ep,
+              startPoint: { x: round2(sp.x), y: round2(sp.y) },
+              endPoint: { x: round2(ep.x), y: round2(ep.y) },
               stops: newStops,
             });
           } else {
@@ -348,16 +353,16 @@ export function GradientPreview({ className }: GradientPreviewProps) {
             const newStops = gradientValue.stops.map((s) => {
               const t = stopProportions?.get(s.id) ?? 0.5;
               // t * len = distance from sp, position = distance * 2
-              return { ...s, position: t * len * 2 };
+              return { ...s, position: round2(t * len * 2) };
             });
 
             replaceGradient({
               ...gradientValue,
               angle: Math.round(newAngle),
-              centerX: sp.x,
-              centerY: sp.y,
-              startPoint: sp,
-              endPoint: ep,
+              centerX: round2(sp.x),
+              centerY: round2(sp.y),
+              startPoint: { x: round2(sp.x), y: round2(sp.y) },
+              endPoint: { x: round2(ep.x), y: round2(ep.y) },
               stops: newStops,
             });
           }

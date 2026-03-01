@@ -455,6 +455,7 @@ function generateCode(options: PlaygroundOptions): string {
   if (options.enableGradient) {
     imports.push("ColorPickerModeSelector");
     imports.push("ColorPickerGradientEditor");
+    imports.push("ColorPickerGradientSwatches");
   }
   if (options.variant === "popover") {
     imports.push("ColorPickerTrigger");
@@ -502,6 +503,7 @@ function generateCode(options: PlaygroundOptions): string {
 
   if (options.enableGradient) {
     parts.push("    <ColorPickerGradientEditor />");
+    parts.push("    <ColorPickerGradientSwatches gradients={gradientSwatches} />");
   }
 
   const innerJsx = parts.join("\n");
