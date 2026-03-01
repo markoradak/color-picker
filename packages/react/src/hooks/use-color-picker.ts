@@ -29,6 +29,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
   }, []); // Only compute once on mount
 
   const [hsva, setHSVA] = useState<HSVA>(initialHSVA);
+  const hsvaRef = useRef<HSVA>(initialHSVA);
   const [format, setFormat] = useState<ColorFormat>(() =>
     typeof currentValue === "string" ? detectFormat(currentValue) : "hex"
   );
@@ -48,6 +49,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
       isInternalUpdateRef.current = false;
     } else if (typeof controlledValue === "string") {
       const newHSVA = toHSVA(controlledValue);
+      hsvaRef.current = newHSVA;
       setHSVA(newHSVA);
     }
   }
@@ -65,13 +67,11 @@ export function useColorPicker(options: UseColorPickerOptions) {
 
   const setHue = useCallback(
     (h: number): string => {
-      let result = "";
-      setHSVA((prev) => {
-        const next = { ...prev, h };
-        result = fromHSVA(next);
-        updateValue(result);
-        return next;
-      });
+      const next = { ...hsvaRef.current, h };
+      hsvaRef.current = next;
+      setHSVA(next);
+      const result = fromHSVA(next);
+      updateValue(result);
       return result;
     },
     [updateValue]
@@ -79,13 +79,11 @@ export function useColorPicker(options: UseColorPickerOptions) {
 
   const setSaturationValue = useCallback(
     (s: number, v: number): string => {
-      let result = "";
-      setHSVA((prev) => {
-        const next = { ...prev, s, v };
-        result = fromHSVA(next);
-        updateValue(result);
-        return next;
-      });
+      const next = { ...hsvaRef.current, s, v };
+      hsvaRef.current = next;
+      setHSVA(next);
+      const result = fromHSVA(next);
+      updateValue(result);
       return result;
     },
     [updateValue]
@@ -93,13 +91,11 @@ export function useColorPicker(options: UseColorPickerOptions) {
 
   const setAlpha = useCallback(
     (a: number): string => {
-      let result = "";
-      setHSVA((prev) => {
-        const next = { ...prev, a };
-        result = fromHSVA(next);
-        updateValue(result);
-        return next;
-      });
+      const next = { ...hsvaRef.current, a };
+      hsvaRef.current = next;
+      setHSVA(next);
+      const result = fromHSVA(next);
+      updateValue(result);
       return result;
     },
     [updateValue]
@@ -109,6 +105,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
     (input: string) => {
       if (!isValidColor(input)) return;
       const newHSVA = toHSVA(input);
+      hsvaRef.current = newHSVA;
       setHSVA(newHSVA);
       updateValue(input);
     },
@@ -122,7 +119,9 @@ export function useColorPicker(options: UseColorPickerOptions) {
    */
   const syncHSVA = useCallback((input: string) => {
     if (!isValidColor(input)) return;
-    setHSVA(toHSVA(input));
+    const newHSVA = toHSVA(input);
+    hsvaRef.current = newHSVA;
+    setHSVA(newHSVA);
   }, []);
 
   const toggleFormat = useCallback(() => {
