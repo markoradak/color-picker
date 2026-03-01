@@ -1,7 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type { ColorPickerSliderProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
+import { fromHSVA } from "../utils/color";
 import { clamp } from "../utils/position";
 
 const HUE_GRADIENT =
@@ -51,6 +52,10 @@ export function ColorPickerHueSlider({ className }: ColorPickerSliderProps) {
   );
 
   const thumbPosition = (hsva.h / 360) * 100;
+  const thumbColor = useMemo(
+    () => fromHSVA({ h: hsva.h, s: 100, v: 100, a: 1 }),
+    [hsva.h]
+  );
 
   return (
     <div
@@ -74,15 +79,23 @@ export function ColorPickerHueSlider({ className }: ColorPickerSliderProps) {
       ]
         .filter(Boolean)
         .join(" ")}
-      style={{ background: HUE_GRADIENT }}
     >
+      {/* Hue gradient track */}
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{ background: HUE_GRADIENT }}
+        aria-hidden="true"
+      />
       {/* Thumb indicator */}
       <div
         className="pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ left: `${thumbPosition}%` }}
         aria-hidden="true"
       >
-        <div className="h-4 w-4 rounded-full border-2 border-white bg-transparent shadow-[0_0_0_1px_rgba(0,0,0,0.2)]" />
+        <div
+          className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]"
+          style={{ backgroundColor: thumbColor }}
+        />
       </div>
     </div>
   );

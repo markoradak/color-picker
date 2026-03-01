@@ -57,6 +57,10 @@ export function ColorPickerAlphaSlider({ className }: ColorPickerSliderProps) {
 
   const alphaGradient = `linear-gradient(to right, transparent, ${solidColor})`;
   const thumbPosition = hsva.a * 100;
+  const thumbColor = useMemo(
+    () => fromHSVA(hsva),
+    [hsva.h, hsva.s, hsva.v, hsva.a]
+  );
 
   return (
     <div
@@ -73,7 +77,7 @@ export function ColorPickerAlphaSlider({ className }: ColorPickerSliderProps) {
       data-dragging={isDragging ? "" : undefined}
       className={[
         "cp-alpha-slider",
-        "relative h-3 w-full cursor-pointer overflow-hidden rounded-full outline-none",
+        "relative h-3 w-full cursor-pointer rounded-full outline-none",
         "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         className,
@@ -83,13 +87,13 @@ export function ColorPickerAlphaSlider({ className }: ColorPickerSliderProps) {
     >
       {/* Checkerboard background */}
       <div
-        className="absolute inset-0 rounded-full"
+        className="absolute inset-0 overflow-hidden rounded-full"
         style={CHECKERBOARD_STYLE}
         aria-hidden="true"
       />
       {/* Color gradient overlay */}
       <div
-        className="absolute inset-0 rounded-full"
+        className="absolute inset-0 overflow-hidden rounded-full"
         style={{ background: alphaGradient }}
         aria-hidden="true"
       />
@@ -99,7 +103,10 @@ export function ColorPickerAlphaSlider({ className }: ColorPickerSliderProps) {
         style={{ left: `${thumbPosition}%` }}
         aria-hidden="true"
       >
-        <div className="h-4 w-4 rounded-full border-2 border-white bg-transparent shadow-[0_0_0_1px_rgba(0,0,0,0.2)]" />
+        <div
+          className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]"
+          style={{ backgroundColor: thumbColor }}
+        />
       </div>
     </div>
   );
