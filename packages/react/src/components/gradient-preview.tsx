@@ -111,7 +111,7 @@ function getStopDotPosition(
     case "radial":
     case "conic":
       // All three types use the same gradient-line model.
-      // No clamping — parent overflow:hidden clips dots at edges.
+      // No clamping — dots can extend past the preview edges.
       return getLineStopVisual(stop, gradient);
     case "mesh": {
       return {
@@ -457,7 +457,7 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     <div
       className={[
         "cp-gradient-preview",
-        "relative aspect-square w-full overflow-hidden rounded-lg",
+        "relative aspect-square w-full rounded-lg",
         disabled ? "cursor-not-allowed opacity-50" : "",
         className,
       ]
