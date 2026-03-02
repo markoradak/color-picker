@@ -85,6 +85,7 @@ export interface ColorPickerSliderProps {
  */
 export interface ColorPickerInputProps {
   className?: string;
+  enableFormatToggle?: boolean;
 }
 
 /**

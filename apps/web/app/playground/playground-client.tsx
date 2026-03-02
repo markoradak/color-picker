@@ -7,7 +7,6 @@ import {
   ColorPickerHueSlider,
   ColorPickerAlphaSlider,
   ColorPickerInput,
-  ColorPickerFormatToggle,
   ColorPickerEyeDropper,
   ColorPickerSwatches,
   ColorPickerGradientEditor,
@@ -360,7 +359,6 @@ interface PlaygroundOptions {
   showAlpha: boolean;
   showEyeDropper: boolean;
   showSwatches: boolean;
-  showFormatToggle: boolean;
   showInput: boolean;
   enableGradient: boolean;
   swatchColors: string[];
@@ -451,7 +449,6 @@ function generateCode(options: PlaygroundOptions): string {
 
   if (options.showAlpha) imports.push("ColorPickerAlphaSlider");
   if (options.showInput) imports.push("ColorPickerInput");
-  if (options.showFormatToggle) imports.push("ColorPickerFormatToggle");
   if (options.showEyeDropper) imports.push("ColorPickerEyeDropper");
   if (options.showSwatches) imports.push("ColorPickerSwatches");
   if (options.enableGradient) {
@@ -495,7 +492,6 @@ function generateCode(options: PlaygroundOptions): string {
 
   const inputRow: string[] = [];
   if (options.showInput) inputRow.push("      <ColorPickerInput />");
-  if (options.showFormatToggle) inputRow.push("      <ColorPickerFormatToggle />");
   if (options.showEyeDropper) inputRow.push("      <ColorPickerEyeDropper />");
 
   if (inputRow.length > 0) {
@@ -549,7 +545,6 @@ export function PlaygroundClient() {
     showAlpha: true,
     showEyeDropper: true,
     showSwatches: true,
-    showFormatToggle: true,
     showInput: true,
     enableGradient: true,
     swatchColors: DEFAULT_SWATCHES,
@@ -662,11 +657,6 @@ export function PlaygroundClient() {
               onChange={(v) => updateOption("showInput", v)}
             />
             <Toggle
-              label="Format toggle"
-              checked={options.showFormatToggle}
-              onChange={(v) => updateOption("showFormatToggle", v)}
-            />
-            <Toggle
               label="EyeDropper"
               checked={options.showEyeDropper}
               onChange={(v) => updateOption("showEyeDropper", v)}
@@ -730,12 +720,9 @@ function InlinePicker({
               <ColorPickerArea />
               <ColorPickerHueSlider />
               {options.showAlpha && <ColorPickerAlphaSlider />}
-              {(options.showInput ||
-                options.showFormatToggle ||
-                options.showEyeDropper) && (
+              {(options.showInput || options.showEyeDropper) && (
                 <div className="flex items-center gap-2">
                   {options.showInput && <ColorPickerInput className="flex-1" />}
-                  {options.showFormatToggle && <ColorPickerFormatToggle />}
                   {options.showEyeDropper && <ColorPickerEyeDropper />}
                 </div>
               )}
@@ -782,12 +769,9 @@ function PopoverPicker({
             <ColorPickerArea />
             <ColorPickerHueSlider />
             {options.showAlpha && <ColorPickerAlphaSlider />}
-            {(options.showInput ||
-              options.showFormatToggle ||
-              options.showEyeDropper) && (
+            {(options.showInput || options.showEyeDropper) && (
               <div className="flex items-center gap-2">
                 {options.showInput && <ColorPickerInput className="flex-1" />}
-                {options.showFormatToggle && <ColorPickerFormatToggle />}
                 {options.showEyeDropper && <ColorPickerEyeDropper />}
               </div>
             )}

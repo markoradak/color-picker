@@ -23,7 +23,6 @@ function renderFullPicker(
         <ColorPicker.HueSlider />
         <ColorPicker.AlphaSlider />
         <ColorPicker.Input />
-        <ColorPicker.FormatToggle />
         {options?.swatches && (
           <ColorPicker.Swatches colors={options.swatches} />
         )}
@@ -49,7 +48,6 @@ function renderInlinePicker(
       <ColorPicker.HueSlider />
       <ColorPicker.AlphaSlider />
       <ColorPicker.Input />
-      <ColorPicker.FormatToggle />
       {options?.swatches && (
         <ColorPicker.Swatches colors={options.swatches} />
       )}
@@ -257,7 +255,6 @@ describe("ColorPicker compound component", () => {
           <ColorPicker.Area />
           <ColorPicker.HueSlider />
           <ColorPicker.Input />
-          <ColorPicker.FormatToggle />
         </ColorPicker>
       );
 

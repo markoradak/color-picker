@@ -71,8 +71,7 @@ function ColorPickerControls({
           <ColorPickerHueSlider />
           {enableAlpha && <ColorPickerAlphaSlider />}
           <div className="flex items-center gap-2">
-            <ColorPickerInput />
-            {enableFormatToggle && <ColorPickerFormatToggle />}
+            <ColorPickerInput enableFormatToggle={enableFormatToggle} />
             {enableEyeDropper && <ColorPickerEyeDropper />}
           </div>
           {swatches && swatches.length > 0 && (

@@ -6,10 +6,10 @@ import { isValidColor } from "../utils/color";
 /**
  * Text input showing the current color in the selected format (HEX, RGB, HSL).
  * Validates on blur and Enter key, reverting to the last valid value on invalid input.
- * Displays an inline format label.
+ * Includes a built-in format toggle button on the left that cycles HEX → RGB → HSL.
  */
-export function ColorPickerInput({ className }: ColorPickerInputProps) {
-  const { formattedValue, format, setColorFromString, disabled } =
+export function ColorPickerInput({ className, enableFormatToggle = true }: ColorPickerInputProps) {
+  const { formattedValue, format, toggleFormat, setColorFromString, disabled } =
     useColorPickerContext();
 
   const [inputValue, setInputValue] = useState(formattedValue);
@@ -70,15 +70,29 @@ export function ColorPickerInput({ className }: ColorPickerInputProps) {
     <div
       className={[
         "cp-input",
-        "flex items-center gap-2",
+        "flex items-center overflow-hidden rounded-md border",
+        "focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      <span className="shrink-0 select-none text-xs font-medium">
-        {formatLabel}
-      </span>
+      {enableFormatToggle && (
+        <button
+          type="button"
+          onClick={toggleFormat}
+          disabled={disabled}
+          aria-label={`Color format: ${formatLabel}. Click to change.`}
+          className={[
+            "cp-format-toggle",
+            "shrink-0 select-none border-r px-2 py-1 text-xs font-medium",
+            "outline-none hover:bg-black/5 dark:hover:bg-white/5",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+          ].join(" ")}
+        >
+          {formatLabel}
+        </button>
+      )}
       <input
         ref={inputRef}
         type="text"
@@ -92,8 +106,8 @@ export function ColorPickerInput({ className }: ColorPickerInputProps) {
         autoComplete="off"
         aria-label={`Color value in ${formatLabel} format`}
         className={[
-          "w-full rounded-md border px-2 py-1 text-sm",
-          "outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
+          "w-full px-2 py-1 text-sm",
+          "outline-none",
           "disabled:cursor-not-allowed disabled:opacity-50",
         ].join(" ")}
       />
