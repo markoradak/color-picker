@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import type { ColorPickerProviderProps, ColorPickerValue } from "../types";
 import { useColorPicker } from "../hooks/use-color-picker";
 import { useGradient } from "../hooks/use-gradient";
@@ -37,13 +37,20 @@ export function ColorPickerProvider({
   // No-op gradient state — this provider is solid-color only
   const gradientState = useGradient({});
 
+  // No-op popover state — this provider has no popover
+  const noop = useCallback(() => {}, []);
+  const preserveFocusRef = useRef(false);
+
   const contextValue = useMemo(
     () => ({
       ...pickerState,
       disabled,
       gradient: gradientState,
+      popoverOpen: false,
+      setPopoverOpen: noop,
+      preserveFocusRef,
     }),
-    [pickerState, disabled, gradientState]
+    [pickerState, disabled, gradientState, noop]
   );
 
   return (

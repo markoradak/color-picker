@@ -9,6 +9,12 @@ import type { useGradient } from "../hooks/use-gradient";
 export type ColorPickerContextValue = ReturnType<typeof useColorPicker> & {
   disabled: boolean;
   gradient: ReturnType<typeof useGradient>;
+  /** Whether the popover is currently open. */
+  popoverOpen: boolean;
+  /** Set the popover open state. */
+  setPopoverOpen: (open: boolean) => void;
+  /** Ref that, when true, tells Content to skip auto-focus on open. */
+  preserveFocusRef: React.RefObject<boolean>;
 };
 
 export const ColorPickerContext =

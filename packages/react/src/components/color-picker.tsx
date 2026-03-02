@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import type { ColorPickerProps, GradientValue } from "../types";
 import { useColorPicker } from "../hooks/use-color-picker";
@@ -74,18 +74,26 @@ export function ColorPicker({
     onValueChange: handleGradientChange,
   });
 
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const preserveFocusRef = useRef(false);
+
   const contextValue = useMemo(
     () => ({
       ...pickerState,
       disabled,
       gradient: gradientState,
+      popoverOpen,
+      setPopoverOpen,
+      preserveFocusRef,
     }),
-    [pickerState, disabled, gradientState]
+    [pickerState, disabled, gradientState, popoverOpen]
   );
 
   return (
     <ColorPickerContext.Provider value={contextValue}>
-      <Popover.Root>{children}</Popover.Root>
+      <Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
+        {children}
+      </Popover.Root>
     </ColorPickerContext.Provider>
   );
 }

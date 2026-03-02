@@ -3,6 +3,7 @@ export { ColorPicker, useColorPickerContext } from "./components/color-picker";
 export { ColorPickerProvider } from "./components/color-picker-provider";
 export { ColorPickerModeSelector } from "./components/mode-selector";
 export { ColorPickerTrigger } from "./components/trigger";
+export { ColorPickerInputTrigger } from "./components/input-trigger";
 export { ColorPickerContent } from "./components/content";
 export { ColorPickerArea } from "./components/area";
 export { ColorPickerHueSlider } from "./components/hue-slider";
@@ -47,6 +48,7 @@ export type {
   ColorPickerSwatchesProps,
   ColorPickerGradientSwatchesProps,
   ColorPickerTriggerProps,
+  ColorPickerInputTriggerProps,
   ColorPickerContentProps,
   ColorPickerPresetProps,
   ColorPickerPopoverProps,

@@ -14,6 +14,7 @@ import {
   ColorPickerGradientSwatches,
   ColorPickerModeSelector,
   ColorPickerTrigger,
+  ColorPickerInputTrigger,
   ColorPickerContent,
   toCSS,
 } from "@markoradak/color-picker";
@@ -355,6 +356,7 @@ const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
 
 interface PlaygroundOptions {
   variant: "inline" | "popover";
+  triggerMode: "thumbnail" | "input";
   showAlpha: boolean;
   showEyeDropper: boolean;
   showSwatches: boolean;
@@ -458,7 +460,11 @@ function generateCode(options: PlaygroundOptions): string {
     imports.push("ColorPickerGradientSwatches");
   }
   if (options.variant === "popover") {
-    imports.push("ColorPickerTrigger");
+    if (options.triggerMode === "input") {
+      imports.push("ColorPickerInputTrigger");
+    } else {
+      imports.push("ColorPickerTrigger");
+    }
     imports.push("ColorPickerContent");
   }
 
@@ -510,8 +516,11 @@ function generateCode(options: PlaygroundOptions): string {
 
   let jsx: string;
   if (options.variant === "popover") {
+    const triggerTag = options.triggerMode === "input"
+      ? "<ColorPickerInputTrigger />"
+      : "<ColorPickerTrigger />";
     jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}>
-    <ColorPickerTrigger />
+    ${triggerTag}
     <ColorPickerContent>
 ${innerJsx}
     </ColorPickerContent>
@@ -536,6 +545,7 @@ ${jsx}
 export function PlaygroundClient() {
   const [options, setOptions] = useState<PlaygroundOptions>({
     variant: "inline",
+    triggerMode: "thumbnail",
     showAlpha: true,
     showEyeDropper: true,
     showSwatches: true,
@@ -619,6 +629,20 @@ export function PlaygroundClient() {
                 updateOption("variant", v as "inline" | "popover")
               }
             />
+
+            {options.variant === "popover" && (
+              <SegmentedControl
+                label="Trigger mode"
+                options={[
+                  { value: "thumbnail", label: "Thumbnail" },
+                  { value: "input", label: "Input" },
+                ]}
+                value={options.triggerMode}
+                onChange={(v) =>
+                  updateOption("triggerMode", v as "thumbnail" | "input")
+                }
+              />
+            )}
 
             <hr className="border-neutral-200 dark:border-neutral-700" />
 
@@ -739,7 +763,11 @@ function PopoverPicker({
 
   return (
     <ColorPicker value={value} onValueChange={onValueChange}>
-      <ColorPickerTrigger />
+      {options.triggerMode === "input" ? (
+        <ColorPickerInputTrigger />
+      ) : (
+        <ColorPickerTrigger />
+      )}
       <ColorPickerContent>
         {options.enableGradient && <ColorPickerModeSelector />}
         {isGradientMode ? (

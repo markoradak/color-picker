@@ -8,6 +8,7 @@ import type { ColorPickerPopoverProps, ColorPickerInlineProps } from "../types";
 import { ColorPicker } from "./color-picker";
 import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerTrigger } from "./trigger";
+import { ColorPickerInputTrigger } from "./input-trigger";
 import { ColorPickerContent } from "./content";
 import { ColorPickerArea } from "./area";
 import { ColorPickerHueSlider } from "./hue-slider";
@@ -120,8 +121,24 @@ export function ColorPickerPopover({
   align = "center",
   sideOffset = 4,
   trigger,
+  triggerMode = "thumbnail",
   className,
 }: ColorPickerPopoverProps) {
+  const renderTrigger = () => {
+    if (trigger) {
+      return <ColorPickerTrigger asChild>{trigger}</ColorPickerTrigger>;
+    }
+    if (triggerMode === "input") {
+      return (
+        <ColorPickerInputTrigger
+          enableFormatToggle={enableFormatToggle}
+          enableEyeDropper={enableEyeDropper}
+        />
+      );
+    }
+    return <ColorPickerTrigger />;
+  };
+
   return (
     <ColorPicker
       value={value}
@@ -130,11 +147,7 @@ export function ColorPickerPopover({
       disabled={disabled}
     >
       <div className={className}>
-        {trigger ? (
-          <ColorPickerTrigger asChild>{trigger}</ColorPickerTrigger>
-        ) : (
-          <ColorPickerTrigger />
-        )}
+        {renderTrigger()}
       </div>
       <ColorPickerContent side={side} align={align} sideOffset={sideOffset}>
         <ColorPickerControls

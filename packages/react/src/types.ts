@@ -115,6 +115,19 @@ export interface ColorPickerTriggerProps {
 }
 
 /**
+ * Props for the ColorPickerInputTrigger component.
+ * An input-style trigger where the thumbnail opens the popover,
+ * while the text input, format toggle, and eye dropper are interactive inline.
+ */
+export interface ColorPickerInputTriggerProps {
+  className?: string;
+  /** Show the format toggle button inline. Default: true */
+  enableFormatToggle?: boolean;
+  /** Show the eye dropper button inline (auto-hidden if browser unsupported). Default: true */
+  enableEyeDropper?: boolean;
+}
+
+/**
  * Props for the ColorPicker.Content component.
  */
 export interface ColorPickerContentProps {
@@ -122,6 +135,8 @@ export interface ColorPickerContentProps {
   side?: "top" | "right" | "bottom" | "left";
   align?: "start" | "center" | "end";
   sideOffset?: number;
+  /** Called when the popover content receives focus after opening. Call `event.preventDefault()` to prevent auto-focus. */
+  onOpenAutoFocus?: (event: Event) => void;
   children: React.ReactNode;
 }
 
@@ -181,6 +196,15 @@ export interface ColorPickerPopoverProps extends ColorPickerPresetProps {
   sideOffset?: number;
   /** Custom trigger element. If not provided, a default color swatch trigger is rendered. */
   trigger?: React.ReactNode;
+  /**
+   * Trigger display mode.
+   * - "thumbnail": Renders a small color swatch button (default).
+   * - "input": Renders an input-style trigger showing the color thumbnail and formatted value.
+   *
+   * Ignored when a custom `trigger` is provided.
+   * Default: "thumbnail"
+   */
+  triggerMode?: "thumbnail" | "input";
 }
 
 /**
