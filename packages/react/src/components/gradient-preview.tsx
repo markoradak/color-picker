@@ -583,7 +583,7 @@ export function GradientPreview({ className }: GradientPreviewProps) {
                 className={[
                   "absolute -translate-x-1/2 -translate-y-1/2",
                   "h-4 w-4 rounded-full border-2 outline-none",
-                  "focus-visible:ring-2 focus-visible:ring-blue-500",
+                  "",
                   isActive
                     ? "border-white shadow-[0_0_0_2px_rgba(59,130,246,0.8),0_1px_4px_rgba(0,0,0,0.4)] z-10"
                     : "border-white/80 shadow-[0_0_0_1px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.3)]",

@@ -30,7 +30,7 @@ export function ColorPickerFormatToggle({
       className={[
         "cp-format-toggle",
         "shrink-0 rounded-md border px-2 py-1 text-xs font-medium",
-        "outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+        "outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       ]

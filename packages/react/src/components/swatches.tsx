@@ -52,7 +52,7 @@ export function ColorPickerSwatches({
             aria-pressed={isActive}
             className={[
               "relative h-6 w-6 rounded-md border outline-none",
-              "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+              "",
               "disabled:cursor-not-allowed disabled:opacity-50",
               isActive ? "ring-1" : "",
             ].join(" ")}

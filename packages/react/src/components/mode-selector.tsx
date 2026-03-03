@@ -96,7 +96,7 @@ export function ColorPickerModeSelector({ className }: ColorPickerModeSelectorPr
             disabled={disabled}
             className={[
               "flex-1 rounded-md px-2 py-1 text-xs font-medium outline-none transition-colors",
-              "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+              "",
               "disabled:cursor-not-allowed disabled:opacity-50",
               isActive
                 ? ""

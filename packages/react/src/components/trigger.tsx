@@ -42,7 +42,7 @@ export const ColorPickerTrigger = forwardRef<
       className={[
         "cp-trigger",
         "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border p-1",
-        "outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+        "outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       ]

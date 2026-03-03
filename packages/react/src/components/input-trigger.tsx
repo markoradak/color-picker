@@ -166,7 +166,7 @@ export function ColorPickerInputTrigger({
           "cp-input-trigger",
           "inline-flex h-10 w-full cursor-pointer items-center gap-2 rounded-lg border px-1.5",
           "text-left",
-          "focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2",
+          "",
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
           className,
         ]
@@ -201,7 +201,7 @@ export function ColorPickerInputTrigger({
             disabled={disabled}
             tabIndex={-1}
             aria-label={`Color format: ${formatLabel}. Click to change.`}
-            className="shrink-0 cursor-pointer select-none rounded px-1 text-xs font-medium opacity-50 outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed"
+            className="shrink-0 cursor-pointer select-none rounded px-1 text-xs font-medium opacity-50 outline-none hover:opacity-80 disabled:cursor-not-allowed"
           >
             {formatLabel}
           </button>
@@ -242,7 +242,7 @@ export function ColorPickerInputTrigger({
             disabled={disabled || isPicking}
             tabIndex={-1}
             aria-label="Pick a color from the screen"
-            className="inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded opacity-50 outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-30"
+            className="inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded opacity-50 outline-none hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-30"
           >
             {isPicking ? (
               <svg

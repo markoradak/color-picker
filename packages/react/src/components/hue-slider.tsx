@@ -73,7 +73,7 @@ export function ColorPickerHueSlider({ className }: ColorPickerSliderProps) {
       className={[
         "cp-hue-slider",
         "relative h-3 w-full cursor-pointer rounded-full outline-none",
-        "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+        "",
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         className,
       ]

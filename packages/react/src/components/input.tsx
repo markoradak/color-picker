@@ -71,7 +71,7 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
       className={[
         "cp-input",
         "flex items-center overflow-hidden rounded-md border",
-        "focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500",
+        "",
         className,
       ]
         .filter(Boolean)
@@ -86,7 +86,7 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
           className={[
             "cp-format-toggle",
             "shrink-0 select-none border-r px-2 py-1 text-xs font-medium",
-            "outline-none hover:bg-black/5 dark:hover:bg-white/5",
+            "outline-none",
             "disabled:cursor-not-allowed disabled:opacity-50",
           ].join(" ")}
         >

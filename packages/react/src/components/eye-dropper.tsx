@@ -68,7 +68,7 @@ export function ColorPickerEyeDropper({
       className={[
         "cp-eye-dropper",
         "inline-flex h-8 w-8 items-center justify-center rounded-md border",
-        "outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
+        "outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       ]

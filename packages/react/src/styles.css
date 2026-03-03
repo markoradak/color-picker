@@ -122,7 +122,13 @@
 
 /* Input container */
 .cp-input {
+  border-color: var(--cp-input-border);
   gap: 0.5rem;
+}
+
+/* Input trigger */
+.cp-input-trigger {
+  border-color: var(--cp-input-border);
 }
 
 .cp-input span {
@@ -208,4 +214,69 @@
 /* Gradient stops */
 .cp-gradient-stops [role="group"] {
   border-radius: var(--cp-radius-full);
+}
+
+/* ------------------------------------------------------------------ */
+/* Focus ring & hover states via CSS custom properties                 */
+/* ------------------------------------------------------------------ */
+
+/* Shared focus-visible ring (trigger, area, sliders, eye dropper, format toggle, swatches, mode selector) */
+.cp-trigger:focus-visible,
+.cp-area:focus-visible,
+.cp-hue-slider:focus-visible,
+.cp-alpha-slider:focus-visible,
+.cp-eye-dropper:focus-visible,
+.cp-format-toggle:focus-visible,
+.cp-swatches button:focus-visible,
+.cp-mode-selector [role="radio"]:focus-visible {
+  outline: none;
+  box-shadow: var(--cp-ring);
+}
+
+/* Ring offset — larger for main controls, smaller for compact buttons */
+.cp-trigger:focus-visible,
+.cp-area:focus-visible,
+.cp-hue-slider:focus-visible,
+.cp-alpha-slider:focus-visible {
+  outline: var(--cp-ring-offset) solid transparent;
+  outline-offset: 0;
+}
+
+.cp-eye-dropper:focus-visible,
+.cp-format-toggle:focus-visible,
+.cp-swatches button:focus-visible,
+.cp-mode-selector [role="radio"]:focus-visible {
+  outline: 1px solid transparent;
+  outline-offset: 0;
+}
+
+/* Gradient stop dots */
+.cp-gradient-stops button:focus-visible,
+.cp-gradient-preview [data-stop-dot]:focus-visible {
+  outline: none;
+  box-shadow: var(--cp-ring);
+}
+
+/* Input container — focus-within border + ring */
+.cp-input:focus-within {
+  border-color: var(--cp-border-focus);
+  box-shadow: 0 0 0 1px var(--cp-border-focus);
+}
+
+/* Input-trigger — focus-within ring + offset */
+.cp-input-trigger:focus-within {
+  outline: var(--cp-ring-offset) solid transparent;
+  outline-offset: 0;
+  box-shadow: var(--cp-ring);
+}
+
+/* Inline format toggle inside input — hover uses custom property */
+.cp-input .cp-format-toggle:hover:not(:disabled) {
+  background-color: var(--cp-hover-bg);
+}
+
+/* Input-trigger inline buttons — focus-visible ring */
+.cp-input-trigger button:focus-visible {
+  outline: none;
+  box-shadow: var(--cp-ring);
 }
