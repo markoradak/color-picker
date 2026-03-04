@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import type { ColorPickerInputTriggerProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
@@ -17,6 +17,16 @@ interface EyeDropperConstructor {
 
 function isEyeDropperSupported(): boolean {
   return typeof window !== "undefined" && "EyeDropper" in window;
+}
+
+const emptySubscribe = () => () => {};
+
+function useIsEyeDropperSupported(): boolean {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => isEyeDropperSupported(),
+    () => false,
+  );
 }
 
 /**
@@ -154,7 +164,8 @@ export function ColorPickerInputTrigger({
   const formatLabel = isGradientMode
     ? gradient.gradient.type.toUpperCase()
     : format.toUpperCase();
-  const showEyeDropper = enableEyeDropper && isEyeDropperSupported();
+  const eyeDropperSupported = useIsEyeDropperSupported();
+  const showEyeDropper = enableEyeDropper && eyeDropperSupported;
 
   return (
     <Popover.Anchor asChild>
