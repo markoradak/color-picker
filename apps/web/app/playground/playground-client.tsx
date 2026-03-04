@@ -565,7 +565,7 @@ export function PlaygroundClient() {
   return (
     <div className="flex flex-col gap-8">
       {/* Top: Preview + Options side by side */}
-      <div className="grid gap-6 sm:grid-cols-[minmax(0,_24rem)_1fr]">
+      <div className="grid gap-6 sm:grid-cols-[minmax(0,_18rem)_1fr]">
         {/* Preview */}
         <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 sm:p-6">
           <h2 className="mb-4 text-sm font-semibold text-neutral-900 dark:text-neutral-100">

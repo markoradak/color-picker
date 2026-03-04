@@ -51,7 +51,7 @@ export function ColorPickerSwatches({
             aria-label={`Select color ${color}`}
             aria-pressed={isActive}
             className={[
-              "relative h-6 w-6 rounded-md border outline-none",
+              "relative aspect-square rounded-md border outline-none",
               "",
               "disabled:cursor-not-allowed disabled:opacity-50",
               isActive ? "ring-1" : "",

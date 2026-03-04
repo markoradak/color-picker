@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 import { useColorPickerContext } from "./color-picker-context";
 
 interface ColorPickerEyeDropperProps {
@@ -14,11 +14,27 @@ interface EyeDropperConstructor {
   new (): EyeDropperAPI;
 }
 
-/**
- * Check if the EyeDropper API is available in the current browser.
- */
-function isEyeDropperSupported(): boolean {
+const emptySubscribe = () => () => {};
+
+function getEyeDropperSupported() {
   return typeof window !== "undefined" && "EyeDropper" in window;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
+/**
+ * SSR-safe hook that returns whether the EyeDropper API is available.
+ * Returns false on the server and during hydration, then the real value
+ * after mount — avoiding hydration mismatches.
+ */
+function useEyeDropperSupported(): boolean {
+  return useSyncExternalStore(
+    emptySubscribe,
+    getEyeDropperSupported,
+    getServerSnapshot,
+  );
 }
 
 /**
@@ -33,9 +49,10 @@ export function ColorPickerEyeDropper({
 }: ColorPickerEyeDropperProps) {
   const { setColorFromString, disabled } = useColorPickerContext();
   const [isPicking, setIsPicking] = useState(false);
+  const supported = useEyeDropperSupported();
 
   const handleClick = useCallback(async () => {
-    if (disabled || !isEyeDropperSupported()) return;
+    if (disabled || !supported) return;
 
     const EyeDropper = (
       window as unknown as { EyeDropper: EyeDropperConstructor }
@@ -52,10 +69,10 @@ export function ColorPickerEyeDropper({
     } finally {
       setIsPicking(false);
     }
-  }, [setColorFromString, disabled]);
+  }, [setColorFromString, disabled, supported]);
 
   // Graceful degradation: render nothing if API is unavailable
-  if (!isEyeDropperSupported()) {
+  if (!supported) {
     return null;
   }
 
