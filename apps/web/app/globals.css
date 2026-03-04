@@ -46,13 +46,13 @@
   color: #a1a1aa;
 }
 
-.dark .cp-input input {
+.dark .cp-input-field {
   background-color: #2c2c2e;
   border-color: #444;
   color: #e5e5e5;
 }
 
-.dark .cp-input input:focus {
+.dark .cp-input-field:focus {
   border-color: #3b82f6;
 }
 
@@ -77,6 +77,10 @@
 }
 
 .dark .cp-trigger {
+  border-color: #444;
+}
+
+.dark .cp-input-trigger {
   border-color: #444;
 }
 

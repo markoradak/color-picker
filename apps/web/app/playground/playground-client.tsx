@@ -541,7 +541,7 @@ ${jsx}
 export function PlaygroundClient() {
   const [options, setOptions] = useState<PlaygroundOptions>({
     variant: "inline",
-    triggerMode: "thumbnail",
+    triggerMode: "input",
     showAlpha: true,
     showEyeDropper: true,
     showSwatches: true,
@@ -563,10 +563,10 @@ export function PlaygroundClient() {
   );
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-      {/* Left: Live picker + options */}
-      <div className="flex flex-col gap-6">
-        {/* Live picker */}
+    <div className="flex flex-col gap-8">
+      {/* Top: Preview + Options side by side */}
+      <div className="grid gap-6 sm:grid-cols-[minmax(0,_24rem)_1fr]">
+        {/* Preview */}
         <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 sm:p-6">
           <h2 className="mb-4 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             Preview
@@ -586,28 +586,9 @@ export function PlaygroundClient() {
               />
             )}
           </div>
-
-          {/* CSS output */}
-          <div className="mt-6">
-            <p className="mb-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">
-              CSS Output
-            </p>
-            <div className="flex items-center gap-3">
-              <div
-                className="h-8 w-8 shrink-0 rounded-md border border-neutral-200 dark:border-neutral-700"
-                style={{ background: cssValue }}
-              />
-              <div className="relative flex-1">
-                <code className="block overflow-x-auto rounded-md bg-neutral-100 px-3 py-2 font-mono text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
-                  {cssValue}
-                </code>
-                <CopyButton text={cssValue} />
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Options panel */}
+        {/* Options */}
         <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 sm:p-6">
           <h2 className="mb-4 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             Options
@@ -629,8 +610,8 @@ export function PlaygroundClient() {
               <SegmentedControl
                 label="Trigger mode"
                 options={[
-                  { value: "thumbnail", label: "Thumbnail" },
                   { value: "input", label: "Input" },
+                  { value: "thumbnail", label: "Thumbnail" },
                 ]}
                 value={options.triggerMode}
                 onChange={(v) =>
@@ -670,22 +651,39 @@ export function PlaygroundClient() {
         </div>
       </div>
 
-      {/* Right: Generated code */}
-      <div className="flex flex-col gap-6">
-        <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 sm:p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-              Generated Code
-            </h2>
+      {/* CSS Output */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 sm:p-6">
+        <h2 className="mb-3 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+          CSS Output
+        </h2>
+        <div className="flex items-center gap-3">
+          <div
+            className="h-8 w-8 shrink-0 rounded-md border border-neutral-200 dark:border-neutral-700"
+            style={{ background: cssValue }}
+          />
+          <div className="relative flex-1">
+            <code className="block overflow-x-auto rounded-md bg-neutral-100 px-3 py-2 font-mono text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+              {cssValue}
+            </code>
+            <CopyButton text={cssValue} />
           </div>
-          <div className="relative">
-            <pre className="max-h-[600px] overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs leading-relaxed dark:border-neutral-700 dark:bg-neutral-800">
-              <code className="font-mono text-neutral-800 dark:text-neutral-200">
-                {generatedCode}
-              </code>
-            </pre>
-            <CopyButton text={generatedCode} />
-          </div>
+        </div>
+      </div>
+
+      {/* Generated code */}
+      <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 sm:p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+            Generated Code
+          </h2>
+        </div>
+        <div className="relative">
+          <pre className="max-h-[600px] overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs leading-relaxed dark:border-neutral-700 dark:bg-neutral-800">
+            <code className="font-mono text-neutral-800 dark:text-neutral-200">
+              {generatedCode}
+            </code>
+          </pre>
+          <CopyButton text={generatedCode} />
         </div>
       </div>
     </div>
@@ -704,7 +702,7 @@ function InlinePicker({
   const isGradientMode = typeof value !== "string";
 
   return (
-    <div className="w-full max-w-[272px]">
+    <div className="w-full">
       <ColorPicker value={value} onValueChange={onValueChange}>
         <div className="flex flex-col gap-3">
           {options.enableGradient && <ColorPickerModeSelector />}

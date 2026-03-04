@@ -70,8 +70,7 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
     <div
       className={[
         "cp-input",
-        "flex items-center overflow-hidden rounded-md border",
-        "",
+        "flex items-center gap-1.5",
         className,
       ]
         .filter(Boolean)
@@ -85,7 +84,7 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
           aria-label={`Color format: ${formatLabel}. Click to change.`}
           className={[
             "cp-format-toggle",
-            "shrink-0 select-none border-r px-2 py-1 text-xs font-medium",
+            "shrink-0 select-none rounded-md border px-2 h-8 text-xs font-medium",
             "outline-none",
             "disabled:cursor-not-allowed disabled:opacity-50",
           ].join(" ")}
@@ -106,7 +105,8 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
         autoComplete="off"
         aria-label={`Color value in ${formatLabel} format`}
         className={[
-          "w-full px-2 py-1 text-sm",
+          "cp-input-field",
+          "w-full rounded-md border px-2 h-8 text-sm",
           "outline-none",
           "disabled:cursor-not-allowed disabled:opacity-50",
         ].join(" ")}
