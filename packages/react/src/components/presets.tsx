@@ -61,7 +61,7 @@ function ColorPickerControls({
         <>
           <ColorPickerGradientEditor />
           {gradientSwatches && gradientSwatches.length > 0 && (
-            <ColorPickerGradientSwatches gradients={gradientSwatches} className="mt-0.5" />
+            <ColorPickerGradientSwatches values={gradientSwatches} className="mt-0.5" />
           )}
         </>
       ) : (
@@ -75,7 +75,7 @@ function ColorPickerControls({
             {enableEyeDropper && <ColorPickerEyeDropper />}
           </div>
           {swatches && swatches.length > 0 && (
-            <ColorPickerSwatches colors={swatches} columns={swatchColumns} />
+            <ColorPickerSwatches values={swatches} columns={swatchColumns} />
           )}
         </>
       )}

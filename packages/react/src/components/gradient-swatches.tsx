@@ -53,10 +53,10 @@ const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
  * Reuses the same `cp-swatches` CSS class and button markup as the
  * solid color swatches for a consistent appearance.
  *
- * When no `gradients` are provided, a default set of presets is used.
+ * When no `values` are provided, a default set of presets is used.
  */
 export function ColorPickerGradientSwatches({
-  gradients = DEFAULT_GRADIENT_SWATCHES,
+  values = DEFAULT_GRADIENT_SWATCHES,
   columns = 8,
   className,
 }: ColorPickerGradientSwatchesProps) {
@@ -72,9 +72,9 @@ export function ColorPickerGradientSwatches({
   const filtered = useMemo(
     () =>
       currentType
-        ? gradients.filter((g) => g.type === currentType)
-        : gradients,
-    [gradients, currentType]
+        ? values.filter((g) => g.type === currentType)
+        : values,
+    [values, currentType]
   );
 
   const handleClick = useCallback(

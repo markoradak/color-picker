@@ -19,10 +19,10 @@ const DEFAULT_SWATCH_COLORS = [
  * Clicking a swatch updates the color in context.
  * The active swatch (matching current color) shows a checkmark indicator.
  *
- * When no `colors` are provided, a default palette is used.
+ * When no `values` are provided, a default palette is used.
  */
 export function ColorPickerSwatches({
-  colors = DEFAULT_SWATCH_COLORS,
+  values = DEFAULT_SWATCH_COLORS,
   columns = 8,
   className,
 }: ColorPickerSwatchesProps) {
@@ -51,7 +51,7 @@ export function ColorPickerSwatches({
         .join(" ")}
       style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
-      {colors.map((color) => {
+      {values.map((color) => {
         const isActive = color.toLowerCase() === currentColor;
         const checkColor = getContrastColor(color);
 

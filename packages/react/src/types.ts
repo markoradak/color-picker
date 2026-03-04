@@ -92,7 +92,7 @@ export interface ColorPickerInputProps {
  * Props for the ColorPicker.Swatches component.
  */
 export interface ColorPickerSwatchesProps {
-  colors?: string[];
+  values?: string[];
   columns?: number;
   className?: string;
 }
@@ -101,7 +101,7 @@ export interface ColorPickerSwatchesProps {
  * Props for the ColorPicker.GradientSwatches component.
  */
 export interface ColorPickerGradientSwatchesProps {
-  gradients?: GradientValue[];
+  values?: GradientValue[];
   columns?: number;
   className?: string;
 }

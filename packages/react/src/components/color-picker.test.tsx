@@ -24,7 +24,7 @@ function renderFullPicker(
         <ColorPicker.AlphaSlider />
         <ColorPicker.Input />
         {options?.swatches && (
-          <ColorPicker.Swatches colors={options.swatches} />
+          <ColorPicker.Swatches values={options.swatches} />
         )}
       </ColorPicker.Content>
     </ColorPicker>
@@ -49,7 +49,7 @@ function renderInlinePicker(
       <ColorPicker.AlphaSlider />
       <ColorPicker.Input />
       {options?.swatches && (
-        <ColorPicker.Swatches colors={options.swatches} />
+        <ColorPicker.Swatches values={options.swatches} />
       )}
     </ColorPicker>
   );

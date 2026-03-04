@@ -503,12 +503,12 @@ function generateCode(options: PlaygroundOptions): string {
   if (options.showEyeDropper) parts.push("    <ColorPickerEyeDropper />");
 
   if (options.showSwatches) {
-    parts.push("    <ColorPickerSwatches {/* colors={[...]} */} />");
+    parts.push("    <ColorPickerSwatches {/* values={[...]} */} />");
   }
 
   if (options.enableGradient) {
     parts.push("    <ColorPickerGradientEditor />");
-    parts.push("    <ColorPickerGradientSwatches {/* gradients={[...]} */} />");
+    parts.push("    <ColorPickerGradientSwatches {/* values={[...]} */} />");
   }
 
   const innerJsx = parts.join("\n");
@@ -718,7 +718,7 @@ function InlinePicker({
             <>
               <ColorPickerGradientEditor />
               {options.showSwatches && (
-                <ColorPickerGradientSwatches gradients={DEFAULT_GRADIENT_SWATCHES} className="mt-0.5" />
+                <ColorPickerGradientSwatches values={DEFAULT_GRADIENT_SWATCHES} className="mt-0.5" />
               )}
             </>
           ) : (
@@ -733,7 +733,7 @@ function InlinePicker({
                 </div>
               )}
               {options.showSwatches && (
-                <ColorPickerSwatches colors={options.swatchColors} />
+                <ColorPickerSwatches values={options.swatchColors} />
               )}
             </>
           )}
@@ -767,7 +767,7 @@ function PopoverPicker({
           <>
             <ColorPickerGradientEditor />
             {options.showSwatches && (
-              <ColorPickerGradientSwatches gradients={DEFAULT_GRADIENT_SWATCHES} className="mt-0.5" />
+              <ColorPickerGradientSwatches values={DEFAULT_GRADIENT_SWATCHES} className="mt-0.5" />
             )}
           </>
         ) : (
@@ -782,7 +782,7 @@ function PopoverPicker({
               </div>
             )}
             {options.showSwatches && (
-              <ColorPickerSwatches colors={options.swatchColors} />
+              <ColorPickerSwatches values={options.swatchColors} />
             )}
           </>
         )}

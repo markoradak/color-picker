@@ -43,7 +43,7 @@ export function HeroDemo() {
               <ColorPickerFormatToggle />
               <ColorPickerEyeDropper />
             </div>
-            <ColorPickerSwatches colors={SWATCHES} />
+            <ColorPickerSwatches values={SWATCHES} />
           </div>
         </ColorPicker>
       </div>

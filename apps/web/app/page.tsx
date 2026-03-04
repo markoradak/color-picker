@@ -32,7 +32,7 @@ function MyColorPicker() {
           <ColorPickerEyeDropper />
         </div>
         <ColorPickerSwatches
-          colors={["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"]}
+          values={["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"]}
         />
       </ColorPickerContent>
     </ColorPicker>
