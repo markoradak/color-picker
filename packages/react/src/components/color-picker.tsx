@@ -49,6 +49,7 @@ export function ColorPicker({
   onValueChange,
   defaultValue,
   disabled = false,
+  defaultOpen = false,
   children,
 }: ColorPickerProps) {
   const pickerState = useColorPicker({
@@ -74,7 +75,7 @@ export function ColorPicker({
     onValueChange: handleGradientChange,
   });
 
-  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(defaultOpen);
   const preserveFocusRef = useRef(false);
 
   const contextValue = useMemo(

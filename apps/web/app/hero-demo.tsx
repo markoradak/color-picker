@@ -15,25 +15,15 @@ import {
   ColorPickerInputTrigger,
   ColorPickerContent,
 } from "@markoradak/color-picker";
-import type { ColorPickerValue, GradientValue } from "@markoradak/color-picker";
-
-const DEFAULT_GRADIENT: GradientValue = {
-  type: "linear",
-  angle: 135,
-  stops: [
-    { id: "s1", color: "#16db89", position: 0 },
-    { id: "s2", color: "#3b82f6", position: 50 },
-    { id: "s3", color: "#8b5cf6", position: 100 },
-  ],
-};
+import type { ColorPickerValue } from "@markoradak/color-picker";
 
 export function HeroDemo() {
-  const [value, setValue] = useState<ColorPickerValue>(DEFAULT_GRADIENT);
+  const [value, setValue] = useState<ColorPickerValue>("#16db89");
 
   const isGradientMode = typeof value !== "string";
 
   return (
-    <ColorPicker value={value} onValueChange={setValue}>
+    <ColorPicker value={value} onValueChange={setValue} defaultOpen>
       <div style={{ width: 'calc(var(--cp-width) + 2px)' }}>
         <ColorPickerInputTrigger />
       </div>
