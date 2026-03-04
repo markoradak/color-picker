@@ -61,7 +61,7 @@ export interface ColorPickerProps {
   defaultValue?: ColorPickerValue;
   /** Whether the picker is disabled */
   disabled?: boolean;
-  /** Whether the popover should be open by default */
+  /** Whether the popover starts open (uncontrolled) */
   defaultOpen?: boolean;
   /** Children (compound components) */
   children: React.ReactNode;
