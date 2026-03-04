@@ -106,12 +106,11 @@ export function ColorPickerGradientSwatches({
       aria-label="Gradient swatches"
       className={[
         "cp-swatches",
-        "grid gap-1",
+        "flex flex-wrap justify-between gap-y-1",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
-      style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
       {filtered.map((gradient, i) => {
         const css = toCSS(gradient);

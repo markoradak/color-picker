@@ -31,7 +31,7 @@ export function ColorPickerGradientEditor({ className }: GradientEditorProps) {
     <div
       className={[
         "cp-gradient-editor",
-        "flex flex-col",
+        "flex flex-col pb-1",
         className,
       ]
         .filter(Boolean)

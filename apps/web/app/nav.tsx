@@ -22,32 +22,32 @@ export function Nav() {
     theme === "light" ? "Light" : theme === "dark" ? "Dark" : "System";
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/80">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
+    <nav className="sticky top-0 z-50 border-b border-[#e5e5e5] bg-white/80 backdrop-blur-md dark:border-[#2a2a2a] dark:bg-[#0f0f0f]/80">
+      <div className="mx-auto flex h-14 max-w-[1000px] items-center justify-between px-6 md:px-10">
         <div className="flex items-center gap-6">
           <Link
             href="/"
-            className="text-sm font-semibold tracking-tight text-neutral-900 dark:text-neutral-100"
+            className="text-sm font-semibold text-[#222] transition-colors hover:text-accent dark:text-white dark:hover:text-accent"
           >
             @markoradak/color-picker
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-4">
             <Link
               href="/"
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`text-sm transition-colors ${
                 pathname === "/"
-                  ? "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100"
-                  : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                  ? "text-[#222] dark:text-white"
+                  : "text-[#666] hover:text-accent"
               }`}
             >
               Home
             </Link>
             <Link
               href="/playground"
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`text-sm transition-colors ${
                 pathname === "/playground"
-                  ? "bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100"
-                  : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                  ? "text-[#222] dark:text-white"
+                  : "text-[#666] hover:text-accent"
               }`}
             >
               Playground
@@ -59,7 +59,7 @@ export function Nav() {
             href="https://github.com/markoradak/color-picker"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+            className="text-[#666] transition-colors hover:text-accent"
             aria-label="GitHub repository"
           >
             <svg
@@ -74,7 +74,7 @@ export function Nav() {
           <button
             type="button"
             onClick={cycleTheme}
-            className="flex items-center gap-1.5 rounded-md border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-50 hover:text-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+            className="flex items-center gap-1.5 rounded-md border border-[#e5e5e5] px-2.5 py-1.5 text-xs text-[#666] transition-colors hover:text-accent dark:border-[#2a2a2a]"
             aria-label={`Current theme: ${themeLabel}. Click to change.`}
           >
             {theme === "light" && (

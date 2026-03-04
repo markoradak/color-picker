@@ -44,12 +44,11 @@ export function ColorPickerSwatches({
       aria-label="Color swatches"
       className={[
         "cp-swatches",
-        "grid gap-1",
+        "flex flex-wrap justify-between gap-y-1",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
-      style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
       {values.map((color) => {
         const isActive = color.toLowerCase() === currentColor;

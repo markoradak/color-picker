@@ -206,7 +206,7 @@ export function ColorPickerInline({
       <div
         className={[
           "cp-inline",
-          "flex w-64 flex-col gap-3 rounded-xl border p-3",
+          "flex flex-col gap-3 rounded-xl border p-3",
           className,
         ]
           .filter(Boolean)

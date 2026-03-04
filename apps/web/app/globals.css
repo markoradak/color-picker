@@ -4,6 +4,16 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --font-mono: "Source Code Pro", ui-monospace, SFMono-Regular, "SF Mono",
+    Menlo, Consolas, "Liberation Mono", monospace;
+  --color-accent: #16db89;
+}
+
+body {
+  font-family: var(--font-mono);
+}
+
 /* Popover open/close animations (Radix data-state attributes) */
 @keyframes cp-fade-in {
   from {

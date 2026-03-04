@@ -9,9 +9,9 @@ const COMPOUND_EXAMPLE = `import {
   ColorPickerHueSlider,
   ColorPickerAlphaSlider,
   ColorPickerInput,
-  ColorPickerFormatToggle,
   ColorPickerEyeDropper,
-  ColorPickerSwatches,
+  ColorPickerModeSelector,
+  ColorPickerGradientEditor,
   ColorPickerTrigger,
   ColorPickerContent,
 } from "@markoradak/color-picker";
@@ -23,17 +23,12 @@ function MyColorPicker() {
     <ColorPicker value={color} onValueChange={setColor}>
       <ColorPickerTrigger />
       <ColorPickerContent>
+        <ColorPickerModeSelector />
         <ColorPickerArea />
         <ColorPickerHueSlider />
         <ColorPickerAlphaSlider />
-        <div className="flex items-center gap-2">
-          <ColorPickerInput />
-          <ColorPickerFormatToggle />
-          <ColorPickerEyeDropper />
-        </div>
-        <ColorPickerSwatches
-          values={["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"]}
-        />
+        <ColorPickerInput />
+        <ColorPickerEyeDropper />
       </ColorPickerContent>
     </ColorPicker>
   );
@@ -41,9 +36,9 @@ function MyColorPicker() {
 
 const GRADIENT_EXAMPLE = `import {
   ColorPicker,
-  ColorPickerArea,
-  ColorPickerHueSlider,
   ColorPickerGradientEditor,
+  ColorPickerGradientSwatches,
+  ColorPickerModeSelector,
   toCSS,
 } from "@markoradak/color-picker";
 import type { ColorPickerValue } from "@markoradak/color-picker";
@@ -59,14 +54,28 @@ function MyGradientPicker() {
   });
 
   return (
-    <>
-      <ColorPicker value={value} onValueChange={setValue}>
-        <ColorPickerArea />
-        <ColorPickerHueSlider />
-        <ColorPickerGradientEditor />
-      </ColorPicker>
+    <ColorPicker value={value} onValueChange={setValue}>
+      <ColorPickerModeSelector />
+      <ColorPickerGradientEditor />
+      <ColorPickerGradientSwatches values={[...]} />
       <div style={{ background: toCSS(value) }} />
-    </>
+    </ColorPicker>
+  );
+}`;
+
+const PRESET_EXAMPLE = `import { ColorPickerInline } from "@markoradak/color-picker/presets";
+
+function QuickPicker() {
+  const [color, setColor] = useState("#16db89");
+
+  return (
+    <ColorPickerInline
+      value={color}
+      onValueChange={setColor}
+      enableGradient
+      enableAlpha
+      swatches={["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"]}
+    />
   );
 }`;
 
@@ -75,387 +84,278 @@ const FEATURES = [
     title: "Compound Components",
     description:
       "Radix-style composable API. Pick only the parts you need and arrange them however you want.",
-    icon: (
-      <svg
-        className="h-6 w-6"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <rect x="3" y="3" width="7" height="7" />
-        <rect x="14" y="3" width="7" height="7" />
-        <rect x="14" y="14" width="7" height="7" />
-        <rect x="3" y="14" width="7" height="7" />
-      </svg>
-    ),
   },
   {
     title: "Gradient Editor",
     description:
-      "Built-in support for linear, radial, conic, and mesh gradients with interactive stop editing.",
-    icon: (
-      <svg
-        className="h-6 w-6"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        <path d="M2 12h20" />
-      </svg>
-    ),
+      "Linear, radial, conic, and mesh gradients with interactive stop editing, angle controls, and type switching.",
+  },
+  {
+    title: "Solid Colors",
+    description:
+      "Full HEX, RGB, and HSL support with format toggling, validated input, and automatic formatting.",
+  },
+  {
+    title: "Mode Selector",
+    description:
+      "Built-in toggle between solid and gradient modes. One value type handles both.",
+  },
+  {
+    title: "Eye Dropper",
+    description:
+      "Native browser color sampling via the EyeDropper API with graceful fallback when unsupported.",
+  },
+  {
+    title: "Preset Swatches",
+    description:
+      "Solid color swatches and gradient swatches with keyboard navigation and active state indicators.",
+  },
+  {
+    title: "Alpha Support",
+    description:
+      "Full opacity control with alpha slider. Checkerboard pattern for transparency preview.",
+  },
+  {
+    title: "Pre-composed Presets",
+    description:
+      "ColorPickerPopover and ColorPickerInline for common layouts. Import from /presets sub-path.",
+  },
+  {
+    title: "CSS Theming",
+    description:
+      "Style every part with CSS custom properties. Ships a default theme with light and dark modes.",
   },
   {
     title: "Accessible",
     description:
-      "Full keyboard navigation, ARIA labels, screen reader support. Built on Radix UI primitives.",
-    icon: (
-      <svg
-        className="h-6 w-6"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="8" r="2" />
-        <path d="M8 14l4-2 4 2" />
-        <path d="M12 12v6" />
-      </svg>
-    ),
+      "Full keyboard navigation, ARIA labels, and screen reader support. Built on Radix UI primitives.",
   },
   {
-    title: "Tiny Bundle",
+    title: "Tree-shakeable",
     description:
-      "Tree-shakeable ESM + CJS builds. Import only what you use. Zero unnecessary dependencies.",
-    icon: (
-      <svg
-        className="h-6 w-6"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-        <line x1="12" y1="22.08" x2="12" y2="12" />
-      </svg>
-    ),
+      "ESM + CJS dual builds. Import only what you use. Only CSS files have side effects.",
   },
   {
-    title: "HEX / RGB / HSL",
+    title: "Utilities",
     description:
-      "Toggle between color formats on the fly. Validates input and formats output automatically.",
-    icon: (
-      <svg
-        className="h-6 w-6"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <polyline points="4 17 10 11 4 5" />
-        <line x1="12" y1="19" x2="20" y2="19" />
-      </svg>
-    ),
+      "toCSS, fromCSS, parseColor, formatColor, and more. Use them standalone or with the components.",
+  },
+];
+
+const GRADIENT_TYPES = [
+  {
+    label: "Linear",
+    css: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    syntax: "linear-gradient(135deg, ...)",
   },
   {
-    title: "EyeDropper API",
-    description:
-      "Native browser color sampling with graceful degradation when unsupported.",
-    icon: (
-      <svg
-        className="h-6 w-6"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M2 22l1-1h3l9-9" />
-        <path d="M3 21v-3l9-9" />
-        <path d="M15 6l3-3a2.12 2.12 0 013 3l-3 3" />
-        <path d="M14.5 5.5l4 4" />
-      </svg>
-    ),
+    label: "Radial",
+    css: "radial-gradient(circle at 30% 40%, #f093fb 0%, #f5576c 100%)",
+    syntax: "radial-gradient(circle at ...)",
   },
+  {
+    label: "Conic",
+    css: "conic-gradient(from 45deg at 50% 50%, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b)",
+    syntax: "conic-gradient(from 45deg ...)",
+  },
+  {
+    label: "Mesh",
+    css: [
+      "radial-gradient(circle at 20% 30%, #a18cd1 0%, transparent 50%)",
+      "radial-gradient(circle at 80% 20%, #fbc2eb 0%, transparent 50%)",
+      "radial-gradient(circle at 50% 80%, #84fab0 0%, transparent 50%)",
+    ].join(", "),
+    syntax: "Layered radial gradients",
+  },
+];
+
+const API_COMPONENTS = [
+  { name: "ColorPicker", description: "Root provider and context" },
+  { name: "ColorPickerArea", description: "Saturation/brightness 2D area" },
+  { name: "ColorPickerHueSlider", description: "Hue selection slider" },
+  { name: "ColorPickerAlphaSlider", description: "Opacity slider" },
+  { name: "ColorPickerInput", description: "Color value text input" },
+  { name: "ColorPickerFormatToggle", description: "HEX/RGB/HSL switcher" },
+  { name: "ColorPickerEyeDropper", description: "Native color sampling" },
+  { name: "ColorPickerSwatches", description: "Preset color swatches" },
+  { name: "ColorPickerTrigger", description: "Popover trigger button" },
+  { name: "ColorPickerInputTrigger", description: "Input-style trigger" },
+  { name: "ColorPickerContent", description: "Popover content wrapper" },
+  { name: "ColorPickerModeSelector", description: "Solid/gradient toggle" },
+  {
+    name: "ColorPickerGradientEditor",
+    description: "Gradient preview and stop editor",
+  },
+  {
+    name: "ColorPickerGradientSwatches",
+    description: "Preset gradient swatches",
+  },
+  { name: "GradientPreview", description: "Standalone gradient preview" },
 ];
 
 export default function Home() {
   return (
-    <main>
+    <main className="mx-auto max-w-[1000px] px-6 md:px-10">
       {/* Hero */}
-      <section className="border-b border-neutral-100 bg-gradient-to-b from-neutral-50 to-white pb-16 pt-12 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950 sm:pb-24 sm:pt-20">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* Left: Text */}
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-4">
-                <span className="w-fit rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400">
-                  v0.0.1
-                </span>
-                <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-4xl lg:text-5xl">
-                  A color picker built for{" "}
-                  <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                    composition
-                  </span>
-                </h1>
-                <p className="max-w-lg text-base text-neutral-600 dark:text-neutral-400 sm:text-lg">
-                  Compound components for React. Pick solid colors or edit
-                  gradients with a Radix-style composable API. Accessible,
-                  tree-shakeable, and framework-ready.
-                </p>
-              </div>
+      <section className="grid items-start gap-12 py-16 sm:py-24 lg:grid-cols-2 lg:gap-16">
+        <div className="flex flex-col gap-6">
+          <h1 className="text-2xl font-bold sm:text-3xl">
+            @markoradak/color-picker
+          </h1>
+          <p className="text-[#666]">
+            Compound-component React color picker and gradient editor.
+            Composable, accessible, tree-shakeable.
+          </p>
 
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href="/playground"
-                  className="inline-flex items-center rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-                >
-                  Open Playground
-                </a>
-                <a
-                  href="https://github.com/markoradak/color-picker"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
-                >
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                  </svg>
-                  GitHub
-                </a>
-              </div>
+          <CodeBlock code={INSTALL_CODE} language="bash" />
 
-              {/* Install */}
-              <div className="mt-2">
-                <CodeBlock code={INSTALL_CODE} language="bash" />
-              </div>
-            </div>
-
-            {/* Right: Live demo */}
-            <div className="flex justify-center lg:justify-end">
-              <HeroDemo />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="border-b border-neutral-100 py-16 dark:border-neutral-800 sm:py-24">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="mb-12 text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">
-              Everything you need
-            </h2>
-            <p className="mt-3 text-neutral-600 dark:text-neutral-400">
-              A complete color picking experience with a flexible, composable
-              architecture.
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((feature) => (
-              <div
-                key={feature.title}
-                className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900"
-              >
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
-                  {feature.icon}
-                </div>
-                <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                  {feature.title}
-                </h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Code Examples */}
-      <section className="border-b border-neutral-100 py-16 dark:border-neutral-800 sm:py-24">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="mb-12 text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">
-              Compound API
-            </h2>
-            <p className="mt-3 text-neutral-600 dark:text-neutral-400">
-              Compose your picker from individual parts. Use only what you need.
-            </p>
-          </div>
-
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8">
-            <div>
-              <h3 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                Popover Color Picker
-              </h3>
-              <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
-                The classic pattern: a trigger button that opens a popover with
-                the full color picker UI. Built on Radix Popover for accessible
-                positioning.
-              </p>
-              <CodeBlock code={COMPOUND_EXAMPLE} />
-            </div>
-
-            <div>
-              <h3 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                Gradient Editor
-              </h3>
-              <p className="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
-                Pass a gradient value instead of a color string. The picker
-                automatically enters gradient mode with stop editing, type
-                switching, and angle controls.
-              </p>
-              <CodeBlock code={GRADIENT_EXAMPLE} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Gradient showcase */}
-      <section className="py-16 sm:py-24">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="mb-12 text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-3xl">
-              Gradient Types
-            </h2>
-            <p className="mt-3 text-neutral-600 dark:text-neutral-400">
-              Four gradient modes out of the box, all with interactive stop
-              editing.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
-              <div
-                className="h-40"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                }}
-              />
-              <div className="bg-white p-4 dark:bg-neutral-900">
-                <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                  Linear
-                </p>
-                <p className="mt-0.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
-                  linear-gradient(135deg, ...)
-                </p>
-              </div>
-            </div>
-
-            <div className="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
-              <div
-                className="h-40"
-                style={{
-                  background:
-                    "radial-gradient(circle at 30% 40%, #f093fb 0%, #f5576c 100%)",
-                }}
-              />
-              <div className="bg-white p-4 dark:bg-neutral-900">
-                <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                  Radial
-                </p>
-                <p className="mt-0.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
-                  radial-gradient(circle at ...)
-                </p>
-              </div>
-            </div>
-
-            <div className="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
-              <div
-                className="h-40"
-                style={{
-                  background:
-                    "conic-gradient(from 45deg at 50% 50%, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b)",
-                }}
-              />
-              <div className="bg-white p-4 dark:bg-neutral-900">
-                <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                  Conic
-                </p>
-                <p className="mt-0.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
-                  conic-gradient(from 45deg ...)
-                </p>
-              </div>
-            </div>
-
-            <div className="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
-              <div
-                className="h-40"
-                style={{
-                  background: [
-                    "radial-gradient(circle at 20% 30%, #a18cd1 0%, transparent 50%)",
-                    "radial-gradient(circle at 80% 20%, #fbc2eb 0%, transparent 50%)",
-                    "radial-gradient(circle at 50% 80%, #84fab0 0%, transparent 50%)",
-                  ].join(", "),
-                }}
-              />
-              <div className="bg-white p-4 dark:bg-neutral-900">
-                <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                  Mesh
-                </p>
-                <p className="mt-0.5 font-mono text-xs text-neutral-500 dark:text-neutral-400">
-                  Simulated via layered radials
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-neutral-200 py-8 dark:border-neutral-800">
-        <div className="mx-auto max-w-5xl px-4 text-center text-sm text-neutral-500 dark:text-neutral-400 sm:px-6">
-          <p>
-            Built by{" "}
+          <div className="flex gap-3">
             <a
-              href="https://github.com/markoradak"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-neutral-700 underline underline-offset-2 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-100"
+              href="/playground"
+              className="inline-flex items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-[#0f0f0f] transition-opacity hover:opacity-90"
             >
-              Marko Radak
+              Playground
             </a>
-            . Source on{" "}
             <a
               href="https://github.com/markoradak/color-picker"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-neutral-700 underline underline-offset-2 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-100"
+              className="inline-flex items-center rounded-md border border-[#e5e5e5] px-4 py-2 text-sm text-[#666] transition-colors hover:text-accent dark:border-[#2a2a2a]"
             >
               GitHub
             </a>
-            .
-          </p>
+          </div>
         </div>
+
+        <div className="flex justify-center lg:justify-end">
+          <HeroDemo />
+        </div>
+      </section>
+
+      {/* Features */}
+      <hr className="border-[#e5e5e5] dark:border-[#2a2a2a]" />
+      <section className="py-16 sm:py-24">
+        <h2 className="mb-10 text-xl font-bold sm:text-2xl">Features</h2>
+        <div className="grid gap-x-16 gap-y-8 sm:grid-cols-2">
+          {FEATURES.map((feature) => (
+            <div key={feature.title}>
+              <h3 className="text-sm font-semibold">{feature.title}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-[#666]">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Gradient Types */}
+      <hr className="border-[#e5e5e5] dark:border-[#2a2a2a]" />
+      <section className="py-16 sm:py-24">
+        <h2 className="mb-10 text-xl font-bold sm:text-2xl">Gradient Types</h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          {GRADIENT_TYPES.map((g) => (
+            <div key={g.label}>
+              <div
+                className="h-48 rounded-lg"
+                style={{ background: g.css }}
+              />
+              <p className="mt-3 text-sm font-semibold">{g.label}</p>
+              <p className="mt-0.5 text-xs text-[#666]">{g.syntax}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Code Examples */}
+      <hr className="border-[#e5e5e5] dark:border-[#2a2a2a]" />
+      <section className="py-16 sm:py-24">
+        <h2 className="mb-10 text-xl font-bold sm:text-2xl">Code Examples</h2>
+
+        <div className="flex flex-col gap-12">
+          <div>
+            <h3 className="mb-2 text-sm font-semibold">
+              Compound Component Popover
+            </h3>
+            <p className="mb-4 text-sm text-[#666]">
+              Trigger button opens a popover with composable color picker
+              controls. Built on Radix Popover.
+            </p>
+            <CodeBlock code={COMPOUND_EXAMPLE} />
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-sm font-semibold">Gradient Editor</h3>
+            <p className="mb-4 text-sm text-[#666]">
+              Pass a gradient value to enable gradient mode with stop editing,
+              type switching, and angle controls.
+            </p>
+            <CodeBlock code={GRADIENT_EXAMPLE} />
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-sm font-semibold">Pre-composed Preset</h3>
+            <p className="mb-4 text-sm text-[#666]">
+              ColorPickerInline from /presets for a quick inline picker with all
+              features enabled.
+            </p>
+            <CodeBlock code={PRESET_EXAMPLE} />
+          </div>
+        </div>
+      </section>
+
+      {/* API Reference */}
+      <hr className="border-[#e5e5e5] dark:border-[#2a2a2a]" />
+      <section className="py-16 sm:py-24">
+        <h2 className="mb-10 text-xl font-bold sm:text-2xl">
+          Component Reference
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#e5e5e5] text-left dark:border-[#2a2a2a]">
+                <th className="pb-3 pr-8 font-semibold">Component</th>
+                <th className="pb-3 font-semibold">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {API_COMPONENTS.map((c) => (
+                <tr
+                  key={c.name}
+                  className="border-b border-[#e5e5e5] dark:border-[#2a2a2a]"
+                >
+                  <td className="py-2.5 pr-8 font-medium">{c.name}</td>
+                  <td className="py-2.5 text-[#666]">{c.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <hr className="border-[#e5e5e5] dark:border-[#2a2a2a]" />
+      <footer className="py-8 text-sm text-[#666]">
+        <p>
+          Built by{" "}
+          <a
+            href="https://markoradak.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-accent"
+          >
+            Marko Radak
+          </a>
+          . Source on{" "}
+          <a
+            href="https://github.com/markoradak/color-picker"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-accent"
+          >
+            GitHub
+          </a>
+          .
+        </p>
       </footer>
     </main>
   );

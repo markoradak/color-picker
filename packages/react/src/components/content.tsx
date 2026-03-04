@@ -46,7 +46,7 @@ export const ColorPickerContent = forwardRef<
         onOpenAutoFocus={handleOpenAutoFocus}
         className={[
           "cp-content",
-          "z-50 flex w-80 flex-col gap-3 rounded-xl border p-3",
+          "z-50 flex flex-col gap-3 rounded-xl border p-3",
           className,
         ]
           .filter(Boolean)
