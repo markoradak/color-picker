@@ -503,13 +503,12 @@ function generateCode(options: PlaygroundOptions): string {
   if (options.showEyeDropper) parts.push("    <ColorPickerEyeDropper />");
 
   if (options.showSwatches) {
-    const swatchesStr = options.swatchColors.map((c) => `"${c}"`).join(", ");
-    parts.push(`    <ColorPickerSwatches colors={[${swatchesStr}]} />`);
+    parts.push("    <ColorPickerSwatches {/* colors={[...]} */} />");
   }
 
   if (options.enableGradient) {
     parts.push("    <ColorPickerGradientEditor />");
-    parts.push("    <ColorPickerGradientSwatches gradients={gradientSwatches} />");
+    parts.push("    <ColorPickerGradientSwatches {/* gradients={[...]} */} />");
   }
 
   const innerJsx = parts.join("\n");

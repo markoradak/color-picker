@@ -3,13 +3,26 @@ import type { ColorPickerSwatchesProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { fromHSVA, getContrastColor } from "../utils/color";
 
+const DEFAULT_SWATCH_COLORS = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#06b6d4",
+  "#3b82f6",
+  "#8b5cf6",
+  "#ec4899",
+];
+
 /**
  * Grid of preset color swatch buttons.
  * Clicking a swatch updates the color in context.
  * The active swatch (matching current color) shows a checkmark indicator.
+ *
+ * When no `colors` are provided, a default palette is used.
  */
 export function ColorPickerSwatches({
-  colors,
+  colors = DEFAULT_SWATCH_COLORS,
   columns = 8,
   className,
 }: ColorPickerSwatchesProps) {
