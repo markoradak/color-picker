@@ -76,7 +76,7 @@ export function ColorPickerModeSelector({ className }: ColorPickerModeSelectorPr
     <div
       className={[
         "cp-mode-selector",
-        "flex gap-1 rounded-lg border p-0.5",
+        "flex gap-0.5 rounded-lg border p-0.5 overflow-hidden",
         className,
       ]
         .filter(Boolean)
@@ -95,7 +95,7 @@ export function ColorPickerModeSelector({ className }: ColorPickerModeSelectorPr
             onClick={() => handleModeChange(mode.value)}
             disabled={disabled}
             className={[
-              "flex-1 rounded-md px-2 py-1 text-xs font-medium outline-none transition-colors",
+              "flex-1 rounded-md px-1 py-1 text-xs font-medium outline-none transition-colors truncate",
               "",
               "disabled:cursor-not-allowed disabled:opacity-50",
               isActive

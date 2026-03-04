@@ -366,24 +366,33 @@ interface PlaygroundOptions {
 
 function Toggle({
   label,
+  description,
   checked,
   onChange,
 }: {
   label: string;
+  description?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3">
-      <span className="text-sm text-neutral-700 dark:text-neutral-300">
-        {label}
+    <label className="flex cursor-pointer items-start justify-between gap-3">
+      <span className="flex flex-col">
+        <span className="text-sm text-neutral-700 dark:text-neutral-300">
+          {label}
+        </span>
+        {description && (
+          <span className="text-xs text-neutral-500 dark:text-neutral-500">
+            {description}
+          </span>
+        )}
       </span>
       <button
         type="button"
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
+        className={`relative mt-0.5 inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
           checked
             ? "bg-blue-500"
             : "bg-neutral-300 dark:bg-neutral-600"
@@ -490,13 +499,8 @@ function generateCode(options: PlaygroundOptions): string {
   parts.push("    <ColorPickerHueSlider />");
   if (options.showAlpha) parts.push("    <ColorPickerAlphaSlider />");
 
-  const inputRow: string[] = [];
-  if (options.showInput) inputRow.push("      <ColorPickerInput />");
-  if (options.showEyeDropper) inputRow.push("      <ColorPickerEyeDropper />");
-
-  if (inputRow.length > 0) {
-    parts.push(`    <div className="flex items-center gap-2">\n${inputRow.join("\n")}\n    </div>`);
-  }
+  if (options.showInput) parts.push("    <ColorPickerInput />");
+  if (options.showEyeDropper) parts.push("    <ColorPickerEyeDropper />");
 
   if (options.showSwatches) {
     const swatchesStr = options.swatchColors.map((c) => `"${c}"`).join(", ");
@@ -624,26 +628,31 @@ export function PlaygroundClient() {
 
             <Toggle
               label="Gradient mode"
+              description="Linear, radial, conic, and mesh gradients"
               checked={options.enableGradient}
               onChange={(v) => updateOption("enableGradient", v)}
             />
             <Toggle
               label="Alpha slider"
+              description="Adjust color transparency"
               checked={options.showAlpha}
               onChange={(v) => updateOption("showAlpha", v)}
             />
             <Toggle
               label="Color input"
+              description="HEX, RGB, and HSL text input"
               checked={options.showInput}
               onChange={(v) => updateOption("showInput", v)}
             />
             <Toggle
               label="EyeDropper"
+              description="Sample colors from the screen"
               checked={options.showEyeDropper}
               onChange={(v) => updateOption("showEyeDropper", v)}
             />
             <Toggle
               label="Swatches"
+              description="Preset color palette"
               checked={options.showSwatches}
               onChange={(v) => updateOption("showSwatches", v)}
             />
