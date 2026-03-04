@@ -20,7 +20,15 @@ import {
 import type { ColorPickerValue } from "@markoradak/color-picker";
 import { CopyButton } from "../copy-button";
 
-const DEFAULT_COLOR = "#3b82f6";
+const DEFAULT_VALUE: ColorPickerValue = {
+  type: "mesh",
+  stops: [
+    { id: "1", color: "#16db89", position: 0, x: 23.84, y: 26.60 },
+    { id: "2", color: "#16db897f", position: 0, x: 66.00, y: 84.25 },
+    { id: "3", color: "#16db8926", position: 0, x: 81.36, y: 54.36 },
+  ],
+  baseColor: "#e7fff5",
+};
 
 const DEFAULT_SWATCHES = [
   "#ef4444",
@@ -163,9 +171,9 @@ function generateCode(options: PlaygroundOptions): string {
 
   let stateLine: string;
   if (options.enableGradient) {
-    stateLine = `const [value, setValue] = useState<ColorPickerValue>("${DEFAULT_COLOR}");`;
+    stateLine = `const [value, setValue] = useState<ColorPickerValue>("#16db89");`;
   } else {
-    stateLine = `const [color, setColor] = useState("${DEFAULT_COLOR}");`;
+    stateLine = `const [color, setColor] = useState("#16db89");`;
   }
 
   const valueVar = options.enableGradient ? "value" : "color";
@@ -233,7 +241,7 @@ export function PlaygroundClient() {
     swatchColors: DEFAULT_SWATCHES,
   });
 
-  const [value, setValue] = useState<ColorPickerValue>(DEFAULT_COLOR);
+  const [value, setValue] = useState<ColorPickerValue>(DEFAULT_VALUE);
   const cssValue = typeof value === "string" ? value : toCSS(value);
 
   const generatedCode = useMemo(() => generateCode(options), [options]);
