@@ -34,7 +34,9 @@ export function HeroDemo() {
 
   return (
     <ColorPicker value={value} onValueChange={setValue}>
-      <ColorPickerInputTrigger />
+      <div style={{ width: 'calc(var(--cp-width) + 2px)' }}>
+        <ColorPickerInputTrigger />
+      </div>
       <ColorPickerContent>
         <ColorPickerModeSelector />
         {isGradientMode ? (
