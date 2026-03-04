@@ -74,7 +74,7 @@ function Toggle({
         onClick={() => onChange(!checked)}
         className={`relative mt-0.5 inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
           checked
-            ? "bg-blue-500"
+            ? "bg-[#16db89]"
             : "bg-neutral-300 dark:bg-neutral-600"
         }`}
       >
@@ -248,7 +248,7 @@ export function PlaygroundClient() {
   return (
     <div className="flex flex-col gap-8">
       {/* Top: Preview + Options side by side */}
-      <div className="grid gap-6 sm:grid-cols-[minmax(0,_18rem)_1fr]">
+      <div className="grid gap-6 sm:grid-cols-[minmax(0,_21rem)_1fr]">
         {/* Preview */}
         <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 sm:p-6">
           <h2 className="mb-4 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
@@ -366,7 +366,7 @@ export function PlaygroundClient() {
           </h2>
         </div>
         <div className="relative">
-          <pre className="max-h-[600px] overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs leading-relaxed dark:border-neutral-700 dark:bg-neutral-800">
+          <pre className="overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs leading-relaxed dark:border-neutral-700 dark:bg-neutral-800">
             <code className="font-mono text-neutral-800 dark:text-neutral-200">
               {generatedCode}
             </code>

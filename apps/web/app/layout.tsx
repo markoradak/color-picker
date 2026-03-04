@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "./theme-provider";
-import { Nav } from "./nav";
 
 export const metadata: Metadata = {
   title: "@markoradak/color-picker",
@@ -32,8 +31,7 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var theme = localStorage.getItem('theme');
-                  var dark = theme === 'dark' || (!theme || theme === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                   if (dark) document.documentElement.classList.add('dark');
                 } catch(e) {}
               })();
@@ -43,7 +41,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-white text-[#222] antialiased dark:bg-[#0f0f0f] dark:text-white">
         <ThemeProvider>
-          <Nav />
           {children}
         </ThemeProvider>
       </body>

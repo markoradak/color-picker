@@ -1,5 +1,7 @@
 import { HeroDemo } from "./hero-demo";
 import { CodeBlock } from "./code-block";
+import { ThemeToggle } from "./theme-toggle";
+import { PlaygroundClient } from "./playground/playground-client";
 
 const INSTALL_CODE = `npm install @markoradak/color-picker`;
 
@@ -209,9 +211,9 @@ export default function Home() {
 
           <CodeBlock code={INSTALL_CODE} language="bash" />
 
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
             <a
-              href="/playground"
+              href="#playground"
               className="inline-flex items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-[#0f0f0f] transition-opacity hover:opacity-90"
             >
               Playground
@@ -224,12 +226,25 @@ export default function Home() {
             >
               GitHub
             </a>
+            <span className="ml-auto">
+              <ThemeToggle />
+            </span>
           </div>
         </div>
 
         <div className="flex justify-center lg:justify-end">
           <HeroDemo />
         </div>
+      </section>
+
+      {/* Playground */}
+      <hr className="border-[#e5e5e5] dark:border-[#2a2a2a]" />
+      <section id="playground" className="py-16 sm:py-24">
+        <h2 className="mb-2 text-xl font-bold sm:text-2xl">Playground</h2>
+        <p className="mb-8 text-sm text-[#666]">
+          Configure the color picker interactively and copy the generated code.
+        </p>
+        <PlaygroundClient />
       </section>
 
       {/* Features */}
