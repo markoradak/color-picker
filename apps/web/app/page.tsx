@@ -144,32 +144,6 @@ const FEATURES = [
   },
 ];
 
-const GRADIENT_TYPES = [
-  {
-    label: "Linear",
-    css: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    syntax: "linear-gradient(135deg, ...)",
-  },
-  {
-    label: "Radial",
-    css: "radial-gradient(circle at 30% 40%, #f093fb 0%, #f5576c 100%)",
-    syntax: "radial-gradient(circle at ...)",
-  },
-  {
-    label: "Conic",
-    css: "conic-gradient(from 45deg at 50% 50%, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b)",
-    syntax: "conic-gradient(from 45deg ...)",
-  },
-  {
-    label: "Mesh",
-    css: [
-      "radial-gradient(circle at 20% 30%, #a18cd1 0%, transparent 50%)",
-      "radial-gradient(circle at 80% 20%, #fbc2eb 0%, transparent 50%)",
-      "radial-gradient(circle at 50% 80%, #84fab0 0%, transparent 50%)",
-    ].join(", "),
-    syntax: "Layered radial gradients",
-  },
-];
 
 const API_COMPONENTS = [
   { name: "ColorPicker", description: "Root provider and context" },
@@ -258,24 +232,6 @@ export default function Home() {
               <p className="mt-1 text-sm leading-relaxed text-[#666]">
                 {feature.description}
               </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Gradient Types */}
-      <hr className="border-[#e5e5e5] dark:border-[#2a2a2a]" />
-      <section className="py-16 sm:py-24">
-        <h2 className="mb-10 text-xl font-bold sm:text-2xl">Gradient Types</h2>
-        <div className="grid gap-6 sm:grid-cols-2">
-          {GRADIENT_TYPES.map((g) => (
-            <div key={g.label}>
-              <div
-                className="h-48 rounded-lg"
-                style={{ background: g.css }}
-              />
-              <p className="mt-3 text-sm font-semibold">{g.label}</p>
-              <p className="mt-0.5 text-xs text-[#666]">{g.syntax}</p>
             </div>
           ))}
         </div>
