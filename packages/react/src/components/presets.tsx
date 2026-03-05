@@ -30,7 +30,7 @@ import { ColorPickerGradientSwatches } from "./gradient-swatches";
  * - Solid controls (Area, HueSlider, AlphaSlider, Input) in solid mode
  * - Gradient controls (GradientEditor) in gradient mode
  */
-function ColorPickerControls({
+export function ColorPickerControls({
   enableAlpha = true,
   enableGradient = false,
   enableModeSelector,

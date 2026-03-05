@@ -40,6 +40,7 @@ export function ColorPickerProvider({
   // No-op popover state — this provider has no popover
   const noop = useCallback(() => {}, []);
   const preserveFocusRef = useRef(false);
+  const emptySwatches: string[] = [];
 
   const contextValue = useMemo(
     () => ({
@@ -49,6 +50,8 @@ export function ColorPickerProvider({
       popoverOpen: false,
       setPopoverOpen: noop,
       preserveFocusRef,
+      swatches: emptySwatches,
+      setSwatches: noop as (swatches: string[]) => void,
     }),
     [pickerState, disabled, gradientState, noop]
   );

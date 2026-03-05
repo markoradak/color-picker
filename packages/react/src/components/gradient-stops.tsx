@@ -2,10 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerProvider } from "./color-picker-provider";
-import { ColorPickerArea } from "./area";
-import { ColorPickerHueSlider } from "./hue-slider";
-import { ColorPickerAlphaSlider } from "./alpha-slider";
-import { ColorPickerInput } from "./input";
+import { ColorPickerControls } from "./presets";
 import { interpolateColorAt, sortStops } from "../utils/gradient";
 import { clamp } from "../utils/position";
 
@@ -207,19 +204,14 @@ export function GradientStops({ className }: GradientStopsProps) {
                   side="top"
                   sideOffset={8}
                   align="center"
-                  className="cp-content z-50 w-56 rounded-xl border p-3"
+                  className="cp-content z-50 flex flex-col gap-3 rounded-xl border p-3"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                 >
                   <ColorPickerProvider
                     value={stop.color}
                     onValueChange={(color) => handleStopColorChange(stop.id, color)}
                   >
-                    <div className="flex flex-col gap-2">
-                      <ColorPickerArea className="!h-32" />
-                      <ColorPickerHueSlider />
-                      <ColorPickerAlphaSlider />
-                      <ColorPickerInput />
-                    </div>
+                    <ColorPickerControls />
                   </ColorPickerProvider>
                 </Popover.Content>
               </Popover.Portal>

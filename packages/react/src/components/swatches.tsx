@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import type { ColorPickerSwatchesProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { fromHSVA, getContrastColor } from "../utils/color";
@@ -26,7 +26,12 @@ export function ColorPickerSwatches({
   columns = 8,
   className,
 }: ColorPickerSwatchesProps) {
-  const { hsva, setColorFromString, disabled } = useColorPickerContext();
+  const { hsva, setColorFromString, disabled, setSwatches } = useColorPickerContext();
+
+  // Register swatch values in context so gradient stop popovers can use them
+  useEffect(() => {
+    setSwatches(values);
+  }, [values, setSwatches]);
 
   const currentColor = fromHSVA(hsva).toLowerCase();
 

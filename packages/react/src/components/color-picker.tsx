@@ -77,6 +77,7 @@ export function ColorPicker({
 
   const [popoverOpen, setPopoverOpen] = useState(defaultOpen);
   const preserveFocusRef = useRef(false);
+  const [registeredSwatches, setRegisteredSwatches] = useState<string[]>([]);
 
   const contextValue = useMemo(
     () => ({
@@ -86,8 +87,10 @@ export function ColorPicker({
       popoverOpen,
       setPopoverOpen,
       preserveFocusRef,
+      swatches: registeredSwatches,
+      setSwatches: setRegisteredSwatches,
     }),
-    [pickerState, disabled, gradientState, popoverOpen]
+    [pickerState, disabled, gradientState, popoverOpen, registeredSwatches]
   );
 
   return (

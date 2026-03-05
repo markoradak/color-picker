@@ -15,6 +15,10 @@ export type ColorPickerContextValue = ReturnType<typeof useColorPicker> & {
   setPopoverOpen: (open: boolean) => void;
   /** Ref that, when true, tells Content to skip auto-focus on open. */
   preserveFocusRef: React.RefObject<boolean>;
+  /** Preset color swatches shared with nested pickers (e.g. gradient stop popovers). */
+  swatches: string[];
+  /** Register swatches in context (called by ColorPickerSwatches on mount). */
+  setSwatches: (swatches: string[]) => void;
 };
 
 export const ColorPickerContext =

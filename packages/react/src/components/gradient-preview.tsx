@@ -2,12 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerProvider } from "./color-picker-provider";
-import { ColorPickerArea } from "./area";
-import { ColorPickerHueSlider } from "./hue-slider";
-import { ColorPickerAlphaSlider } from "./alpha-slider";
-import { ColorPickerInput } from "./input";
-import { ColorPickerFormatToggle } from "./format-toggle";
-import { ColorPickerEyeDropper } from "./eye-dropper";
+import { ColorPickerControls } from "./presets";
 import { toCSS } from "../utils/css";
 import { interpolateColorAt } from "../utils/gradient";
 import { clamp } from "../utils/position";
@@ -176,7 +171,7 @@ function positionFromCoords(
  * - **Mesh**: free-form 2D positioning
  */
 export function GradientPreview({ className }: GradientPreviewProps) {
-  const { gradient: gradientCtx, disabled } = useColorPickerContext();
+  const { gradient: gradientCtx, disabled, swatches } = useColorPickerContext();
   const {
     gradient: gradientValue,
     activeStopId,
@@ -517,13 +512,7 @@ export function GradientPreview({ className }: GradientPreviewProps) {
                 value={gradientValue.baseColor || "#ffffff"}
                 onValueChange={(color) => setBaseColor(color)}
               >
-                <ColorPickerArea />
-                <ColorPickerHueSlider />
-                <div className="flex items-center gap-2">
-                  <ColorPickerInput />
-                  <ColorPickerFormatToggle />
-                  <ColorPickerEyeDropper />
-                </div>
+                <ColorPickerControls swatches={swatches} />
               </ColorPickerProvider>
             </Popover.Content>
           </Popover.Portal>
@@ -611,14 +600,7 @@ export function GradientPreview({ className }: GradientPreviewProps) {
                   value={stop.color}
                   onValueChange={(color) => handleStopColorChange(stop.id, color)}
                 >
-                  <ColorPickerArea />
-                  <ColorPickerHueSlider />
-                  <ColorPickerAlphaSlider />
-                  <div className="flex items-center gap-2">
-                    <ColorPickerInput />
-                    <ColorPickerFormatToggle />
-                    <ColorPickerEyeDropper />
-                  </div>
+                  <ColorPickerControls swatches={swatches} />
                 </ColorPickerProvider>
               </Popover.Content>
             </Popover.Portal>

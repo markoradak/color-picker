@@ -18,7 +18,7 @@ export { GradientPreview } from "./components/gradient-preview";
 export { GradientStops } from "./components/gradient-stops";
 
 // Pre-composed presets
-export { ColorPickerPopover, ColorPickerInline } from "./components/presets";
+export { ColorPickerPopover, ColorPickerInline, ColorPickerControls } from "./components/presets";
 
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
