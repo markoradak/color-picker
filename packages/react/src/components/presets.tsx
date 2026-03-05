@@ -116,6 +116,8 @@ export function ColorPickerPopover({
   swatches,
   swatchColumns = 8,
   gradientSwatches,
+  tokens,
+  autoTokens,
   side = "bottom",
   align = "center",
   sideOffset = 4,
@@ -144,6 +146,8 @@ export function ColorPickerPopover({
       onValueChange={onValueChange}
       defaultValue={defaultValue}
       disabled={disabled}
+      tokens={tokens}
+      autoTokens={autoTokens}
     >
       <div className={className}>
         {renderTrigger()}
@@ -194,6 +198,8 @@ export function ColorPickerInline({
   swatches,
   swatchColumns = 8,
   gradientSwatches,
+  tokens,
+  autoTokens,
   className,
 }: ColorPickerInlineProps) {
   return (
@@ -202,6 +208,8 @@ export function ColorPickerInline({
       onValueChange={onValueChange}
       defaultValue={defaultValue}
       disabled={disabled}
+      tokens={tokens}
+      autoTokens={autoTokens}
     >
       <div
         className={[

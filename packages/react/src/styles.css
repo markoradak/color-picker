@@ -281,3 +281,10 @@
   outline: none;
   box-shadow: var(--cp-ring);
 }
+
+/* Token badge */
+.cp-token-badge {
+  background-color: var(--cp-bg-secondary);
+  color: var(--cp-text-muted);
+  border-color: var(--cp-border);
+}

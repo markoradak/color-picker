@@ -5,6 +5,20 @@
 export type SolidColor = string;
 
 /**
+ * A map of semantic token names to color values.
+ * Example: { primary: "#3b82f6", brand: "#f97316" }
+ */
+export type ColorTokens = Record<string, string>;
+
+/**
+ * Configuration for auto-detecting CSS custom property color tokens.
+ * - `true` (default): auto-detect all CSS color variables
+ * - `false`: disable auto-detection
+ * - `{ prefix: string }`: only detect variables matching the prefix, strip it for display names
+ */
+export type AutoTokensConfig = { prefix?: string } | boolean;
+
+/**
  * The active mode of the color picker.
  * "solid" for a flat color string, or a gradient type.
  */
@@ -63,6 +77,10 @@ export interface ColorPickerProps {
   disabled?: boolean;
   /** Whether the popover starts open (uncontrolled) */
   defaultOpen?: boolean;
+  /** Map of semantic token names to color values. Token names can be used as `value`. */
+  tokens?: ColorTokens;
+  /** Auto-detect CSS custom property color tokens. Default: true (detect all). Set to false to disable, or { prefix: "--brand-" } to filter. */
+  autoTokens?: AutoTokensConfig;
   /** Children (compound components) */
   children: React.ReactNode;
 }
@@ -176,6 +194,10 @@ export interface ColorPickerPresetProps {
   enableEyeDropper?: boolean;
   /** Show the color format toggle button. Default: true */
   enableFormatToggle?: boolean;
+  /** Map of semantic token names to color values. Token names can be used as `value`. */
+  tokens?: ColorTokens;
+  /** Auto-detect CSS custom property color tokens. Default: true (detect all). Set to false to disable, or { prefix: "--brand-" } to filter. */
+  autoTokens?: AutoTokensConfig;
   /** Preset swatch colors to display (solid mode) */
   swatches?: string[];
   /** Number of columns for the swatch grid. Default: 8 */
@@ -237,6 +259,10 @@ export interface ColorPickerProviderProps {
   defaultValue?: string;
   /** Whether the picker is disabled */
   disabled?: boolean;
+  /** Map of semantic token names to color values. Token names can be used as `value`. */
+  tokens?: ColorTokens;
+  /** Auto-detect CSS custom property color tokens. Default: true (detect all). Set to false to disable, or { prefix: "--brand-" } to filter. */
+  autoTokens?: AutoTokensConfig;
   /** Children (compound components) */
   children: React.ReactNode;
 }

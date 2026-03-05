@@ -16,6 +16,8 @@ export function ColorPickerProvider({
   onValueChange,
   defaultValue = "#000000",
   disabled = false,
+  tokens,
+  autoTokens,
   children,
 }: ColorPickerProviderProps) {
   // Wrap the string-typed callback for the generic useColorPicker hook
@@ -32,6 +34,8 @@ export function ColorPickerProvider({
     value,
     onValueChange: handleValueChange,
     defaultValue,
+    tokens,
+    autoTokens,
   });
 
   // No-op gradient state — this provider is solid-color only

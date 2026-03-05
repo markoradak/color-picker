@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import * as Popover from "@radix-ui/react-popover";
 import type { ColorPickerInputTriggerProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
-import { fromHSVA, isValidColor } from "../utils/color";
+import { fromHSVA, isValidColor, resolveToken } from "../utils/color";
 import { toCSS } from "../utils/css";
 import { CHECKERBOARD_STYLE } from "./shared";
 
@@ -53,6 +53,8 @@ export function ColorPickerInputTrigger({
     gradient,
     setPopoverOpen,
     preserveFocusRef,
+    matchedToken,
+    tokens,
   } = useColorPickerContext();
 
   const currentColor = fromHSVA(hsva);
@@ -75,7 +77,8 @@ export function ColorPickerInputTrigger({
   const commitValue = useCallback(() => {
     setIsEditing(false);
     const trimmed = inputValue.trim();
-    if (trimmed && isValidColor(trimmed)) {
+    const resolved = resolveToken(trimmed, tokens);
+    if (trimmed && isValidColor(resolved)) {
       setColorFromString(trimmed);
     } else {
       setInputValue(formattedValue);
@@ -228,21 +231,37 @@ export function ColorPickerInputTrigger({
             {toCSS(gradient.gradient)}
           </span>
         ) : (
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            onClick={handleInputClick}
-            onFocus={handleInputFocus}
-            onBlur={handleInputBlur}
-            onKeyDown={handleInputKeyDown}
-            disabled={disabled}
-            spellCheck={false}
-            autoComplete="off"
-            aria-label={`Color value in ${formatLabel} format`}
-            className="min-w-0 flex-1 cursor-text bg-transparent font-mono text-xs outline-none disabled:cursor-not-allowed"
-          />
+          <div className="relative min-w-0 flex-1">
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={handleInputChange}
+              onClick={handleInputClick}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
+              onKeyDown={handleInputKeyDown}
+              disabled={disabled}
+              spellCheck={false}
+              autoComplete="off"
+              aria-label={`Color value in ${formatLabel} format`}
+              className="w-full cursor-text bg-transparent font-mono text-xs outline-none disabled:cursor-not-allowed"
+            />
+            {matchedToken && (
+              <span
+                className={[
+                  "cp-token-badge",
+                  "absolute right-0 top-1/2 -translate-y-1/2",
+                  "select-none rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none",
+                  "transition-opacity hover:!opacity-100",
+                  isEditing ? "opacity-40" : "opacity-70",
+                ].join(" ")}
+                aria-label={`Matches token: ${matchedToken}`}
+              >
+                {matchedToken}
+              </span>
+            )}
+          </div>
         )}
 
         {/* Eye dropper */}

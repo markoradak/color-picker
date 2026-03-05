@@ -1,12 +1,15 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { ColorFormat, ColorPickerValue, HSVA } from "../types";
-import { detectFormat, formatColor, fromHSVA, isValidColor, toHSVA } from "../utils/color";
+import type { AutoTokensConfig, ColorFormat, ColorPickerValue, ColorTokens, HSVA } from "../types";
+import { detectFormat, findMatchingToken, formatColor, fromHSVA, isValidColor, resolveToken, toHSVA } from "../utils/color";
 import { isGradient } from "../utils/css";
+import { useAutoTokens } from "./use-auto-tokens";
 
 interface UseColorPickerOptions {
   value?: ColorPickerValue;
   defaultValue?: ColorPickerValue;
   onValueChange?: (value: ColorPickerValue) => void;
+  tokens?: ColorTokens;
+  autoTokens?: AutoTokensConfig;
 }
 
 /**
@@ -14,7 +17,8 @@ interface UseColorPickerOptions {
  * Maintains internal HSV state for smooth dragging without rounding artifacts.
  */
 export function useColorPicker(options: UseColorPickerOptions) {
-  const { value: controlledValue, defaultValue = "#000000", onValueChange } = options;
+  const { value: controlledValue, defaultValue = "#000000", onValueChange, tokens: manualTokens, autoTokens } = options;
+  const tokens = useAutoTokens(autoTokens, manualTokens);
 
   const isControlled = controlledValue !== undefined;
   const [internalValue, setInternalValue] = useState<ColorPickerValue>(defaultValue);
@@ -23,7 +27,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
   // Internal HSVA state for smooth drag (avoids hex rounding during drag)
   const initialHSVA = useMemo(() => {
     if (typeof currentValue === "string") {
-      return toHSVA(currentValue);
+      return toHSVA(resolveToken(currentValue, tokens));
     }
     return { h: 0, s: 0, v: 0, a: 1 };
   }, []); // Only compute once on mount
@@ -48,7 +52,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
       // Skip HSVA sync for our own updates — HSVA is already correct
       isInternalUpdateRef.current = false;
     } else if (typeof controlledValue === "string") {
-      const newHSVA = toHSVA(controlledValue);
+      const newHSVA = toHSVA(resolveToken(controlledValue, tokens));
       hsvaRef.current = newHSVA;
       setHSVA(newHSVA);
     }
@@ -103,13 +107,14 @@ export function useColorPicker(options: UseColorPickerOptions) {
 
   const setColorFromString = useCallback(
     (input: string) => {
-      if (!isValidColor(input)) return;
-      const newHSVA = toHSVA(input);
+      const resolved = resolveToken(input, tokens);
+      if (!isValidColor(resolved)) return;
+      const newHSVA = toHSVA(resolved);
       hsvaRef.current = newHSVA;
       setHSVA(newHSVA);
-      updateValue(input);
+      updateValue(resolved);
     },
-    [updateValue]
+    [updateValue, tokens]
   );
 
   /**
@@ -141,6 +146,11 @@ export function useColorPicker(options: UseColorPickerOptions) {
 
   const isGradientMode = isGradient(currentValue);
 
+  const matchedToken = useMemo(
+    () => findMatchingToken(cssValue, tokens),
+    [cssValue, tokens]
+  );
+
   return {
     value: currentValue,
     hsva,
@@ -156,5 +166,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
     setFormat,
     toggleFormat,
     updateValue,
+    matchedToken,
+    tokens,
   };
 }

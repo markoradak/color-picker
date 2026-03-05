@@ -22,7 +22,7 @@ export { ColorPickerPopover, ColorPickerInline, ColorPickerControls } from "./co
 
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
-export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor } from "./utils/color";
+export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor, resolveToken, findMatchingToken, getCSSColorTokens } from "./utils/color";
 export { createGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, moveStop, createDefaultGradient, createDefaultGradientFromColor, interpolateColorAt } from "./utils/gradient";
 export { clamp, getRelativePosition, angleFromPosition } from "./utils/position";
 
@@ -30,6 +30,7 @@ export { clamp, getRelativePosition, angleFromPosition } from "./utils/position"
 export { usePointerDrag } from "./hooks/use-pointer-drag";
 export { useColorPicker } from "./hooks/use-color-picker";
 export { useGradient } from "./hooks/use-gradient";
+export { useAutoTokens } from "./hooks/use-auto-tokens";
 
 // Types
 export type {
@@ -53,5 +54,7 @@ export type {
   ColorPickerPresetProps,
   ColorPickerPopoverProps,
   ColorPickerInlineProps,
+  ColorTokens,
+  AutoTokensConfig,
   HSVA,
 } from "./types";

@@ -411,3 +411,88 @@ describe("ColorPickerInline preset", () => {
     expect(toggle).toBeDisabled();
   });
 });
+
+describe("Color tokens support", () => {
+  const tokens = { primary: "#3b82f6", brand: "#f97316" };
+
+  it("resolves a token name as value and displays a color in the input", () => {
+    render(
+      <ColorPicker value="primary" onValueChange={() => {}} tokens={tokens}>
+        <ColorPicker.Area />
+        <ColorPicker.HueSlider />
+        <ColorPicker.Input />
+      </ColorPicker>
+    );
+
+    const input = screen.getByRole("textbox");
+    // HSVA roundtrip may shift the hex slightly, so check it's a valid hex
+    expect(input.getAttribute("value")).toMatch(/^#[0-9a-f]{6}$/i);
+  });
+
+  it("shows the token badge when current color matches a token", () => {
+    render(
+      <ColorPicker value="#3b82f6" onValueChange={() => {}} tokens={tokens}>
+        <ColorPicker.Input />
+      </ColorPicker>
+    );
+
+    expect(screen.getByLabelText(/matches token: primary/i)).toBeInTheDocument();
+  });
+
+  it("does not show a badge when color does not match any token", () => {
+    render(
+      <ColorPicker value="#ff0000" onValueChange={() => {}} tokens={tokens}>
+        <ColorPicker.Input />
+      </ColorPicker>
+    );
+
+    expect(screen.queryByLabelText(/matches token/i)).not.toBeInTheDocument();
+  });
+
+  it("emits the resolved color string via onValueChange, not the token name", () => {
+    const onChange = vi.fn();
+    render(
+      <ColorPicker value="primary" onValueChange={onChange} tokens={tokens}>
+        <ColorPicker.Input />
+      </ColorPicker>
+    );
+
+    const input = screen.getByRole("textbox");
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: "brand" } });
+    fireEvent.blur(input);
+
+    expect(onChange).toHaveBeenCalledWith("#f97316");
+  });
+
+  it("allows typing a token name in the input to set its color", () => {
+    const onChange = vi.fn();
+    render(
+      <ColorPicker value="#000000" onValueChange={onChange} tokens={tokens}>
+        <ColorPicker.Input />
+      </ColorPicker>
+    );
+
+    const input = screen.getByRole("textbox");
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: "primary" } });
+    fireEvent.blur(input);
+
+    expect(onChange).toHaveBeenCalledWith("#3b82f6");
+  });
+
+  it("works with ColorPickerInline preset", () => {
+    render(
+      <ColorPickerInline
+        value="brand"
+        onValueChange={() => {}}
+        tokens={tokens}
+      />
+    );
+
+    const input = screen.getByRole("textbox");
+    // HSVA roundtrip may shift the hex slightly
+    expect(input.getAttribute("value")).toMatch(/^#[0-9a-f]{6}$/i);
+    expect(screen.getByLabelText(/matches token: brand/i)).toBeInTheDocument();
+  });
+});

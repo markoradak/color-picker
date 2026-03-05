@@ -50,12 +50,16 @@ export function ColorPicker({
   defaultValue,
   disabled = false,
   defaultOpen = false,
+  tokens,
+  autoTokens,
   children,
 }: ColorPickerProps) {
   const pickerState = useColorPicker({
     value,
     onValueChange,
     defaultValue,
+    tokens,
+    autoTokens,
   });
 
   // Gradient state -- wired to the gradient portion of the value

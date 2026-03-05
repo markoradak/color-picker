@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   detectFormat,
+  findMatchingToken,
   formatColor,
   fromHSVA,
+  getCSSColorTokens,
   getContrastColor,
   isValidColor,
   parseColor,
+  resolveToken,
   toHSVA,
 } from "./color";
 
@@ -243,6 +246,204 @@ describe("color utilities", () => {
     it("handles named colors", () => {
       expect(getContrastColor("white")).toBe("black");
       expect(getContrastColor("black")).toBe("white");
+    });
+  });
+
+  describe("resolveToken", () => {
+    const tokens = { primary: "#3b82f6", brand: "#f97316" };
+
+    it("resolves a token name to its color value", () => {
+      expect(resolveToken("primary", tokens)).toBe("#3b82f6");
+      expect(resolveToken("brand", tokens)).toBe("#f97316");
+    });
+
+    it("returns the input unchanged when not a token", () => {
+      expect(resolveToken("#ff0000", tokens)).toBe("#ff0000");
+      expect(resolveToken("rgb(255,0,0)", tokens)).toBe("rgb(255,0,0)");
+    });
+
+    it("returns the input unchanged when tokens is undefined", () => {
+      expect(resolveToken("primary")).toBe("primary");
+      expect(resolveToken("#ff0000")).toBe("#ff0000");
+    });
+  });
+
+  describe("findMatchingToken", () => {
+    const tokens = { primary: "#3b82f6", brand: "#f97316" };
+
+    it("finds a matching token by hex value", () => {
+      expect(findMatchingToken("#3b82f6", tokens)).toBe("primary");
+      expect(findMatchingToken("#f97316", tokens)).toBe("brand");
+    });
+
+    it("matches case-insensitively", () => {
+      expect(findMatchingToken("#3B82F6", tokens)).toBe("primary");
+    });
+
+    it("matches after HSVA roundtrip", () => {
+      // The picker internally roundtrips through HSVA, so a slightly shifted
+      // hex should still match the original token
+      expect(findMatchingToken("#3b82f5", tokens)).toBe("primary");
+    });
+
+    it("returns undefined when no token matches", () => {
+      expect(findMatchingToken("#ff0000", tokens)).toBeUndefined();
+    });
+
+    it("returns undefined when tokens is undefined", () => {
+      expect(findMatchingToken("#3b82f6")).toBeUndefined();
+    });
+  });
+
+  describe("getCSSColorTokens", () => {
+    /** Create a mock CSSStyleRule with given selector and properties */
+    function makeStyleRule(vars: Record<string, string>, selector: string) {
+      const properties = Object.keys(vars);
+      const style = {
+        length: properties.length,
+        [Symbol.iterator]: function* () {
+          yield* properties;
+        },
+      };
+      properties.forEach((prop, i) => {
+        (style as Record<number, string>)[i] = prop;
+      });
+
+      const rule = { selectorText: selector, style };
+      Object.setPrototypeOf(rule, CSSStyleRule.prototype);
+      return rule;
+    }
+
+    /** Create a mock grouping rule (e.g., @layer) containing child rules */
+    function makeGroupingRule(childRules: unknown[]) {
+      return { cssRules: childRules };
+    }
+
+    function mockStyleSheets(
+      vars: Record<string, string>,
+      selector = ":root",
+      options?: { nested?: boolean }
+    ) {
+      const styleRule = makeStyleRule(vars, selector);
+      const rules = options?.nested
+        ? [makeGroupingRule([styleRule])]
+        : [styleRule];
+
+      Object.defineProperty(document, "styleSheets", {
+        value: [{ cssRules: rules }],
+        configurable: true,
+      });
+
+      // Mock getComputedStyle
+      const originalGetComputedStyle = window.getComputedStyle;
+      vi.spyOn(window, "getComputedStyle").mockImplementation(() => {
+        const result = originalGetComputedStyle(document.documentElement);
+        return new Proxy(result, {
+          get(target, prop) {
+            if (prop === "getPropertyValue") {
+              return (name: string) => vars[name] ?? "";
+            }
+            return (target as unknown as Record<string | symbol, unknown>)[prop];
+          },
+        });
+      });
+    }
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      Object.defineProperty(document, "styleSheets", {
+        value: document.styleSheets,
+        configurable: true,
+      });
+    });
+
+    it("extracts color variables from :root", () => {
+      mockStyleSheets({
+        "--brand-red": "#ff0000",
+        "--brand-blue": "#0000ff",
+        "--not-a-color": "24px",
+      });
+
+      const tokens = getCSSColorTokens();
+      expect(tokens["brand-red"]).toBe("#ff0000");
+      expect(tokens["brand-blue"]).toBe("#0000ff");
+      expect(tokens["not-a-color"]).toBeUndefined();
+    });
+
+    it("filters by prefix and strips it from names", () => {
+      mockStyleSheets({
+        "--brand-red": "#ff0000",
+        "--brand-blue": "#0000ff",
+        "--other-green": "#00ff00",
+      });
+
+      const tokens = getCSSColorTokens("--brand-");
+      expect(tokens["red"]).toBe("#ff0000");
+      expect(tokens["blue"]).toBe("#0000ff");
+      expect(tokens["other-green"]).toBeUndefined();
+      expect(tokens["green"]).toBeUndefined();
+    });
+
+    it("returns empty object when no variables exist", () => {
+      mockStyleSheets({});
+      expect(getCSSColorTokens()).toEqual({});
+    });
+
+    it("extracts from html selector", () => {
+      mockStyleSheets({ "--color-primary": "#3b82f6" }, "html");
+      const tokens = getCSSColorTokens();
+      expect(tokens["primary"]).toBe("#3b82f6");
+    });
+
+    it("skips internal --cp-* and --tw-* variables by default", () => {
+      mockStyleSheets({
+        "--cp-bg": "#ffffff",
+        "--tw-ring-color": "#3b82f6",
+        "--color-accent": "#16db89",
+      });
+
+      const tokens = getCSSColorTokens();
+      expect(tokens["accent"]).toBe("#16db89");
+      expect(tokens["cp-bg"]).toBeUndefined();
+      expect(tokens["tw-ring-color"]).toBeUndefined();
+    });
+
+    it("includes --cp-* variables when explicitly requested via prefix", () => {
+      mockStyleSheets({
+        "--cp-bg": "#ffffff",
+        "--cp-text": "#171717",
+      });
+
+      const tokens = getCSSColorTokens("--cp-");
+      expect(tokens["bg"]).toBe("#ffffff");
+      expect(tokens["text"]).toBe("#171717");
+    });
+
+    it("extracts from compound selectors containing :root", () => {
+      mockStyleSheets({ "--color-primary": "#3b82f6" }, ":root, :host");
+      const tokens = getCSSColorTokens();
+      expect(tokens["primary"]).toBe("#3b82f6");
+    });
+
+    it("extracts from nested rules (e.g., @layer)", () => {
+      mockStyleSheets(
+        { "--color-accent": "#16db89" },
+        ":root",
+        { nested: true }
+      );
+      const tokens = getCSSColorTokens();
+      expect(tokens["accent"]).toBe("#16db89");
+    });
+
+    it("returns empty object in SSR (no document)", () => {
+      const origDoc = globalThis.document;
+      // @ts-expect-error -- simulating SSR
+      delete globalThis.document;
+      try {
+        expect(getCSSColorTokens()).toEqual({});
+      } finally {
+        globalThis.document = origDoc;
+      }
     });
   });
 });
