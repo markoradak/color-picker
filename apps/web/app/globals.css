@@ -91,6 +91,7 @@ body {
 }
 
 .dark .cp-input-trigger {
+  background-color: #1c1c1e;
   border-color: #444;
 }
 

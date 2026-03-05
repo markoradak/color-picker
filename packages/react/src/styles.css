@@ -140,6 +140,7 @@
 
 /* Input trigger */
 .cp-input-trigger {
+  background-color: var(--cp-input-bg);
   border-color: var(--cp-input-border);
 }
 
