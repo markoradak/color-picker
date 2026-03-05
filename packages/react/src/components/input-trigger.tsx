@@ -231,7 +231,7 @@ export function ColorPickerInputTrigger({
         onClick={handleContainerClick}
         className={[
           "cp-input-trigger",
-          "inline-flex h-10 w-full cursor-pointer items-center gap-2 rounded-lg border px-1.5",
+          "inline-flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-lg border px-1.5",
           "text-left",
           "",
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
@@ -311,28 +311,33 @@ export function ColorPickerInputTrigger({
                   aria-expanded={tokenListOpen}
                   aria-haspopup="listbox"
                   className={[
-                    "cp-token-badge",
-                    "absolute right-0 top-1/2 -translate-y-1/2",
-                    "select-none rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none",
+                    matchedToken ? "cp-token-badge" : "",
+                    "absolute right-1.5 top-1/2 -translate-y-1/2",
                     "cursor-pointer outline-none",
-                    "transition-opacity hover:!opacity-100",
-                    isEditing ? "opacity-40" : "opacity-70",
-                  ].join(" ")}
+                    matchedToken
+                      ? "select-none rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none"
+                      : "opacity-50 hover:opacity-80",
+                    matchedToken ? "" : "transition-opacity hover:opacity-100!",
+                    isEditing ? "opacity-40" : matchedToken ? "" : "",
+                  ].filter(Boolean).join(" ")}
                 >
                   {matchedToken ? (
                     matchedToken
                   ) : (
                     <svg
-                      className="h-3 w-3"
-                      viewBox="0 0 16 16"
+                      className="h-3.5 w-3.5"
+                      viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="1.5"
+                      strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       aria-hidden="true"
                     >
-                      <path d="M2 4l6-2 6 2v3c0 4-3 6.5-6 7.5C5 13.5 2 11 2 7V4z" />
+                      <path d="M11 17a4 4 0 0 1-8 0V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2Z" />
+                      <path d="M16.7 13H19a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H7" />
+                      <path d="M 7 17h.01" />
+                      <path d="m11 8 2.3-2.3a2.4 2.4 0 0 1 3.404.004L18.6 7.6a2.4 2.4 0 0 1 .026 3.434L9.9 19.8" />
                     </svg>
                   )}
                 </button>
@@ -349,7 +354,7 @@ export function ColorPickerInputTrigger({
                     }}
                   >
                     <TokenList
-                      tokens={tokens}
+                      tokens={tokens!}
                       matchedToken={matchedToken}
                       onSelect={handleTokenSelect}
                       disabled={disabled}
@@ -370,7 +375,10 @@ export function ColorPickerInputTrigger({
             disabled={disabled || isPicking}
             tabIndex={-1}
             aria-label="Pick a color from the screen"
-            className="inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded opacity-50 outline-none hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-30"
+            className={[
+              "inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded opacity-50 outline-none hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-30",
+              matchedToken ? "-ml-1.5" : "-ml-1",
+            ].join(" ")}
           >
             {isPicking ? (
               <svg
@@ -393,16 +401,17 @@ export function ColorPickerInputTrigger({
             ) : (
               <svg
                 className="h-3.5 w-3.5"
-                viewBox="0 0 16 16"
+                viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
               >
-                <path d="M13.5 2.5a1.414 1.414 0 0 0-2 0L9.5 4.5l-1-1-5 5V12h3.5l5-5-1-1 2-2a1.414 1.414 0 0 0 0-2Z" />
-                <path d="M2 14l2.5-2.5" />
+                <path d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
+                <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
+                <path d="m2 22 .414-.414" />
               </svg>
             )}
           </button>

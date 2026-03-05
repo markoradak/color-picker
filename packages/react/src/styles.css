@@ -285,8 +285,9 @@
 /* Token badge */
 .cp-token-badge {
   background-color: var(--cp-bg-secondary);
-  color: var(--cp-text-muted);
+  color: var(--cp-text);
   border-color: var(--cp-border);
+  box-shadow: none;
 }
 
 .cp-token-badge:hover:not(:disabled) {

@@ -107,7 +107,7 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
     <div
       className={[
         "cp-input",
-        "flex items-center gap-1.5",
+        "flex items-center gap-0",
         className,
       ]
         .filter(Boolean)
@@ -160,28 +160,33 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
               aria-expanded={tokenListOpen}
               aria-haspopup="listbox"
               className={[
-                "cp-token-badge",
-                "absolute right-1.5 top-1/2 -translate-y-1/2",
-                "select-none rounded-full border px-2 py-0.5 text-[10px] font-medium leading-none",
+                matchedToken ? "cp-token-badge" : "",
+                "absolute right-2.5 top-1/2 -translate-y-1/2",
                 "cursor-pointer outline-none",
-                "transition-opacity hover:!opacity-100",
-                isEditing ? "opacity-40" : "",
+                matchedToken
+                  ? "select-none rounded-full border px-2 py-0.5 text-[10px] font-medium leading-none"
+                  : "opacity-70 hover:opacity-100",
+                matchedToken ? "" : "transition-opacity hover:opacity-100!",
+                isEditing && !matchedToken ? "opacity-40" : "",
               ].filter(Boolean).join(" ")}
             >
               {matchedToken ? (
                 matchedToken
               ) : (
                 <svg
-                  className="h-3 w-3"
-                  viewBox="0 0 16 16"
+                  className="h-3.5 w-3.5"
+                  viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.5"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   aria-hidden="true"
                 >
-                  <path d="M2 4l6-2 6 2v3c0 4-3 6.5-6 7.5C5 13.5 2 11 2 7V4z" />
+                  <path d="M11 17a4 4 0 0 1-8 0V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2Z" />
+                  <path d="M16.7 13H19a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H7" />
+                  <path d="M 7 17h.01" />
+                  <path d="m11 8 2.3-2.3a2.4 2.4 0 0 1 3.404.004L18.6 7.6a2.4 2.4 0 0 1 .026 3.434L9.9 19.8" />
                 </svg>
               )}
             </button>
@@ -191,7 +196,7 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
                 className="cp-token-list-popover absolute right-0 top-full z-50 mt-1"
               >
                 <TokenList
-                  tokens={tokens}
+                  tokens={tokens!}
                   matchedToken={matchedToken}
                   onSelect={handleTokenSelect}
                   disabled={disabled}

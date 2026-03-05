@@ -118,3 +118,22 @@ body {
 .dark .cp-mode-selector [role="radio"][aria-checked="false"] {
   color: #a1a1aa;
 }
+
+.dark .cp-token-badge {
+  background-color: #3a3a3c;
+  color: #e5e5e5;
+  border-color: #444;
+}
+
+.dark .cp-token-badge:hover:not(:disabled) {
+  background-color: #4a4a4c;
+}
+
+.dark .cp-token-list {
+  background-color: #1c1c1e;
+  border-color: #444;
+}
+
+.dark .cp-token-list button:hover:not(:disabled):not([aria-selected="true"]) {
+  background-color: #3a3a3c;
+}

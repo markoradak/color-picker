@@ -114,17 +114,18 @@ export function ColorPickerEyeDropper({
       ) : (
         /* Pipette icon */
         <svg
-          className="h-4 w-4"
-          viewBox="0 0 16 16"
+          className="h-3.5 w-3.5 opacity-70"
+          viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.5"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
           aria-hidden="true"
         >
-          <path d="M13.5 2.5a1.414 1.414 0 0 0-2 0L9.5 4.5l-1-1-5 5V12h3.5l5-5-1-1 2-2a1.414 1.414 0 0 0 0-2Z" />
-          <path d="M2 14l2.5-2.5" />
+          <path d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
+          <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />
+          <path d="m2 22 .414-.414" />
         </svg>
       )}
     </button>
