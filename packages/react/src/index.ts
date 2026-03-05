@@ -16,6 +16,7 @@ export { ColorPickerGradientEditor } from "./components/gradient-editor";
 export { ColorPickerGradientSwatches } from "./components/gradient-swatches";
 export { GradientPreview } from "./components/gradient-preview";
 export { GradientStops } from "./components/gradient-stops";
+export { TokenList } from "./components/token-list";
 
 // Pre-composed presets
 export { ColorPickerPopover, ColorPickerInline, ColorPickerControls } from "./components/presets";
@@ -58,3 +59,4 @@ export type {
   AutoTokensConfig,
   HSVA,
 } from "./types";
+export type { TokenListProps } from "./components/token-list";

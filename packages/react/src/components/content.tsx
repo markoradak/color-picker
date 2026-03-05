@@ -9,7 +9,9 @@ import { useColorPickerContext } from "./color-picker-context";
  * with configurable positioning, shadow, border, and enter/exit animations.
  *
  * Automatically prevents focus steal when the input trigger opened the popover,
- * so the inline text input keeps focus.
+ * so the inline text input keeps focus. Also prevents dismiss when interacting
+ * with the Popover.Anchor (input-trigger) so clicks on the input, token badge,
+ * format toggle, etc. don't cause close-then-reopen flicker.
  */
 export const ColorPickerContent = forwardRef<
   HTMLDivElement,
@@ -36,6 +38,23 @@ export const ColorPickerContent = forwardRef<
     [onOpenAutoFocus, preserveFocusRef],
   );
 
+  const handleInteractOutside = useCallback(
+    (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+
+      // Don't dismiss when the interaction is inside the anchor (input-trigger)
+      // or inside a token-list portal. This prevents the close→reopen flicker
+      // when clicking the input, token badge, format toggle, eye dropper, etc.
+      const inAnchor = target.closest("[data-cp-anchor]");
+      const inTokenList = target.closest("[data-cp-token-portal]");
+      if (inAnchor || inTokenList) {
+        event.preventDefault();
+      }
+    },
+    [],
+  );
+
   return (
     <Popover.Portal>
       <Popover.Content
@@ -44,6 +63,7 @@ export const ColorPickerContent = forwardRef<
         align={align}
         sideOffset={sideOffset}
         onOpenAutoFocus={handleOpenAutoFocus}
+        onInteractOutside={handleInteractOutside}
         className={[
           "cp-content",
           "z-50 flex flex-col gap-3 rounded-xl border p-3",

@@ -288,3 +288,24 @@
   color: var(--cp-text-muted);
   border-color: var(--cp-border);
 }
+
+.cp-token-badge:hover:not(:disabled) {
+  background-color: var(--cp-hover-bg);
+}
+
+/* Token list popover */
+.cp-token-list {
+  background-color: var(--cp-bg);
+  border-color: var(--cp-border);
+  border-radius: var(--cp-radius-sm);
+  box-shadow: var(--cp-shadow);
+}
+
+.cp-token-list button:hover:not(:disabled):not([aria-selected="true"]) {
+  background-color: var(--cp-hover-bg);
+}
+
+.cp-token-list button:focus-visible {
+  outline: none;
+  box-shadow: var(--cp-ring);
+}

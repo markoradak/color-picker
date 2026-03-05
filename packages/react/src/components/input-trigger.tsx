@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import * as Popover from "@radix-ui/react-popover";
 import type { ColorPickerInputTriggerProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { fromHSVA, isValidColor, resolveToken } from "../utils/color";
 import { toCSS } from "../utils/css";
 import { CHECKERBOARD_STYLE } from "./shared";
+import { TokenList } from "./token-list";
 
 // Type for the EyeDropper API
 interface EyeDropperAPI {
@@ -156,6 +158,55 @@ export function ColorPickerInputTrigger({
     [toggleFormat],
   );
 
+  // --- Token dropdown ---
+  const [tokenListOpen, setTokenListOpen] = useState(false);
+  const tokenDropdownRef = useRef<HTMLDivElement>(null);
+  const tokenBadgeRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
+
+  // Position the portal dropdown relative to the badge.
+  useLayoutEffect(() => {
+    if (!tokenListOpen || !tokenBadgeRef.current) return;
+    const rect = tokenBadgeRef.current.getBoundingClientRect();
+    setDropdownPos({
+      top: rect.bottom + 4,
+      right: window.innerWidth - rect.right,
+    });
+  }, [tokenListOpen]);
+
+  // Click-outside to close token dropdown.
+  useEffect(() => {
+    if (!tokenListOpen) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      const target = e.target as Node;
+      if (
+        tokenDropdownRef.current?.contains(target) ||
+        tokenBadgeRef.current?.contains(target)
+      ) {
+        return;
+      }
+      setTokenListOpen(false);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [tokenListOpen]);
+
+  const handleTokenSelect = useCallback(
+    (name: string) => {
+      setColorFromString(name);
+      setTokenListOpen(false);
+    },
+    [setColorFromString]
+  );
+
+  const handleTokenBadgeClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setTokenListOpen((prev) => !prev);
+    },
+    []
+  );
+
   // Clicking the container (thumbnail or empty space) opens the popover
   const handleContainerClick = useCallback(() => {
     if (!disabled) {
@@ -169,12 +220,14 @@ export function ColorPickerInputTrigger({
     : format.toUpperCase();
   const eyeDropperSupported = useIsEyeDropperSupported();
   const showEyeDropper = enableEyeDropper && eyeDropperSupported;
+  const hasTokens = tokens && Object.keys(tokens).length > 0;
 
   return (
     <Popover.Anchor asChild>
       <div
         role="group"
         data-disabled={disabled ? "" : undefined}
+        data-cp-anchor=""
         onClick={handleContainerClick}
         className={[
           "cp-input-trigger",
@@ -247,19 +300,64 @@ export function ColorPickerInputTrigger({
               aria-label={`Color value in ${formatLabel} format`}
               className="w-full cursor-text bg-transparent font-mono text-xs outline-none disabled:cursor-not-allowed"
             />
-            {matchedToken && (
-              <span
-                className={[
-                  "cp-token-badge",
-                  "absolute right-0 top-1/2 -translate-y-1/2",
-                  "select-none rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none",
-                  "transition-opacity hover:!opacity-100",
-                  isEditing ? "opacity-40" : "opacity-70",
-                ].join(" ")}
-                aria-label={`Matches token: ${matchedToken}`}
-              >
-                {matchedToken}
-              </span>
+            {hasTokens && (
+              <>
+                <button
+                  ref={tokenBadgeRef}
+                  type="button"
+                  disabled={disabled}
+                  onClick={handleTokenBadgeClick}
+                  aria-label={matchedToken ? `Matches token: ${matchedToken}. Click to browse tokens.` : "Browse color tokens"}
+                  aria-expanded={tokenListOpen}
+                  aria-haspopup="listbox"
+                  className={[
+                    "cp-token-badge",
+                    "absolute right-0 top-1/2 -translate-y-1/2",
+                    "select-none rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none",
+                    "cursor-pointer outline-none",
+                    "transition-opacity hover:!opacity-100",
+                    isEditing ? "opacity-40" : "opacity-70",
+                  ].join(" ")}
+                >
+                  {matchedToken ? (
+                    matchedToken
+                  ) : (
+                    <svg
+                      className="h-3 w-3"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M2 4l6-2 6 2v3c0 4-3 6.5-6 7.5C5 13.5 2 11 2 7V4z" />
+                    </svg>
+                  )}
+                </button>
+                {tokenListOpen && createPortal(
+                  <div
+                    ref={tokenDropdownRef}
+                    data-cp-token-portal=""
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      position: "fixed",
+                      top: dropdownPos.top,
+                      right: dropdownPos.right,
+                      zIndex: 99999,
+                    }}
+                  >
+                    <TokenList
+                      tokens={tokens}
+                      matchedToken={matchedToken}
+                      onSelect={handleTokenSelect}
+                      disabled={disabled}
+                    />
+                  </div>,
+                  document.body,
+                )}
+              </>
             )}
           </div>
         )}
