@@ -41,6 +41,7 @@ function useIsEyeDropperSupported(): boolean {
  */
 export function ColorPickerInputTrigger({
   className,
+  classNames,
   enableFormatToggle = true,
   enableEyeDropper = true,
 }: ColorPickerInputTriggerProps) {
@@ -226,19 +227,11 @@ export function ColorPickerInputTrigger({
     <Popover.Anchor asChild>
       <div
         role="group"
+        data-cp-part="input-trigger"
         data-disabled={disabled ? "" : undefined}
         data-cp-anchor=""
         onClick={handleContainerClick}
-        className={[
-          "cp-input-trigger",
-          "inline-flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-lg border px-1.5",
-          "text-left",
-          "",
-          "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className={className}
       >
         {/* Hidden trigger for Radix — keeps popover wired for keyboard/a11y */}
         <Popover.Trigger
@@ -246,17 +239,20 @@ export function ColorPickerInputTrigger({
           aria-label="Open color picker"
           tabIndex={-1}
           className="sr-only"
+          style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", borderWidth: 0 }}
         />
 
         {/* Color thumbnail */}
-        <span className="relative h-7 w-7 shrink-0 rounded-md" aria-hidden="true">
+        <span data-cp-el="thumbnail" className={classNames?.thumbnail} style={{ position: "relative" }} aria-hidden="true">
           <span
-            className="absolute inset-0 rounded-md"
-            style={CHECKERBOARD_STYLE}
+            data-cp-el="thumbnail-checkerboard"
+            className={classNames?.thumbnailCheckerboard}
+            style={{ position: "absolute", inset: 0, ...CHECKERBOARD_STYLE }}
           />
           <span
-            className="absolute inset-0 rounded-md"
-            style={{ background: displayBackground }}
+            data-cp-el="thumbnail-swatch"
+            className={classNames?.thumbnailSwatch}
+            style={{ position: "absolute", inset: 0, background: displayBackground }}
           />
         </span>
 
@@ -268,23 +264,24 @@ export function ColorPickerInputTrigger({
             disabled={disabled}
             tabIndex={-1}
             aria-label={`Color format: ${formatLabel}. Click to change.`}
-            className="shrink-0 cursor-pointer select-none rounded px-1 text-xs font-medium opacity-50 outline-none hover:opacity-80 disabled:cursor-not-allowed"
+            data-cp-el="format-toggle"
+            className={classNames?.formatToggle}
           >
             {formatLabel}
           </button>
         ) : (
-          <span className="shrink-0 select-none text-xs font-medium opacity-50">
+          <span data-cp-el="format-label" className={classNames?.formatLabel}>
             {formatLabel}
           </span>
         )}
 
         {/* Editable color value / display */}
         {isGradientMode ? (
-          <span className="min-w-0 flex-1 truncate font-mono text-xs">
+          <span data-cp-el="gradient-display" className={classNames?.gradientDisplay}>
             {toCSS(gradient.gradient)}
           </span>
         ) : (
-          <div className="relative min-w-0 flex-1">
+          <div style={{ position: "relative", minWidth: 0, flex: 1 }}>
             <input
               ref={inputRef}
               type="text"
@@ -298,7 +295,8 @@ export function ColorPickerInputTrigger({
               spellCheck={false}
               autoComplete="off"
               aria-label={`Color value in ${formatLabel} format`}
-              className="w-full cursor-text bg-transparent font-mono text-xs outline-none disabled:cursor-not-allowed"
+              data-cp-el="input"
+              className={classNames?.input}
             />
             {hasTokens && (
               <>
@@ -310,22 +308,18 @@ export function ColorPickerInputTrigger({
                   aria-label={matchedToken ? `Matches token: ${matchedToken}. Click to browse tokens.` : "Browse color tokens"}
                   aria-expanded={tokenListOpen}
                   aria-haspopup="listbox"
-                  className={[
-                    matchedToken ? "cp-token-badge" : "",
-                    "absolute right-1.5 top-1/2 -translate-y-1/2",
-                    "cursor-pointer outline-none",
-                    matchedToken
-                      ? "select-none rounded-full border px-1.5 py-0.5 text-[10px] font-medium leading-none"
-                      : "opacity-50 hover:opacity-80",
-                    matchedToken ? "" : "transition-opacity hover:opacity-100!",
-                    isEditing ? "opacity-40" : matchedToken ? "" : "",
-                  ].filter(Boolean).join(" ")}
+                  data-cp-el="token-badge"
+                  data-matched={matchedToken ? "" : undefined}
+                  data-editing={isEditing ? "" : undefined}
+                  className={classNames?.tokenBadge}
+                  style={{ position: "absolute" }}
                 >
                   {matchedToken ? (
                     matchedToken
                   ) : (
                     <svg
-                      className="h-3.5 w-3.5"
+                      data-cp-el="token-icon"
+                      className={classNames?.tokenIcon}
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -345,6 +339,7 @@ export function ColorPickerInputTrigger({
                   <div
                     ref={tokenDropdownRef}
                     data-cp-token-portal=""
+                    className={classNames?.tokenListContainer}
                     onClick={(e) => e.stopPropagation()}
                     style={{
                       position: "fixed",
@@ -358,6 +353,13 @@ export function ColorPickerInputTrigger({
                       matchedToken={matchedToken}
                       onSelect={handleTokenSelect}
                       disabled={disabled}
+                      className={classNames?.tokenList}
+                      classNames={{
+                        item: classNames?.tokenListItem,
+                        swatch: classNames?.tokenListSwatch,
+                        name: classNames?.tokenListName,
+                        check: classNames?.tokenListCheck,
+                      }}
                     />
                   </div>,
                   document.body,
@@ -375,17 +377,18 @@ export function ColorPickerInputTrigger({
             disabled={disabled || isPicking}
             tabIndex={-1}
             aria-label="Pick a color from the screen"
-            className={[
-              "inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded opacity-50 outline-none hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-30",
-              matchedToken ? "-ml-1.5" : "-ml-1",
-            ].join(" ")}
+            data-cp-el="eye-dropper"
+            data-picking={isPicking ? "" : undefined}
+            className={classNames?.eyeDropper}
           >
             {isPicking ? (
               <svg
-                className="h-3.5 w-3.5 animate-spin"
+                data-cp-el="spinner"
+                className={classNames?.eyeDropperSpinner}
                 viewBox="0 0 16 16"
                 fill="none"
                 aria-hidden="true"
+                style={{ width: "1em", height: "1em" }}
               >
                 <circle
                   cx="8"
@@ -400,7 +403,8 @@ export function ColorPickerInputTrigger({
               </svg>
             ) : (
               <svg
-                className="h-3.5 w-3.5"
+                data-cp-el="icon"
+                className={classNames?.eyeDropperIcon}
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -408,6 +412,7 @@ export function ColorPickerInputTrigger({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
+                style={{ width: "1em", height: "1em" }}
               >
                 <path d="m12 9-8.414 8.414A2 2 0 0 0 3 18.828v1.344a2 2 0 0 1-.586 1.414A2 2 0 0 1 3.828 21h1.344a2 2 0 0 0 1.414-.586L15 12" />
                 <path d="m18 9 .4.4a1 1 0 1 1-3 3l-3.8-3.8a1 1 0 1 1 3-3l.4.4 3.4-3.4a1 1 0 1 1 3 3z" />

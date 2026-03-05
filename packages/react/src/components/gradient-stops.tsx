@@ -8,6 +8,11 @@ import { clamp } from "../utils/position";
 
 interface GradientStopsProps {
   className?: string;
+  classNames?: {
+    bar?: string;
+    stopMarker?: string;
+    popoverContent?: string;
+  };
 }
 
 /**
@@ -16,15 +21,8 @@ interface GradientStopsProps {
  * Renders the current gradient as a horizontal bar background with
  * draggable stop markers along the bottom edge. Each stop marker
  * opens a popover with a mini color picker for editing the stop's color.
- *
- * Supports:
- * - Click a stop marker to open its color editing popover
- * - Drag a stop marker to reposition it (0-100) -- popover stays closed
- * - Click empty space on the bar to add a new stop (color interpolated from neighbours)
- * - Double-click a stop marker to remove it (minimum 2 stops enforced)
- * - Active stop is highlighted with a ring indicator
  */
-export function GradientStops({ className }: GradientStopsProps) {
+export function GradientStops({ className, classNames }: GradientStopsProps) {
   const { gradient, disabled } = useColorPickerContext();
   const {
     gradient: gradientValue,
@@ -41,7 +39,6 @@ export function GradientStops({ className }: GradientStopsProps) {
   const didDragRef = useRef(false);
   const [openStopId, setOpenStopId] = useState<string | null>(null);
 
-  // Build the gradient CSS for the bar background (always render as linear left-to-right)
   const barCSS = (() => {
     const sorted = sortStops(gradientValue.stops);
     const stopsCSS = sorted
@@ -50,7 +47,6 @@ export function GradientStops({ className }: GradientStopsProps) {
     return `linear-gradient(to right, ${stopsCSS})`;
   })();
 
-  // Handle clicking empty space on the bar to add a stop
   const handleBarClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (disabled) return;
@@ -77,7 +73,6 @@ export function GradientStops({ className }: GradientStopsProps) {
       didDragRef.current = false;
       setActiveStopId(stopId);
 
-      // Capture on the button itself
       e.currentTarget.setPointerCapture(e.pointerId);
 
       const handleMove = (ev: PointerEvent) => {
@@ -105,7 +100,6 @@ export function GradientStops({ className }: GradientStopsProps) {
     (stopId: string, e: React.MouseEvent) => {
       e.stopPropagation();
       if (disabled) return;
-      // Only open popover if we didn't drag
       if (!didDragRef.current) {
         setOpenStopId((prev) => (prev === stopId ? null : stopId));
       }
@@ -134,31 +128,24 @@ export function GradientStops({ className }: GradientStopsProps) {
 
   return (
     <div
-      className={[
-        "cp-gradient-stops",
-        "relative",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="gradient-stops"
+      data-disabled={disabled ? "" : undefined}
+      className={className}
+      style={{ position: "relative" }}
     >
       {/* Gradient bar */}
       <div
         ref={barRef}
         onClick={handleBarClick}
-        className={[
-          "relative h-3 w-full cursor-pointer rounded-full",
-          disabled ? "cursor-not-allowed opacity-50" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        style={{ background: barCSS }}
+        data-cp-el="bar"
+        className={classNames?.bar}
+        style={{ background: barCSS, position: "relative" }}
         role="group"
         aria-label="Gradient stops"
       />
 
       {/* Stop markers */}
-      <div className="relative h-5 w-full">
+      <div data-cp-el="markers" style={{ position: "relative" }}>
         {gradientValue.stops.map((stop) => {
           const isActive = stop.id === activeStopId;
           const isOpen = openStopId === stop.id;
@@ -175,25 +162,19 @@ export function GradientStops({ className }: GradientStopsProps) {
                 <button
                   type="button"
                   data-stop-id={stop.id}
+                  data-cp-el="stop-marker"
+                  data-active={isActive ? "" : undefined}
                   onPointerDown={(e) => handleStopPointerDown(stop.id, e)}
                   onClick={(e) => handleStopClick(stop.id, e)}
                   onDoubleClick={(e) => handleStopDoubleClick(stop.id, e)}
                   disabled={disabled}
                   aria-label={`Gradient stop at ${Math.round(stop.position)}%, color ${stop.color}`}
                   aria-pressed={isActive}
-                  className={[
-                    "absolute top-0 -translate-x-1/2",
-                    "h-4 w-4 rounded-full border-2 outline-none",
-                    "",
-                    isActive
-                      ? "border-white shadow-[0_0_0_2px_rgba(59,130,246,0.8),0_1px_3px_rgba(0,0,0,0.3)] z-10"
-                      : "border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.2)]",
-                    disabled ? "cursor-not-allowed" : "cursor-grab",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
+                  className={classNames?.stopMarker}
                   style={{
+                    position: "absolute",
                     left: `${stop.position}%`,
+                    transform: "translateX(-50%)",
                     backgroundColor: stop.color,
                   }}
                 />
@@ -204,7 +185,8 @@ export function GradientStops({ className }: GradientStopsProps) {
                   side="top"
                   sideOffset={8}
                   align="center"
-                  className="cp-content z-50 flex flex-col gap-3 rounded-xl border p-3"
+                  data-cp-part="content"
+                  className={classNames?.popoverContent}
                   onOpenAutoFocus={(e) => e.preventDefault()}
                 >
                   <ColorPickerProvider

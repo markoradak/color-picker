@@ -30,7 +30,7 @@ function getActiveMode(value: unknown): ColorPickerMode {
  * - **Gradient -> solid**: Extracts the active (or first) stop's color
  * - **Gradient A -> B**: Changes the gradient `type`, preserving stops
  */
-export function ColorPickerModeSelector({ className }: ColorPickerModeSelectorProps) {
+export function ColorPickerModeSelector({ className, classNames }: ColorPickerModeSelectorProps) {
   const { value, hsva, disabled, gradient, updateValue } = useColorPickerContext();
   const activeMode = getActiveMode(value);
 
@@ -74,13 +74,9 @@ export function ColorPickerModeSelector({ className }: ColorPickerModeSelectorPr
 
   return (
     <div
-      className={[
-        "cp-mode-selector",
-        "flex justify-between rounded-lg border p-0.5",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="mode-selector"
+      data-disabled={disabled ? "" : undefined}
+      className={className}
       role="radiogroup"
       aria-label="Color picker mode"
     >
@@ -94,16 +90,9 @@ export function ColorPickerModeSelector({ className }: ColorPickerModeSelectorPr
             aria-checked={isActive}
             onClick={() => handleModeChange(mode.value)}
             disabled={disabled}
-            className={[
-              "rounded-md px-1.5 py-1 text-xs font-medium outline-none transition-colors",
-              "",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              isActive
-                ? ""
-                : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
+            data-cp-el="mode-button"
+            data-active={isActive ? "" : undefined}
+            className={classNames?.button}
           >
             {mode.label}
           </button>

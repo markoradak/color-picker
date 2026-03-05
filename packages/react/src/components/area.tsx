@@ -18,7 +18,7 @@ import { clamp } from "../utils/position";
  *
  * Supports arrow key navigation (step=1, shift+arrow=10).
  */
-export function ColorPickerArea({ className }: ColorPickerAreaProps) {
+export function ColorPickerArea({ className, classNames }: ColorPickerAreaProps) {
   const { hsva, setSaturationValue, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -80,23 +80,19 @@ export function ColorPickerArea({ className }: ColorPickerAreaProps) {
       tabIndex={disabled ? -1 : 0}
       onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}
+      data-cp-part="area"
       data-disabled={disabled ? "" : undefined}
       data-dragging={isDragging ? "" : undefined}
-      className={[
-        "cp-area",
-        "relative h-44 w-full cursor-crosshair rounded-lg outline-none",
-        "",
-        "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      style={{ backgroundColor: hueBackground }}
+      className={className}
+      style={{ backgroundColor: hueBackground, position: "relative" }}
     >
       {/* White-to-transparent horizontal gradient */}
       <div
-        className="absolute inset-0 rounded-lg"
+        data-cp-el="white-overlay"
+        className={classNames?.whiteOverlay}
         style={{
+          position: "absolute",
+          inset: 0,
           background:
             "linear-gradient(to right, #ffffff, transparent)",
         }}
@@ -104,8 +100,11 @@ export function ColorPickerArea({ className }: ColorPickerAreaProps) {
       />
       {/* Transparent-to-black vertical gradient */}
       <div
-        className="absolute inset-0 rounded-lg"
+        data-cp-el="black-overlay"
+        className={classNames?.blackOverlay}
         style={{
+          position: "absolute",
+          inset: 0,
           background:
             "linear-gradient(to bottom, transparent, #000000)",
         }}
@@ -113,15 +112,18 @@ export function ColorPickerArea({ className }: ColorPickerAreaProps) {
       />
       {/* Indicator dot */}
       <div
-        className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
         style={{
+          position: "absolute",
           left: `${indicatorX}%`,
           top: `${indicatorY}%`,
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
         }}
         aria-hidden="true"
       >
         <div
-          className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]"
+          data-cp-el="thumb"
+          className={classNames?.thumb}
           style={{ backgroundColor: indicatorColor }}
         />
       </div>

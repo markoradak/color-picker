@@ -90,6 +90,12 @@ export interface ColorPickerProps {
  */
 export interface ColorPickerAreaProps {
   className?: string;
+  /** Class names for inner elements (overlays, thumb). */
+  classNames?: {
+    whiteOverlay?: string;
+    blackOverlay?: string;
+    thumb?: string;
+  };
 }
 
 /**
@@ -98,6 +104,13 @@ export interface ColorPickerAreaProps {
 export interface ColorPickerSliderProps {
   className?: string;
   orientation?: "horizontal" | "vertical";
+  /** Class names for inner elements (track, thumb, checkerboard). */
+  classNames?: {
+    track?: string;
+    thumb?: string;
+    /** Alpha slider only: checkerboard pattern background. */
+    checkerboard?: string;
+  };
 }
 
 /**
@@ -106,6 +119,19 @@ export interface ColorPickerSliderProps {
 export interface ColorPickerInputProps {
   className?: string;
   enableFormatToggle?: boolean;
+  /** Class names for inner elements. */
+  classNames?: {
+    formatToggle?: string;
+    field?: string;
+    tokenBadge?: string;
+    tokenIcon?: string;
+    tokenListContainer?: string;
+    tokenList?: string;
+    tokenListItem?: string;
+    tokenListSwatch?: string;
+    tokenListName?: string;
+    tokenListCheck?: string;
+  };
 }
 
 /**
@@ -115,6 +141,10 @@ export interface ColorPickerSwatchesProps {
   values?: string[];
   columns?: number;
   className?: string;
+  /** Class names for inner elements. */
+  classNames?: {
+    swatch?: string;
+  };
 }
 
 /**
@@ -124,6 +154,10 @@ export interface ColorPickerGradientSwatchesProps {
   values?: GradientValue[];
   columns?: number;
   className?: string;
+  /** Class names for inner elements. */
+  classNames?: {
+    swatch?: string;
+  };
 }
 
 /**
@@ -133,6 +167,11 @@ export interface ColorPickerTriggerProps {
   className?: string;
   asChild?: boolean;
   children?: React.ReactNode;
+  /** Class names for inner elements. */
+  classNames?: {
+    checkerboard?: string;
+    swatch?: string;
+  };
 }
 
 /**
@@ -146,6 +185,27 @@ export interface ColorPickerInputTriggerProps {
   enableFormatToggle?: boolean;
   /** Show the eye dropper button inline (auto-hidden if browser unsupported). Default: true */
   enableEyeDropper?: boolean;
+  /** Class names for inner elements. */
+  classNames?: {
+    thumbnail?: string;
+    thumbnailCheckerboard?: string;
+    thumbnailSwatch?: string;
+    formatToggle?: string;
+    formatLabel?: string;
+    input?: string;
+    eyeDropper?: string;
+    eyeDropperIcon?: string;
+    eyeDropperSpinner?: string;
+    tokenBadge?: string;
+    tokenIcon?: string;
+    gradientDisplay?: string;
+    tokenListContainer?: string;
+    tokenList?: string;
+    tokenListItem?: string;
+    tokenListSwatch?: string;
+    tokenListName?: string;
+    tokenListCheck?: string;
+  };
 }
 
 /**
@@ -243,6 +303,10 @@ export type ColorPickerInlineProps = ColorPickerPresetProps;
  */
 export interface ColorPickerModeSelectorProps {
   className?: string;
+  /** Class names for inner elements. */
+  classNames?: {
+    button?: string;
+  };
 }
 
 /**

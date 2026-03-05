@@ -15,7 +15,7 @@ import { CHECKERBOARD_STYLE } from "./shared";
 export const ColorPickerTrigger = forwardRef<
   HTMLButtonElement,
   ColorPickerTriggerProps
->(function ColorPickerTrigger({ className, asChild, children, ...props }, ref) {
+>(function ColorPickerTrigger({ className, classNames, asChild, children, ...props }, ref) {
   const { hsva, disabled } = useColorPickerContext();
   const currentColor = fromHSVA(hsva);
 
@@ -38,28 +38,23 @@ export const ColorPickerTrigger = forwardRef<
       ref={ref}
       disabled={disabled}
       aria-label="Open color picker"
+      data-cp-part="trigger"
       data-disabled={disabled ? "" : undefined}
-      className={[
-        "cp-trigger",
-        "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border p-1",
-        "outline-none",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={className}
       {...props}
     >
       {/* Checkerboard background for transparency */}
       <span
-        className="absolute inset-1 rounded-md"
-        style={CHECKERBOARD_STYLE}
+        data-cp-el="checkerboard"
+        className={classNames?.checkerboard}
+        style={{ ...CHECKERBOARD_STYLE, position: "absolute" }}
         aria-hidden="true"
       />
       {/* Current color swatch overlay */}
       <span
-        className="relative h-full w-full rounded-md"
-        style={{ backgroundColor: currentColor }}
+        data-cp-el="swatch"
+        className={classNames?.swatch}
+        style={{ backgroundColor: currentColor, position: "relative" }}
         aria-hidden="true"
       />
       {children}

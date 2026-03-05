@@ -27,15 +27,9 @@ export function ColorPickerFormatToggle({
       onClick={toggleFormat}
       disabled={disabled}
       aria-label={`Color format: ${FORMAT_LABELS[format]}. Click to change.`}
-      className={[
-        "cp-format-toggle",
-        "shrink-0 rounded-md border px-2 py-1 text-xs font-medium",
-        "outline-none",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="format-toggle"
+      data-disabled={disabled ? "" : undefined}
+      className={className}
     >
       {FORMAT_LABELS[format]}
     </button>

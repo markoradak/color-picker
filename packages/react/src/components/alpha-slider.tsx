@@ -12,7 +12,7 @@ import { CHECKERBOARD_STYLE } from "./shared";
  *
  * Keyboard: left/right arrows (step=0.01, shift=0.1).
  */
-export function ColorPickerAlphaSlider({ className }: ColorPickerSliderProps) {
+export function ColorPickerAlphaSlider({ className, classNames }: ColorPickerSliderProps) {
   const { hsva, setAlpha, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -73,38 +73,40 @@ export function ColorPickerAlphaSlider({ className }: ColorPickerSliderProps) {
       tabIndex={disabled ? -1 : 0}
       onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}
+      data-cp-part="alpha-slider"
       data-disabled={disabled ? "" : undefined}
       data-dragging={isDragging ? "" : undefined}
-      className={[
-        "cp-alpha-slider",
-        "relative h-3 w-full cursor-pointer rounded-full outline-none",
-        "",
-        "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={className}
+      style={{ position: "relative" }}
     >
       {/* Checkerboard background */}
       <div
-        className="absolute inset-0 overflow-hidden rounded-full"
-        style={CHECKERBOARD_STYLE}
+        data-cp-el="checkerboard"
+        className={classNames?.checkerboard}
+        style={{ position: "absolute", inset: 0, ...CHECKERBOARD_STYLE }}
         aria-hidden="true"
       />
       {/* Color gradient overlay */}
       <div
-        className="absolute inset-0 overflow-hidden rounded-full"
-        style={{ background: alphaGradient }}
+        data-cp-el="track"
+        className={classNames?.track}
+        style={{ position: "absolute", inset: 0, background: alphaGradient }}
         aria-hidden="true"
       />
       {/* Thumb indicator */}
       <div
-        className="pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ left: `${thumbPosition}%` }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: `${thumbPosition}%`,
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+        }}
         aria-hidden="true"
       >
         <div
-          className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]"
+          data-cp-el="thumb"
+          className={classNames?.thumb}
           style={{ backgroundColor: thumbColor }}
         />
       </div>

@@ -14,7 +14,7 @@ const HUE_GRADIENT =
  *
  * Keyboard: left/right arrows (step=1, shift=10).
  */
-export function ColorPickerHueSlider({ className }: ColorPickerSliderProps) {
+export function ColorPickerHueSlider({ className, classNames }: ColorPickerSliderProps) {
   const { hsva, setHue, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -68,32 +68,33 @@ export function ColorPickerHueSlider({ className }: ColorPickerSliderProps) {
       tabIndex={disabled ? -1 : 0}
       onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}
+      data-cp-part="hue-slider"
       data-disabled={disabled ? "" : undefined}
       data-dragging={isDragging ? "" : undefined}
-      className={[
-        "cp-hue-slider",
-        "relative h-3 w-full cursor-pointer rounded-full outline-none",
-        "",
-        "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={className}
+      style={{ position: "relative" }}
     >
       {/* Hue gradient track */}
       <div
-        className="absolute inset-0 rounded-full"
-        style={{ background: HUE_GRADIENT }}
+        data-cp-el="track"
+        className={classNames?.track}
+        style={{ position: "absolute", inset: 0, background: HUE_GRADIENT }}
         aria-hidden="true"
       />
       {/* Thumb indicator */}
       <div
-        className="pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ left: `${thumbPosition}%` }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: `${thumbPosition}%`,
+          transform: "translate(-50%, -50%)",
+          pointerEvents: "none",
+        }}
         aria-hidden="true"
       >
         <div
-          className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]"
+          data-cp-el="thumb"
+          className={classNames?.thumb}
           style={{ backgroundColor: thumbColor }}
         />
       </div>

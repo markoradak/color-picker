@@ -16,6 +16,7 @@ import {
   ColorPickerContent,
 } from "@markoradak/color-picker";
 import type { ColorPickerValue } from "@markoradak/color-picker";
+import { styles } from "./component-styles";
 
 export function HeroDemo() {
   const [value, setValue] = useState<ColorPickerValue>("#16db89");
@@ -24,26 +25,53 @@ export function HeroDemo() {
 
   return (
     <ColorPicker value={value} onValueChange={setValue} defaultOpen>
-      <div style={{ width: 'calc(var(--cp-width) + 2px)' }}>
-        <ColorPickerInputTrigger />
+      <div className="w-80">
+        <ColorPickerInputTrigger
+          className={styles.inputTrigger}
+          classNames={styles.inputTriggerClassNames}
+        />
       </div>
-      <ColorPickerContent>
-        <ColorPickerModeSelector />
+      <ColorPickerContent className={styles.content}>
+        <ColorPickerModeSelector
+          className={styles.modeSelector}
+          classNames={styles.modeSelectorClassNames}
+        />
         {isGradientMode ? (
           <>
-            <ColorPickerGradientEditor />
-            <ColorPickerGradientSwatches className="mt-0.5" />
+            <ColorPickerGradientEditor
+              className={styles.gradientEditor}
+              classNames={styles.gradientEditorClassNames}
+            />
+            <ColorPickerGradientSwatches
+              className={styles.gradientSwatches}
+              classNames={styles.gradientSwatchClassNames}
+            />
           </>
         ) : (
           <>
-            <ColorPickerArea />
-            <ColorPickerHueSlider />
-            <ColorPickerAlphaSlider />
+            <ColorPickerArea
+              className={styles.area}
+              classNames={styles.areaClassNames}
+            />
+            <ColorPickerHueSlider
+              className={styles.hueSlider}
+              classNames={styles.hueSliderClassNames}
+            />
+            <ColorPickerAlphaSlider
+              className={styles.alphaSlider}
+              classNames={styles.alphaSliderClassNames}
+            />
             <div className="flex items-center gap-2">
-              <ColorPickerInput className="flex-1" />
-              <ColorPickerEyeDropper />
+              <ColorPickerInput
+                className={`${styles.input} flex-1`}
+                classNames={styles.inputClassNames}
+              />
+              <ColorPickerEyeDropper className={styles.eyeDropper} classNames={styles.eyeDropperClassNames} />
             </div>
-            <ColorPickerSwatches />
+            <ColorPickerSwatches
+              className={styles.swatches}
+              classNames={styles.swatchClassNames}
+            />
           </>
         )}
       </ColorPickerContent>

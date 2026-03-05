@@ -6,7 +6,7 @@ import { useColorPickerContext } from "./color-picker-context";
 /**
  * Content container for the color picker popover.
  * Renders inside a Radix Popover.Portal + Popover.Content
- * with configurable positioning, shadow, border, and enter/exit animations.
+ * with configurable positioning.
  *
  * Automatically prevents focus steal when the input trigger opened the popover,
  * so the inline text input keeps focus. Also prevents dismiss when interacting
@@ -64,13 +64,8 @@ export const ColorPickerContent = forwardRef<
         sideOffset={sideOffset}
         onOpenAutoFocus={handleOpenAutoFocus}
         onInteractOutside={handleInteractOutside}
-        className={[
-          "cp-content",
-          "z-50 flex flex-col gap-3 rounded-xl border p-3",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        data-cp-part="content"
+        className={className}
         {...props}
       >
         {children}

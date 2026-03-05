@@ -23,21 +23,21 @@ function renderGradientEditor(
 describe("GradientEditor", () => {
   it("renders nothing when value is a solid color", () => {
     const { container } = renderGradientEditor("#ff0000");
-    const editor = container.querySelector(".cp-gradient-editor");
+    const editor = container.querySelector('[data-cp-part="gradient-editor"]');
     expect(editor).toBeNull();
   });
 
   it("renders when value is a gradient", () => {
     const gradient = createDefaultGradient("linear");
     const { container } = renderGradientEditor(gradient);
-    const editor = container.querySelector(".cp-gradient-editor");
+    const editor = container.querySelector('[data-cp-part="gradient-editor"]');
     expect(editor).not.toBeNull();
   });
 
   it("renders the gradient preview", () => {
     const gradient = createDefaultGradient("linear");
     const { container } = renderGradientEditor(gradient);
-    const preview = container.querySelector(".cp-gradient-preview");
+    const preview = container.querySelector('[data-cp-part="gradient-preview"]');
     expect(preview).not.toBeNull();
   });
 
@@ -53,7 +53,7 @@ describe("GradientEditor", () => {
     for (const type of ["linear", "radial", "conic", "mesh"] as const) {
       const gradient = createDefaultGradient(type);
       const { container } = renderGradientEditor(gradient);
-      const preview = container.querySelector(".cp-gradient-preview");
+      const preview = container.querySelector('[data-cp-part="gradient-preview"]');
       expect(preview).not.toBeNull();
       container.remove();
     }

@@ -47,11 +47,7 @@ const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
  * Clicking a swatch sets the picker value to that gradient.
  *
  * Automatically filters to show only gradients matching the current
- * gradient type (linear, radial, conic, mesh). Pass all gradient
- * presets and the component handles filtering.
- *
- * Reuses the same `cp-swatches` CSS class and button markup as the
- * solid color swatches for a consistent appearance.
+ * gradient type (linear, radial, conic, mesh).
  *
  * When no `values` are provided, a default set of presets is used.
  */
@@ -59,6 +55,7 @@ export function ColorPickerGradientSwatches({
   values = DEFAULT_GRADIENT_SWATCHES,
   columns = 8,
   className,
+  classNames,
 }: ColorPickerGradientSwatchesProps) {
   const { value, updateValue, disabled } = useColorPickerContext();
 
@@ -104,13 +101,13 @@ export function ColorPickerGradientSwatches({
     <div
       role="group"
       aria-label="Gradient swatches"
-      className={[
-        "cp-swatches",
-        "flex flex-wrap justify-between gap-y-1",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="gradient-swatches"
+      data-disabled={disabled ? "" : undefined}
+      className={className}
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+      }}
     >
       {filtered.map((gradient, i) => {
         const css = toCSS(gradient);
@@ -124,12 +121,9 @@ export function ColorPickerGradientSwatches({
             disabled={disabled}
             aria-label={`Select ${gradient.type} gradient`}
             aria-pressed={active}
-            className={[
-              "relative aspect-square rounded-md border outline-none",
-              "",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              active ? "ring-1" : "",
-            ].join(" ")}
+            data-cp-el="swatch"
+            data-active={active ? "" : undefined}
+            className={classNames?.swatch}
             style={{ background: css }}
           />
         );

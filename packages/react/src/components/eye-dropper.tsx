@@ -3,6 +3,10 @@ import { useColorPickerContext } from "./color-picker-context";
 
 interface ColorPickerEyeDropperProps {
   className?: string;
+  classNames?: {
+    icon?: string;
+    spinner?: string;
+  };
 }
 
 // Type for the EyeDropper API (not yet in all TypeScript lib definitions)
@@ -46,6 +50,7 @@ function useEyeDropperSupported(): boolean {
  */
 export function ColorPickerEyeDropper({
   className,
+  classNames,
 }: ColorPickerEyeDropperProps) {
   const { setColorFromString, disabled } = useColorPickerContext();
   const [isPicking, setIsPicking] = useState(false);
@@ -82,20 +87,16 @@ export function ColorPickerEyeDropper({
       onClick={handleClick}
       disabled={disabled || isPicking}
       aria-label="Pick a color from the screen"
-      className={[
-        "cp-eye-dropper",
-        "inline-flex h-8 w-8 items-center justify-center rounded-md border",
-        "outline-none",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="eye-dropper"
+      data-disabled={disabled ? "" : undefined}
+      data-picking={isPicking ? "" : undefined}
+      className={className}
     >
       {isPicking ? (
         /* Simple loading indicator */
         <svg
-          className="h-4 w-4 animate-spin"
+          data-cp-el="spinner"
+          className={classNames?.spinner}
           viewBox="0 0 16 16"
           fill="none"
           aria-hidden="true"
@@ -114,7 +115,8 @@ export function ColorPickerEyeDropper({
       ) : (
         /* Pipette icon */
         <svg
-          className="h-3.5 w-3.5 opacity-70"
+          data-cp-el="icon"
+          className={classNames?.icon}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

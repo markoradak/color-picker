@@ -11,6 +11,13 @@ import { CHECKERBOARD_STYLE } from "./shared";
 
 interface GradientPreviewProps {
   className?: string;
+  classNames?: {
+    stopDot?: string;
+    baseColor?: string;
+    contextMenu?: string;
+    contextMenuItem?: string;
+    popoverContent?: string;
+  };
 }
 
 interface ContextMenuState {
@@ -33,30 +40,19 @@ function getLineDirection(gradient: GradientValue): { dx: number; dy: number } {
   }
   switch (gradient.type) {
     case "radial": {
-      // Default: horizontal line from center
       return { dx: 1, dy: 0 };
     }
     case "conic": {
-      // Default: direction from start angle
       const rad = (((gradient.angle ?? 0) - 90) * Math.PI) / 180;
       return { dx: Math.cos(rad), dy: Math.sin(rad) };
     }
     default: {
-      // Linear: direction from angle (default 90°)
       const rad = (((gradient.angle ?? 90) - 90) * Math.PI) / 180;
       return { dx: Math.cos(rad), dy: Math.sin(rad) };
     }
   }
 }
 
-/**
- * Compute the unclamped visual position of a gradient stop on the gradient line.
- * Works for linear, radial, and conic gradients.
- *
- * Linear: position 50 = center at (50,50), extends both directions.
- * Radial/Conic: position 0 = center at (centerX,centerY), extends outward.
- * This matches CSS where radial/conic position 0% is at the center.
- */
 function getLineStopVisual(
   stop: GradientStop,
   gradient: GradientValue
@@ -81,9 +77,6 @@ function getLineStopVisual(
     };
   }
 
-  // Radial/Conic: position 0 = center, 50 coordinate units = position 100.
-  // Same formula for default and endpoint cases — centerX/centerY tracks
-  // the center, and getLineDirection provides the correct direction.
   const cx = gradient.centerX ?? 50;
   const cy = gradient.centerY ?? 50;
 
@@ -93,10 +86,6 @@ function getLineStopVisual(
   };
 }
 
-/**
- * Compute the visual (x%, y%) position of a stop dot within the preview square.
- * Returns values clamped to 2-98 for CSS positioning (keeps dots visible).
- */
 function getStopDotPosition(
   stop: GradientStop,
   gradient: GradientValue
@@ -105,8 +94,6 @@ function getStopDotPosition(
     case "linear":
     case "radial":
     case "conic":
-      // All three types use the same gradient-line model.
-      // No clamping — dots can extend past the preview edges.
       return getLineStopVisual(stop, gradient);
     case "mesh": {
       return {
@@ -119,15 +106,10 @@ function getStopDotPosition(
   }
 }
 
-/** Round to 2 decimal places. */
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-/**
- * Compute a stop position (0-100) from a 2D click coordinate on the preview,
- * based on the gradient type's geometry.
- */
 function positionFromCoords(
   mx: number,
   my: number,
@@ -140,7 +122,6 @@ function positionFromCoords(
     }
     case "radial":
     case "conic": {
-      // Position 0 = center, 50 coordinate units = position 100.
       const { dx, dy } = getLineDirection(gradient);
       const cx = gradient.centerX ?? 50;
       const cy = gradient.centerY ?? 50;
@@ -156,21 +137,8 @@ function positionFromCoords(
  *
  * Renders the gradient as a CSS background on a square element, with
  * absolutely positioned dots for each gradient stop.
- *
- * Interactions:
- * - **Click empty space**: add a new stop (color interpolated, position from geometry)
- * - **Click a dot**: open a color editing popover
- * - **Drag a dot**: reposition/rotate depending on gradient type
- * - **Double-click a dot**: remove it (min 2 stops enforced)
- *
- * Drag behavior per gradient type:
- * - **Linear** (endpoints): free 2D drag redefines the gradient line direction
- * - **Linear** (middle): constrained to move along the current axis
- * - **Radial**: distance from center sets stop position
- * - **Conic**: angle around center sets stop position
- * - **Mesh**: free-form 2D positioning
  */
-export function GradientPreview({ className }: GradientPreviewProps) {
+export function GradientPreview({ className, classNames }: GradientPreviewProps) {
   const { gradient: gradientCtx, disabled, swatches } = useColorPickerContext();
   const {
     gradient: gradientValue,
@@ -197,9 +165,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
 
   const gradientCSS = toCSS(gradientValue);
 
-  /**
-   * Get mouse position in 0-100 coordinates relative to the preview element.
-   */
   const getPreviewCoords = useCallback(
     (ev: PointerEvent | React.PointerEvent | React.MouseEvent): { mx: number; my: number } | null => {
       const el = previewRef.current;
@@ -213,9 +178,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     []
   );
 
-  /**
-   * Click on empty space in the preview → add a new stop.
-   */
   const handlePreviewClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (disabled) return;
@@ -236,18 +198,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     [disabled, gradientValue, addStop, addStopWithCoordinates, getPreviewCoords]
   );
 
-  /**
-   * Pointer down on a dot → start drag tracking.
-   *
-   * For linear gradients:
-   * - First/last stops are endpoint handles — free 2D drag moves one end of
-   *   the gradient line while the opposite end stays fixed (anchor). All other
-   *   stops stay at their proportional position along the new line.
-   * - Middle stops are axis-locked — only position changes along the line.
-   *
-   * For radial/conic: all stops project onto the gradient geometry.
-   * For mesh: free 2D positioning.
-   */
   const handleDotPointerDown = useCallback(
     (stopId: string, e: React.PointerEvent<HTMLButtonElement>) => {
       if (disabled) return;
@@ -260,9 +210,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
 
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      // Determine if this stop is an endpoint (first/last by position).
-      // If so, capture the opposite endpoint's visual position as anchor
-      // and each stop's proportional position (t) for smooth interpolation.
       let isEndpoint = false;
       let isFirstStop = false;
       let anchorPoint: { x: number; y: number } | null = null;
@@ -282,11 +229,9 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         isEndpoint = isFirstStop || isLastStop;
 
         if (isEndpoint) {
-          // Use the opposite stop's unclamped visual position as anchor.
           const oppositeStop = isFirstStop ? lastStop : firstStop;
           anchorPoint = getLineStopVisual(oppositeStop, gradientValue);
 
-          // Capture proportional positions so middle stops move with endpoints.
           const range = lastStop.position - firstStop.position;
           if (range > 0) {
             stopProportions = new Map();
@@ -307,11 +252,9 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         if (gradientValue.type === "mesh") {
           updateStopCoordinates(sid, clamp(mx, 0, 100), clamp(my, 0, 100));
         } else if (isEndpoint && anchorPoint) {
-          // Endpoint: move this end of the line, anchor the opposite end.
           const sp = isFirstStop ? { x: mx, y: my } : anchorPoint;
           const ep = isFirstStop ? anchorPoint : { x: mx, y: my };
 
-          // Derive angle from the line direction
           const ddx = ep.x - sp.x;
           const ddy = ep.y - sp.y;
           const len = Math.sqrt(ddx * ddx + ddy * ddy);
@@ -321,8 +264,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
               : gradientValue.angle ?? (gradientValue.type === "linear" ? 90 : 0);
 
           if (gradientValue.type === "linear") {
-            // Linear: interpolate middle stops proportionally along sp→ep,
-            // then project onto the new gradient direction.
             const newRad = ((newAngle - 90) * Math.PI) / 180;
             const ndx = Math.cos(newRad);
             const ndy = Math.sin(newRad);
@@ -343,11 +284,8 @@ export function GradientPreview({ className }: GradientPreviewProps) {
               stops: newStops,
             });
           } else {
-            // Radial/Conic: interpolate middle stops proportionally along
-            // sp→ep. Position = distance from center * 2 (coordinate-relative).
             const newStops = gradientValue.stops.map((s) => {
               const t = stopProportions?.get(s.id) ?? 0.5;
-              // t * len = distance from sp, position = distance * 2
               return { ...s, position: round2(t * len * 2) };
             });
 
@@ -362,7 +300,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
             });
           }
         } else {
-          // Middle stop or non-linear: project onto current line/geometry.
           const newPos = positionFromCoords(mx, my, gradientValue);
           updateStopPosition(sid, newPos);
         }
@@ -388,9 +325,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     ]
   );
 
-  /**
-   * Click on a dot → open color popover (only if we didn't drag).
-   */
   const handleDotClick = useCallback(
     (stopId: string, e: React.MouseEvent) => {
       e.stopPropagation();
@@ -402,9 +336,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     [disabled]
   );
 
-  /**
-   * Double-click on a dot → remove it.
-   */
   const handleDotDoubleClick = useCallback(
     (stopId: string, e: React.MouseEvent) => {
       e.stopPropagation();
@@ -434,7 +365,6 @@ export function GradientPreview({ className }: GradientPreviewProps) {
     [disabled, gradientValue.type]
   );
 
-  // Close context menu on click outside
   useEffect(() => {
     if (!contextMenu) return;
     const handleClick = (e: MouseEvent) => {
@@ -450,32 +380,23 @@ export function GradientPreview({ className }: GradientPreviewProps) {
 
   return (
     <div
-      className={[
-        "cp-gradient-preview",
-        "relative aspect-square w-full rounded-lg",
-        disabled ? "cursor-not-allowed opacity-50" : "",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="gradient-preview"
+      data-disabled={disabled ? "" : undefined}
+      className={className}
+      style={{ position: "relative" }}
     >
       {/* Checkerboard background for alpha visibility */}
       <div
-        className="absolute inset-0 rounded-lg"
-        style={CHECKERBOARD_STYLE}
+        data-cp-el="checkerboard"
+        style={{ position: "absolute", inset: 0, ...CHECKERBOARD_STYLE }}
         aria-hidden="true"
       />
       {/* Gradient background — click to add stop */}
       <div
         ref={previewRef}
         onClick={handlePreviewClick}
-        className={[
-          "absolute inset-0 rounded-lg",
-          disabled ? "" : "cursor-crosshair",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        style={{ background: gradientCSS }}
+        data-cp-el="gradient-bg"
+        style={{ position: "absolute", inset: 0, background: gradientCSS }}
         role="img"
         aria-label={`${gradientValue.type} gradient preview`}
       />
@@ -492,12 +413,9 @@ export function GradientPreview({ className }: GradientPreviewProps) {
               disabled={disabled}
               aria-label="Edit base color"
               title="Base color"
-              className={[
-                "absolute bottom-2 left-2 z-20",
-                "h-5 w-5 rounded border-2 border-white/80 shadow-[0_0_0_1px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.3)]",
-                disabled ? "cursor-not-allowed" : "cursor-pointer",
-              ].join(" ")}
-              style={{ backgroundColor: gradientValue.baseColor || "#ffffff" }}
+              data-cp-el="base-color"
+              className={classNames?.baseColor}
+              style={{ position: "absolute", backgroundColor: gradientValue.baseColor || "#ffffff" }}
             />
           </Popover.Trigger>
           <Popover.Portal>
@@ -505,7 +423,8 @@ export function GradientPreview({ className }: GradientPreviewProps) {
               side="top"
               sideOffset={8}
               align="start"
-              className="cp-content z-50 flex w-64 flex-col gap-3 rounded-xl border p-3"
+              data-cp-part="content"
+              className={classNames?.popoverContent}
               onOpenAutoFocus={(e) => e.preventDefault()}
             >
               <ColorPickerProvider
@@ -526,7 +445,8 @@ export function GradientPreview({ className }: GradientPreviewProps) {
         const last = getStopDotPosition(sorted[sorted.length - 1]!, gradientValue);
         return (
           <svg
-            className="absolute inset-0 z-1 pointer-events-none"
+            data-cp-el="gradient-line"
+            style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none" }}
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
             aria-hidden="true"
@@ -563,26 +483,20 @@ export function GradientPreview({ className }: GradientPreviewProps) {
               <button
                 type="button"
                 data-stop-dot
+                data-cp-el="stop-dot"
+                data-active={isActive ? "" : undefined}
                 onPointerDown={(e) => handleDotPointerDown(stop.id, e)}
                 onClick={(e) => handleDotClick(stop.id, e)}
                 onDoubleClick={(e) => handleDotDoubleClick(stop.id, e)}
                 onContextMenu={(e) => handleContextMenu(stop.id, e)}
                 disabled={disabled}
                 aria-label={`Stop ${stop.color} at ${Math.round(stop.position)}%`}
-                className={[
-                  "absolute -translate-x-1/2 -translate-y-1/2",
-                  "h-4 w-4 rounded-full border-2 outline-none",
-                  "",
-                  isActive
-                    ? "border-white shadow-[0_0_0_2px_rgba(59,130,246,0.8),0_1px_4px_rgba(0,0,0,0.4)] z-10"
-                    : "border-white/80 shadow-[0_0_0_1px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.3)]",
-                  disabled ? "cursor-not-allowed" : "cursor-grab",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
+                className={classNames?.stopDot}
                 style={{
+                  position: "absolute",
                   left: `${pos.x}%`,
                   top: `${pos.y}%`,
+                  transform: "translate(-50%, -50%)",
                   backgroundColor: stop.color,
                 }}
               />
@@ -593,7 +507,8 @@ export function GradientPreview({ className }: GradientPreviewProps) {
                 side="top"
                 sideOffset={8}
                 align="center"
-                className="cp-content z-50 flex w-64 flex-col gap-3 rounded-xl border p-3"
+                data-cp-part="content"
+                className={classNames?.popoverContent}
                 onOpenAutoFocus={(e) => e.preventDefault()}
               >
                 <ColorPickerProvider
@@ -612,12 +527,13 @@ export function GradientPreview({ className }: GradientPreviewProps) {
       {contextMenu && isMesh && (
         <div
           ref={contextMenuRef}
-          className="fixed z-50 flex flex-col rounded-lg border py-1 shadow-lg"
+          data-cp-el="context-menu"
+          className={classNames?.contextMenu}
           style={{
+            position: "fixed",
             left: contextMenu.x,
             top: contextMenu.y,
-            background: "var(--cp-bg, #ffffff)",
-            borderColor: "var(--cp-border, #e5e5e5)",
+            zIndex: 50,
             minWidth: 160,
           }}
         >
@@ -634,8 +550,8 @@ export function GradientPreview({ className }: GradientPreviewProps) {
                 key={item.direction}
                 type="button"
                 disabled={isDisabled}
-                className="px-3 py-1.5 text-left text-xs disabled:opacity-30"
-                style={{ color: "var(--cp-text, #171717)" }}
+                data-cp-el="context-menu-item"
+                className={classNames?.contextMenuItem}
                 onClick={() => {
                   moveStop(contextMenu.stopId, item.direction);
                   setContextMenu(null);

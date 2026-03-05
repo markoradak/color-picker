@@ -19,6 +19,7 @@ import {
 } from "@markoradak/color-picker";
 import type { ColorPickerValue } from "@markoradak/color-picker";
 import { CopyButton } from "../copy-button";
+import { styles } from "../component-styles";
 
 const DEFAULT_VALUE: ColorPickerValue = {
   type: "mesh",
@@ -398,30 +399,63 @@ function InlinePicker({
   const isGradientMode = typeof value !== "string";
 
   return (
-    <div className="w-full">
+    <div className="w-80">
       <ColorPicker value={value} onValueChange={onValueChange}>
         <div className="flex flex-col gap-3">
-          {options.enableGradient && <ColorPickerModeSelector />}
+          {options.enableGradient && (
+            <ColorPickerModeSelector
+              className={styles.modeSelector}
+              classNames={styles.modeSelectorClassNames}
+            />
+          )}
           {isGradientMode ? (
             <>
-              <ColorPickerGradientEditor />
+              <ColorPickerGradientEditor
+                className={styles.gradientEditor}
+                classNames={styles.gradientEditorClassNames}
+              />
               {options.showSwatches && (
-                <ColorPickerGradientSwatches className="mt-0.5" />
+                <ColorPickerGradientSwatches
+                  className={styles.gradientSwatches}
+                  classNames={styles.gradientSwatchClassNames}
+                />
               )}
             </>
           ) : (
             <>
-              <ColorPickerArea />
-              <ColorPickerHueSlider />
-              {options.showAlpha && <ColorPickerAlphaSlider />}
+              <ColorPickerArea
+                className={styles.area}
+                classNames={styles.areaClassNames}
+              />
+              <ColorPickerHueSlider
+                className={styles.hueSlider}
+                classNames={styles.hueSliderClassNames}
+              />
+              {options.showAlpha && (
+                <ColorPickerAlphaSlider
+                  className={styles.alphaSlider}
+                  classNames={styles.alphaSliderClassNames}
+                />
+              )}
               {(options.showInput || options.showEyeDropper) && (
                 <div className="flex items-center gap-2">
-                  {options.showInput && <ColorPickerInput className="flex-1" />}
-                  {options.showEyeDropper && <ColorPickerEyeDropper />}
+                  {options.showInput && (
+                    <ColorPickerInput
+                      className={`${styles.input} flex-1`}
+                      classNames={styles.inputClassNames}
+                    />
+                  )}
+                  {options.showEyeDropper && (
+                    <ColorPickerEyeDropper className={styles.eyeDropper} classNames={styles.eyeDropperClassNames} />
+                  )}
                 </div>
               )}
               {options.showSwatches && (
-                <ColorPickerSwatches values={options.swatchColors} />
+                <ColorPickerSwatches
+                  values={options.swatchColors}
+                  className={styles.swatches}
+                  classNames={styles.swatchClassNames}
+                />
               )}
             </>
           )}
@@ -445,32 +479,73 @@ function PopoverPicker({
   return (
     <ColorPicker value={value} onValueChange={onValueChange}>
       {options.triggerMode === "input" ? (
-        <ColorPickerInputTrigger />
+        <div className="w-80">
+          <ColorPickerInputTrigger
+            className={styles.inputTrigger}
+            classNames={styles.inputTriggerClassNames}
+          />
+        </div>
       ) : (
-        <ColorPickerTrigger />
+        <ColorPickerTrigger
+          className={styles.trigger}
+          classNames={styles.triggerClassNames}
+        />
       )}
-      <ColorPickerContent>
-        {options.enableGradient && <ColorPickerModeSelector />}
+      <ColorPickerContent className={styles.content}>
+        {options.enableGradient && (
+          <ColorPickerModeSelector
+            className={styles.modeSelector}
+            classNames={styles.modeSelectorClassNames}
+          />
+        )}
         {isGradientMode ? (
           <>
-            <ColorPickerGradientEditor />
+            <ColorPickerGradientEditor
+              className={styles.gradientEditor}
+              classNames={styles.gradientEditorClassNames}
+            />
             {options.showSwatches && (
-              <ColorPickerGradientSwatches className="mt-0.5" />
+              <ColorPickerGradientSwatches
+                className={styles.gradientSwatches}
+                classNames={styles.gradientSwatchClassNames}
+              />
             )}
           </>
         ) : (
           <>
-            <ColorPickerArea />
-            <ColorPickerHueSlider />
-            {options.showAlpha && <ColorPickerAlphaSlider />}
+            <ColorPickerArea
+              className={styles.area}
+              classNames={styles.areaClassNames}
+            />
+            <ColorPickerHueSlider
+              className={styles.hueSlider}
+              classNames={styles.hueSliderClassNames}
+            />
+            {options.showAlpha && (
+              <ColorPickerAlphaSlider
+                className={styles.alphaSlider}
+                classNames={styles.alphaSliderClassNames}
+              />
+            )}
             {(options.showInput || options.showEyeDropper) && (
               <div className="flex items-center gap-2">
-                {options.showInput && <ColorPickerInput className="flex-1" />}
-                {options.showEyeDropper && <ColorPickerEyeDropper />}
+                {options.showInput && (
+                  <ColorPickerInput
+                    className={`${styles.input} flex-1`}
+                    classNames={styles.inputClassNames}
+                  />
+                )}
+                {options.showEyeDropper && (
+                  <ColorPickerEyeDropper className={styles.eyeDropper} classNames={styles.eyeDropperClassNames} />
+                )}
               </div>
             )}
             {options.showSwatches && (
-              <ColorPickerSwatches values={options.swatchColors} />
+              <ColorPickerSwatches
+                values={options.swatchColors}
+                className={styles.swatches}
+                classNames={styles.swatchClassNames}
+              />
             )}
           </>
         )}

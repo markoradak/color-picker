@@ -3,6 +3,14 @@ import { GradientPreview } from "./gradient-preview";
 
 interface GradientEditorProps {
   className?: string;
+  classNames?: {
+    preview?: string;
+    stopDot?: string;
+    baseColor?: string;
+    contextMenu?: string;
+    contextMenuItem?: string;
+    popoverContent?: string;
+  };
 }
 
 /**
@@ -20,7 +28,7 @@ interface GradientEditorProps {
  *
  * Only renders content when the current value is a gradient.
  */
-export function ColorPickerGradientEditor({ className }: GradientEditorProps) {
+export function ColorPickerGradientEditor({ className, classNames }: GradientEditorProps) {
   const { isGradientMode } = useColorPickerContext();
 
   if (!isGradientMode) {
@@ -29,15 +37,19 @@ export function ColorPickerGradientEditor({ className }: GradientEditorProps) {
 
   return (
     <div
-      className={[
-        "cp-gradient-editor",
-        "flex flex-col pb-1",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="gradient-editor"
+      className={className}
     >
-      <GradientPreview />
+      <GradientPreview
+        className={classNames?.preview}
+        classNames={{
+          stopDot: classNames?.stopDot,
+          baseColor: classNames?.baseColor,
+          contextMenu: classNames?.contextMenu,
+          contextMenuItem: classNames?.contextMenuItem,
+          popoverContent: classNames?.popoverContent,
+        }}
+      />
     </div>
   );
 }

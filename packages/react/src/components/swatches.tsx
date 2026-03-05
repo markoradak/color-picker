@@ -25,6 +25,7 @@ export function ColorPickerSwatches({
   values = DEFAULT_SWATCH_COLORS,
   columns = 8,
   className,
+  classNames,
 }: ColorPickerSwatchesProps) {
   const { hsva, setColorFromString, disabled, setSwatches } = useColorPickerContext();
 
@@ -47,13 +48,13 @@ export function ColorPickerSwatches({
     <div
       role="group"
       aria-label="Color swatches"
-      className={[
-        "cp-swatches",
-        "flex flex-wrap justify-between gap-y-1",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="swatches"
+      data-disabled={disabled ? "" : undefined}
+      className={className}
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+      }}
     >
       {values.map((color) => {
         const isActive = color.toLowerCase() === currentColor;
@@ -67,17 +68,15 @@ export function ColorPickerSwatches({
             disabled={disabled}
             aria-label={`Select color ${color}`}
             aria-pressed={isActive}
-            className={[
-              "relative aspect-square rounded-md border outline-none",
-              "",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              isActive ? "ring-1" : "",
-            ].join(" ")}
+            data-cp-el="swatch"
+            data-active={isActive ? "" : undefined}
+            className={classNames?.swatch}
             style={{ backgroundColor: color }}
           >
             {isActive && (
               <svg
-                className="absolute inset-0 m-auto h-3 w-3"
+                data-cp-el="check"
+                style={{ position: "absolute", inset: 0, margin: "auto" }}
                 viewBox="0 0 12 12"
                 fill="none"
                 stroke={checkColor}

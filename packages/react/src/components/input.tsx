@@ -11,7 +11,7 @@ import { TokenList } from "./token-list";
  *
  * When tokens are available, a clickable badge opens a dropdown listing all tokens.
  */
-export function ColorPickerInput({ className, enableFormatToggle = true }: ColorPickerInputProps) {
+export function ColorPickerInput({ className, classNames, enableFormatToggle = true }: ColorPickerInputProps) {
   const { formattedValue, format, toggleFormat, setColorFromString, disabled, matchedToken, tokens } =
     useColorPickerContext();
 
@@ -105,13 +105,9 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
 
   return (
     <div
-      className={[
-        "cp-input",
-        "flex items-center gap-0",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      data-cp-part="input"
+      data-disabled={disabled ? "" : undefined}
+      className={className}
     >
       {enableFormatToggle && (
         <button
@@ -119,17 +115,13 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
           onClick={toggleFormat}
           disabled={disabled}
           aria-label={`Color format: ${formatLabel}. Click to change.`}
-          className={[
-            "cp-format-toggle",
-            "shrink-0 select-none rounded-md border px-2 h-8 text-xs font-medium",
-            "outline-none",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-          ].join(" ")}
+          data-cp-el="format-toggle"
+          className={classNames?.formatToggle}
         >
           {formatLabel}
         </button>
       )}
-      <div className="relative w-full">
+      <div style={{ position: "relative", width: "100%" }}>
         <input
           ref={inputRef}
           type="text"
@@ -142,12 +134,8 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
           spellCheck={false}
           autoComplete="off"
           aria-label={`Color value in ${formatLabel} format`}
-          className={[
-            "cp-input-field",
-            "w-full rounded-md border px-2 h-8 text-sm",
-            "outline-none",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-          ].join(" ")}
+          data-cp-el="field"
+          className={classNames?.field}
         />
         {hasTokens && (
           <>
@@ -159,22 +147,18 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
               aria-label={matchedToken ? `Matches token: ${matchedToken}. Click to browse tokens.` : "Browse color tokens"}
               aria-expanded={tokenListOpen}
               aria-haspopup="listbox"
-              className={[
-                matchedToken ? "cp-token-badge" : "",
-                "absolute right-2.5 top-1/2 -translate-y-1/2",
-                "cursor-pointer outline-none",
-                matchedToken
-                  ? "select-none rounded-full border px-2 py-0.5 text-[10px] font-medium leading-none"
-                  : "opacity-70 hover:opacity-100",
-                matchedToken ? "" : "transition-opacity hover:opacity-100!",
-                isEditing && !matchedToken ? "opacity-40" : "",
-              ].filter(Boolean).join(" ")}
+              data-cp-el="token-badge"
+              data-matched={matchedToken ? "" : undefined}
+              data-editing={isEditing && !matchedToken ? "" : undefined}
+              className={classNames?.tokenBadge}
+              style={{ position: "absolute" }}
             >
               {matchedToken ? (
                 matchedToken
               ) : (
                 <svg
-                  className="h-3.5 w-3.5"
+                  data-cp-el="token-icon"
+                  className={classNames?.tokenIcon}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -193,13 +177,22 @@ export function ColorPickerInput({ className, enableFormatToggle = true }: Color
             {tokenListOpen && (
               <div
                 ref={tokenDropdownRef}
-                className="cp-token-list-popover absolute right-0 top-full z-50 mt-1"
+                data-cp-el="token-list-popover"
+                className={classNames?.tokenListContainer}
+                style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, marginTop: 4 }}
               >
                 <TokenList
                   tokens={tokens!}
                   matchedToken={matchedToken}
                   onSelect={handleTokenSelect}
                   disabled={disabled}
+                  className={classNames?.tokenList}
+                  classNames={{
+                    item: classNames?.tokenListItem,
+                    swatch: classNames?.tokenListSwatch,
+                    name: classNames?.tokenListName,
+                    check: classNames?.tokenListCheck,
+                  }}
                 />
               </div>
             )}

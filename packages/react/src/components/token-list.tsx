@@ -10,6 +10,15 @@ export interface TokenListProps {
   onSelect: (name: string) => void;
   /** Whether interactions are disabled. */
   disabled: boolean;
+  /** Additional CSS class for the container. */
+  className?: string;
+  /** Class names for inner elements. */
+  classNames?: {
+    item?: string;
+    swatch?: string;
+    name?: string;
+    check?: string;
+  };
 }
 
 /**
@@ -17,7 +26,7 @@ export interface TokenListProps {
  * Each entry shows a small color swatch and the token name.
  * The active token (matching the current color) is highlighted.
  */
-export function TokenList({ tokens, matchedToken, onSelect, disabled }: TokenListProps) {
+export function TokenList({ tokens, matchedToken, onSelect, disabled, className, classNames }: TokenListProps) {
   const entries = Object.entries(tokens);
 
   if (entries.length === 0) return null;
@@ -26,7 +35,8 @@ export function TokenList({ tokens, matchedToken, onSelect, disabled }: TokenLis
     <div
       role="listbox"
       aria-label="Color tokens"
-      className="cp-token-list max-h-40 overflow-y-auto rounded-lg border p-1"
+      data-cp-part="token-list"
+      className={className}
     >
       {entries.map(([name, color]) => {
         const isActive = name === matchedToken;
@@ -38,33 +48,23 @@ export function TokenList({ tokens, matchedToken, onSelect, disabled }: TokenLis
             aria-selected={isActive}
             disabled={disabled}
             onClick={() => onSelect(name)}
-            className={[
-              "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs",
-              "outline-none transition-colors",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              isActive ? "font-medium" : "",
-            ].join(" ")}
-            style={{
-              backgroundColor: isActive ? "var(--cp-hover-bg)" : undefined,
-            }}
+            data-cp-el="token-item"
+            data-active={isActive ? "" : undefined}
+            className={classNames?.item}
           >
             <span
-              className="h-3 w-3 shrink-0 rounded-full border"
-              style={{
-                backgroundColor: color,
-                borderColor: "var(--cp-border)",
-              }}
+              data-cp-el="token-swatch"
+              className={classNames?.swatch}
+              style={{ backgroundColor: color }}
               aria-hidden="true"
             />
-            <span
-              className="min-w-0 flex-1 truncate"
-              style={{ color: "var(--cp-text)" }}
-            >
+            <span data-cp-el="token-name" className={classNames?.name}>
               {name}
             </span>
             {isActive && (
               <svg
-                className="h-3 w-3 shrink-0"
+                data-cp-el="token-check"
+                className={classNames?.check}
                 viewBox="0 0 12 12"
                 fill="none"
                 stroke="currentColor"
@@ -72,7 +72,6 @@ export function TokenList({ tokens, matchedToken, onSelect, disabled }: TokenLis
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
-                style={{ color: "var(--cp-text-muted)" }}
               >
                 <path d="M2 6l3 3 5-5" />
               </svg>
