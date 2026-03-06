@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import type { ColorPickerGradientSwatchesProps, GradientValue } from "../types";
+import type { ColorPickerGradientSwatchesProps, ColorPickerGradientSwatchProps, GradientValue } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { toCSS } from "../utils/css";
 
@@ -43,6 +43,47 @@ const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
 ];
 
 /**
+ * Individual gradient swatch button.
+ * Reads context for active state.
+ */
+export function ColorPickerGradientSwatch({ value, className, style }: ColorPickerGradientSwatchProps) {
+  const { value: pickerValue, updateValue, disabled } = useColorPickerContext();
+
+  const css = toCSS(value);
+
+  const isActive = useMemo(() => {
+    if (typeof pickerValue !== "object" || pickerValue === null) return false;
+    const current = pickerValue as GradientValue;
+    if (current.type !== value.type) return false;
+    if (current.stops.length !== value.stops.length) return false;
+    return current.stops.every(
+      (s, i) =>
+        s.color === value.stops[i]?.color &&
+        Math.abs(s.position - (value.stops[i]?.position ?? 0)) < 1
+    );
+  }, [pickerValue, value]);
+
+  const handleClick = useCallback(() => {
+    if (disabled) return;
+    updateValue(value);
+  }, [value, updateValue, disabled]);
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={disabled}
+      aria-label={`Select ${value.type} gradient`}
+      aria-pressed={isActive}
+      data-cp-el="swatch"
+      data-active={isActive ? "" : undefined}
+      className={className}
+      style={{ ...style, background: css }}
+    />
+  );
+}
+
+/**
  * Grid of preset gradient swatch buttons.
  * Clicking a swatch sets the picker value to that gradient.
  *
@@ -50,14 +91,17 @@ const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
  * gradient type (linear, radial, conic, mesh).
  *
  * When no `values` are provided, a default set of presets is used.
+ *
+ * When children are provided, they replace the auto-rendered swatches.
  */
 export function ColorPickerGradientSwatches({
   values = DEFAULT_GRADIENT_SWATCHES,
   columns = 8,
   className,
-  classNames,
+  swatchClassName,
+  children,
 }: ColorPickerGradientSwatchesProps) {
-  const { value, updateValue, disabled } = useColorPickerContext();
+  const { value, disabled } = useColorPickerContext();
 
   // Current gradient type for filtering
   const currentType =
@@ -74,28 +118,7 @@ export function ColorPickerGradientSwatches({
     [values, currentType]
   );
 
-  const handleClick = useCallback(
-    (gradient: GradientValue) => {
-      if (disabled) return;
-      updateValue(gradient);
-    },
-    [updateValue, disabled]
-  );
-
-  // Check if current value matches a gradient swatch (by type + stop colors)
-  const isActive = (gradient: GradientValue): boolean => {
-    if (typeof value !== "object" || value === null) return false;
-    const current = value as GradientValue;
-    if (current.type !== gradient.type) return false;
-    if (current.stops.length !== gradient.stops.length) return false;
-    return current.stops.every(
-      (s, i) =>
-        s.color === gradient.stops[i]?.color &&
-        Math.abs(s.position - (gradient.stops[i]?.position ?? 0)) < 1
-    );
-  };
-
-  if (filtered.length === 0) return null;
+  if (!children && filtered.length === 0) return null;
 
   return (
     <div
@@ -109,25 +132,14 @@ export function ColorPickerGradientSwatches({
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
       }}
     >
-      {filtered.map((gradient, i) => {
-        const css = toCSS(gradient);
-        const active = isActive(gradient);
-
-        return (
-          <button
-            key={i}
-            type="button"
-            onClick={() => handleClick(gradient)}
-            disabled={disabled}
-            aria-label={`Select ${gradient.type} gradient`}
-            aria-pressed={active}
-            data-cp-el="swatch"
-            data-active={active ? "" : undefined}
-            className={classNames?.swatch}
-            style={{ background: css }}
-          />
-        );
-      })}
+      {children ?? filtered.map((gradient, i) => (
+        <ColorPickerGradientSwatch
+          key={i}
+          value={gradient}
+          className={swatchClassName}
+          style={swatchClassName ? undefined : { width: '100%', aspectRatio: '1 / 1', position: 'relative' }}
+        />
+      ))}
     </div>
   );
 }

@@ -9,34 +9,25 @@ export const styles = {
 
   modeSelector:
     "flex overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 p-0.5 dark:border-zinc-700 dark:bg-zinc-800",
-  modeSelectorClassNames: {
-    button:
-      "min-w-0 flex-1 cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100",
-  },
+  modeSelectorItem:
+    "min-w-0 flex-1 cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100",
 
   area: "relative h-44 w-full cursor-crosshair rounded-lg outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-  areaClassNames: {
-    whiteOverlay: "rounded-lg",
-    blackOverlay: "rounded-lg",
-    thumb: "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]",
-  },
+  areaGradient: "rounded-lg",
+  areaThumb:
+    "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]",
 
   hueSlider:
     "relative h-3 w-full cursor-pointer rounded-full outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-  hueSliderClassNames: {
-    track: "rounded-full",
-    thumb:
-      "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]",
-  },
+  hueSliderTrack: "rounded-full",
+  hueSliderThumb:
+    "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]",
 
   alphaSlider:
     "relative h-3 w-full cursor-pointer rounded-full outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
-  alphaSliderClassNames: {
-    checkerboard: "overflow-hidden rounded-full",
-    track: "overflow-hidden rounded-full",
-    thumb:
-      "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]",
-  },
+  alphaSliderTrack: "overflow-hidden rounded-full",
+  alphaSliderThumb:
+    "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]",
 
   input: "flex items-center gap-1",
   inputClassNames: {
@@ -65,10 +56,8 @@ export const styles = {
   },
 
   swatches: "gap-1",
-  swatchClassNames: {
-    swatch:
-      "relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
-  },
+  swatch:
+    "relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
 
   gradientEditor: "flex flex-col pb-1",
   gradientEditorClassNames: {
@@ -86,11 +75,9 @@ export const styles = {
       "z-50 flex w-80 flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
   },
 
-  gradientSwatches: "mt-0.5 gap-1",
-  gradientSwatchClassNames: {
-    swatch:
-      "relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
-  },
+  gradientSwatches: "gap-1",
+  gradientSwatch:
+    "relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
 
   trigger:
     "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 p-1 outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-zinc-600",

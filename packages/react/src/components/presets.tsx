@@ -13,16 +13,16 @@ import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerTrigger } from "./trigger";
 import { ColorPickerInputTrigger } from "./input-trigger";
 import { ColorPickerContent } from "./content";
-import { ColorPickerArea } from "./area";
-import { ColorPickerHueSlider } from "./hue-slider";
-import { ColorPickerAlphaSlider } from "./alpha-slider";
+import { ColorPickerArea, ColorPickerAreaGradient, ColorPickerAreaThumb } from "./area";
+import { ColorPickerHueSlider, ColorPickerHueSliderTrack, ColorPickerHueSliderThumb } from "./hue-slider";
+import { ColorPickerAlphaSlider, ColorPickerAlphaSliderTrack, ColorPickerAlphaSliderThumb } from "./alpha-slider";
 import { ColorPickerInput } from "./input";
 import { ColorPickerFormatToggle } from "./format-toggle";
 import { ColorPickerEyeDropper } from "./eye-dropper";
-import { ColorPickerSwatches } from "./swatches";
+import { ColorPickerSwatches, ColorPickerSwatch } from "./swatches";
 import { ColorPickerGradientEditor } from "./gradient-editor";
-import { ColorPickerModeSelector } from "./mode-selector";
-import { ColorPickerGradientSwatches } from "./gradient-swatches";
+import { ColorPickerModeSelector, ColorPickerModeSelectorItem } from "./mode-selector";
+import { ColorPickerGradientSwatches, ColorPickerGradientSwatch } from "./gradient-swatches";
 
 /**
  * Shared inner controls rendered by both popover and inline presets.
@@ -58,12 +58,15 @@ export function ColorPickerControls({
   return (
     <>
       {showModeSelector && (
-        <ColorPickerModeSelector
-          className="flex overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 p-0.5 dark:border-zinc-700 dark:bg-zinc-800"
-          classNames={{
-            button: "min-w-0 flex-1 cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100",
-          }}
-        />
+        <ColorPickerModeSelector className="flex overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 p-0.5 dark:border-zinc-700 dark:bg-zinc-800">
+          {(["solid", "linear", "radial", "conic", "mesh"] as const).map((mode) => (
+            <ColorPickerModeSelectorItem
+              key={mode}
+              value={mode}
+              className="min-w-0 flex-1 cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100"
+            />
+          ))}
+        </ColorPickerModeSelector>
       )}
 
       {isGradientMode ? (
@@ -84,39 +87,33 @@ export function ColorPickerControls({
             <ColorPickerGradientSwatches
               values={gradientSwatches}
               className="mt-0.5 gap-1"
-              classNames={{
-                swatch: "relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
-              }}
-            />
+            >
+              {gradientSwatches.map((g, i) => (
+                <ColorPickerGradientSwatch
+                  key={i}
+                  value={g}
+                  className="relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100"
+                />
+              ))}
+            </ColorPickerGradientSwatches>
           )}
         </>
       ) : (
         // Solid mode: show standard color picker controls
         <>
-          <ColorPickerArea
-            className="relative h-44 w-full cursor-crosshair rounded-lg outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
-            classNames={{
-              whiteOverlay: "rounded-lg",
-              blackOverlay: "rounded-lg",
-              thumb: "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]",
-            }}
-          />
-          <ColorPickerHueSlider
-            className="relative h-3 w-full cursor-pointer rounded-full outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
-            classNames={{
-              track: "rounded-full",
-              thumb: "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]",
-            }}
-          />
+          <ColorPickerArea className="relative h-44 w-full cursor-crosshair rounded-lg outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
+            <ColorPickerAreaGradient className="rounded-lg" />
+            <ColorPickerAreaThumb className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]" />
+          </ColorPickerArea>
+          <ColorPickerHueSlider className="relative h-3 w-full cursor-pointer rounded-full outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
+            <ColorPickerHueSliderTrack className="rounded-full" />
+            <ColorPickerHueSliderThumb className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]" />
+          </ColorPickerHueSlider>
           {enableAlpha && (
-            <ColorPickerAlphaSlider
-              className="relative h-3 w-full cursor-pointer rounded-full outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50"
-              classNames={{
-                checkerboard: "overflow-hidden rounded-full",
-                track: "overflow-hidden rounded-full",
-                thumb: "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]",
-              }}
-            />
+            <ColorPickerAlphaSlider className="relative h-3 w-full cursor-pointer rounded-full outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
+              <ColorPickerAlphaSliderTrack className="overflow-hidden rounded-full" />
+              <ColorPickerAlphaSliderThumb className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]" />
+            </ColorPickerAlphaSlider>
           )}
           <div className="flex items-center gap-2">
             <ColorPickerInput
@@ -146,10 +143,15 @@ export function ColorPickerControls({
               values={swatches}
               columns={swatchColumns}
               className="gap-1"
-              classNames={{
-                swatch: "relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
-              }}
-            />
+            >
+              {swatches.map((color) => (
+                <ColorPickerSwatch
+                  key={color}
+                  value={color}
+                  className="relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100"
+                />
+              ))}
+            </ColorPickerSwatches>
           )}
         </>
       )}

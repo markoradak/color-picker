@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import type { ColorPickerSliderProps } from "../types";
+import type { ColorPickerSliderProps, ColorPickerHueSliderTrackProps, ColorPickerHueSliderThumbProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
 import { fromHSVA } from "../utils/color";
@@ -9,12 +9,60 @@ const HUE_GRADIENT =
   "linear-gradient(to right, hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%), hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%))";
 
 /**
+ * Renders the rainbow gradient track for the hue slider.
+ */
+export function ColorPickerHueSliderTrack({ className }: ColorPickerHueSliderTrackProps) {
+  return (
+    <div
+      data-cp-el="track"
+      className={className}
+      style={{ position: "absolute", inset: 0, background: HUE_GRADIENT }}
+      aria-hidden="true"
+    />
+  );
+}
+
+/**
+ * Renders the draggable thumb indicator positioned by hue value.
+ */
+export function ColorPickerHueSliderThumb({ className }: ColorPickerHueSliderThumbProps) {
+  const { hsva } = useColorPickerContext();
+
+  const thumbPosition = (hsva.h / 360) * 100;
+  const thumbColor = useMemo(
+    () => fromHSVA({ h: hsva.h, s: 100, v: 100, a: 1 }),
+    [hsva.h]
+  );
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: `${thumbPosition}%`,
+        transform: "translate(-50%, -50%)",
+        pointerEvents: "none",
+      }}
+      aria-hidden="true"
+    >
+      <div
+        data-cp-el="thumb"
+        className={className}
+        style={{ backgroundColor: thumbColor }}
+      />
+    </div>
+  );
+}
+
+/**
  * Horizontal (or vertical) hue slider with a rainbow gradient background.
  * Draggable thumb selects hue from 0 to 360 degrees.
  *
  * Keyboard: left/right arrows (step=1, shift=10).
+ *
+ * When children are provided, they replace the default track + thumb rendering.
  */
-export function ColorPickerHueSlider({ className, classNames }: ColorPickerSliderProps) {
+export function ColorPickerHueSlider({ className, children }: ColorPickerSliderProps) {
   const { hsva, setHue, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -51,12 +99,6 @@ export function ColorPickerHueSlider({ className, classNames }: ColorPickerSlide
     [hsva.h, setHue, disabled]
   );
 
-  const thumbPosition = (hsva.h / 360) * 100;
-  const thumbColor = useMemo(
-    () => fromHSVA({ h: hsva.h, s: 100, v: 100, a: 1 }),
-    [hsva.h]
-  );
-
   return (
     <div
       role="slider"
@@ -74,30 +116,12 @@ export function ColorPickerHueSlider({ className, classNames }: ColorPickerSlide
       className={className}
       style={{ position: "relative" }}
     >
-      {/* Hue gradient track */}
-      <div
-        data-cp-el="track"
-        className={classNames?.track}
-        style={{ position: "absolute", inset: 0, background: HUE_GRADIENT }}
-        aria-hidden="true"
-      />
-      {/* Thumb indicator */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: `${thumbPosition}%`,
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-        }}
-        aria-hidden="true"
-      >
-        <div
-          data-cp-el="thumb"
-          className={classNames?.thumb}
-          style={{ backgroundColor: thumbColor }}
-        />
-      </div>
+      {children ?? (
+        <>
+          <ColorPickerHueSliderTrack />
+          <ColorPickerHueSliderThumb />
+        </>
+      )}
     </div>
   );
 }

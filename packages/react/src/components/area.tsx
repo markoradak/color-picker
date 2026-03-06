@@ -1,9 +1,74 @@
 import { useCallback } from "react";
-import type { ColorPickerAreaProps } from "../types";
+import type { ColorPickerAreaProps, ColorPickerAreaGradientProps, ColorPickerAreaThumbProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
 import { fromHSVA } from "../utils/color";
 import { clamp } from "../utils/position";
+
+/**
+ * Renders the white-to-transparent and transparent-to-black overlays
+ * that compose the saturation/value gradient.
+ */
+export function ColorPickerAreaGradient({ className }: ColorPickerAreaGradientProps) {
+  return (
+    <>
+      {/* White-to-transparent horizontal gradient */}
+      <div
+        data-cp-el="white-overlay"
+        className={className}
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(to right, #ffffff, transparent)",
+        }}
+        aria-hidden="true"
+      />
+      {/* Transparent-to-black vertical gradient */}
+      <div
+        data-cp-el="black-overlay"
+        className={className}
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(to bottom, transparent, #000000)",
+        }}
+        aria-hidden="true"
+      />
+    </>
+  );
+}
+
+/**
+ * Renders the draggable indicator dot positioned by saturation/value.
+ */
+export function ColorPickerAreaThumb({ className }: ColorPickerAreaThumbProps) {
+  const { hsva } = useColorPickerContext();
+
+  const indicatorX = hsva.s;
+  const indicatorY = 100 - hsva.v;
+  const indicatorColor = fromHSVA(hsva);
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: `${indicatorX}%`,
+        top: `${indicatorY}%`,
+        transform: "translate(-50%, -50%)",
+        pointerEvents: "none",
+      }}
+      aria-hidden="true"
+    >
+      <div
+        data-cp-el="thumb"
+        className={className}
+        style={{ backgroundColor: indicatorColor }}
+      />
+    </div>
+  );
+}
 
 /**
  * 2D saturation/value picker area.
@@ -17,8 +82,10 @@ import { clamp } from "../utils/position";
  * the saturation (x-axis, 0-100) and value (y-axis, 100-0) in context.
  *
  * Supports arrow key navigation (step=1, shift+arrow=10).
+ *
+ * When children are provided, they replace the default gradient + thumb rendering.
  */
-export function ColorPickerArea({ className, classNames }: ColorPickerAreaProps) {
+export function ColorPickerArea({ className, children }: ColorPickerAreaProps) {
   const { hsva, setSaturationValue, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -64,13 +131,6 @@ export function ColorPickerArea({ className, classNames }: ColorPickerAreaProps)
   // Pure hue color for the background (full saturation, full value, no alpha)
   const hueBackground = fromHSVA({ h: hsva.h, s: 100, v: 100, a: 1 });
 
-  // Indicator position: s maps to x (0-100%), v maps to y inverted (100-v)%
-  const indicatorX = hsva.s;
-  const indicatorY = 100 - hsva.v;
-
-  // Current color at the indicator for the dot fill
-  const indicatorColor = fromHSVA(hsva);
-
   return (
     <div
       role="slider"
@@ -86,47 +146,12 @@ export function ColorPickerArea({ className, classNames }: ColorPickerAreaProps)
       className={className}
       style={{ backgroundColor: hueBackground, position: "relative" }}
     >
-      {/* White-to-transparent horizontal gradient */}
-      <div
-        data-cp-el="white-overlay"
-        className={classNames?.whiteOverlay}
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(to right, #ffffff, transparent)",
-        }}
-        aria-hidden="true"
-      />
-      {/* Transparent-to-black vertical gradient */}
-      <div
-        data-cp-el="black-overlay"
-        className={classNames?.blackOverlay}
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(to bottom, transparent, #000000)",
-        }}
-        aria-hidden="true"
-      />
-      {/* Indicator dot */}
-      <div
-        style={{
-          position: "absolute",
-          left: `${indicatorX}%`,
-          top: `${indicatorY}%`,
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-        }}
-        aria-hidden="true"
-      >
-        <div
-          data-cp-el="thumb"
-          className={classNames?.thumb}
-          style={{ backgroundColor: indicatorColor }}
-        />
-      </div>
+      {children ?? (
+        <>
+          <ColorPickerAreaGradient />
+          <ColorPickerAreaThumb />
+        </>
+      )}
     </div>
   );
 }

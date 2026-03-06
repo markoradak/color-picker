@@ -90,12 +90,23 @@ export interface ColorPickerProps {
  */
 export interface ColorPickerAreaProps {
   className?: string;
-  /** Class names for inner elements (overlays, thumb). */
-  classNames?: {
-    whiteOverlay?: string;
-    blackOverlay?: string;
-    thumb?: string;
-  };
+  children?: React.ReactNode;
+}
+
+/**
+ * Props for the ColorPickerAreaGradient sub-component.
+ * Renders the white-to-transparent and transparent-to-black overlays.
+ */
+export interface ColorPickerAreaGradientProps {
+  className?: string;
+}
+
+/**
+ * Props for the ColorPickerAreaThumb sub-component.
+ * Renders the draggable indicator dot positioned by saturation/value.
+ */
+export interface ColorPickerAreaThumbProps {
+  className?: string;
 }
 
 /**
@@ -104,13 +115,39 @@ export interface ColorPickerAreaProps {
 export interface ColorPickerSliderProps {
   className?: string;
   orientation?: "horizontal" | "vertical";
-  /** Class names for inner elements (track, thumb, checkerboard). */
-  classNames?: {
-    track?: string;
-    thumb?: string;
-    /** Alpha slider only: checkerboard pattern background. */
-    checkerboard?: string;
-  };
+  children?: React.ReactNode;
+}
+
+/**
+ * Props for the ColorPickerHueSliderTrack sub-component.
+ * Renders the rainbow gradient track.
+ */
+export interface ColorPickerHueSliderTrackProps {
+  className?: string;
+}
+
+/**
+ * Props for the ColorPickerHueSliderThumb sub-component.
+ * Renders the draggable thumb indicator positioned by hue.
+ */
+export interface ColorPickerHueSliderThumbProps {
+  className?: string;
+}
+
+/**
+ * Props for the ColorPickerAlphaSliderTrack sub-component.
+ * Renders the checkerboard + alpha gradient track.
+ */
+export interface ColorPickerAlphaSliderTrackProps {
+  className?: string;
+}
+
+/**
+ * Props for the ColorPickerAlphaSliderThumb sub-component.
+ * Renders the draggable thumb indicator positioned by alpha.
+ */
+export interface ColorPickerAlphaSliderThumbProps {
+  className?: string;
 }
 
 /**
@@ -141,10 +178,18 @@ export interface ColorPickerSwatchesProps {
   values?: string[];
   columns?: number;
   className?: string;
-  /** Class names for inner elements. */
-  classNames?: {
-    swatch?: string;
-  };
+  swatchClassName?: string;
+  children?: React.ReactNode;
+}
+
+/**
+ * Props for the ColorPickerSwatch sub-component.
+ * Renders an individual color swatch button.
+ */
+export interface ColorPickerSwatchProps {
+  value: string;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -154,10 +199,18 @@ export interface ColorPickerGradientSwatchesProps {
   values?: GradientValue[];
   columns?: number;
   className?: string;
-  /** Class names for inner elements. */
-  classNames?: {
-    swatch?: string;
-  };
+  swatchClassName?: string;
+  children?: React.ReactNode;
+}
+
+/**
+ * Props for the ColorPickerGradientSwatch sub-component.
+ * Renders an individual gradient swatch button.
+ */
+export interface ColorPickerGradientSwatchProps {
+  value: GradientValue;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -304,10 +357,16 @@ export type ColorPickerInlineProps = ColorPickerPresetProps;
  */
 export interface ColorPickerModeSelectorProps {
   className?: string;
-  /** Class names for inner elements. */
-  classNames?: {
-    button?: string;
-  };
+  children?: React.ReactNode;
+}
+
+/**
+ * Props for the ColorPickerModeSelectorItem sub-component.
+ * Renders an individual mode button.
+ */
+export interface ColorPickerModeSelectorItemProps {
+  value: ColorPickerMode;
+  className?: string;
 }
 
 /**

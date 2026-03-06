@@ -1,19 +1,19 @@
 // Components
 export { ColorPicker, useColorPickerContext } from "./components/color-picker";
 export { ColorPickerProvider } from "./components/color-picker-provider";
-export { ColorPickerModeSelector } from "./components/mode-selector";
+export { ColorPickerModeSelector, ColorPickerModeSelectorItem } from "./components/mode-selector";
 export { ColorPickerTrigger } from "./components/trigger";
 export { ColorPickerInputTrigger } from "./components/input-trigger";
 export { ColorPickerContent } from "./components/content";
-export { ColorPickerArea } from "./components/area";
-export { ColorPickerHueSlider } from "./components/hue-slider";
-export { ColorPickerAlphaSlider } from "./components/alpha-slider";
+export { ColorPickerArea, ColorPickerAreaGradient, ColorPickerAreaThumb } from "./components/area";
+export { ColorPickerHueSlider, ColorPickerHueSliderTrack, ColorPickerHueSliderThumb } from "./components/hue-slider";
+export { ColorPickerAlphaSlider, ColorPickerAlphaSliderTrack, ColorPickerAlphaSliderThumb } from "./components/alpha-slider";
 export { ColorPickerInput } from "./components/input";
 export { ColorPickerFormatToggle } from "./components/format-toggle";
 export { ColorPickerEyeDropper } from "./components/eye-dropper";
-export { ColorPickerSwatches } from "./components/swatches";
+export { ColorPickerSwatches, ColorPickerSwatch } from "./components/swatches";
 export { ColorPickerGradientEditor } from "./components/gradient-editor";
-export { ColorPickerGradientSwatches } from "./components/gradient-swatches";
+export { ColorPickerGradientSwatches, ColorPickerGradientSwatch } from "./components/gradient-swatches";
 export { GradientPreview } from "./components/gradient-preview";
 export { GradientStops } from "./components/gradient-stops";
 export { TokenList } from "./components/token-list";
@@ -44,11 +44,20 @@ export type {
   ColorPickerProps,
   ColorPickerProviderProps,
   ColorPickerModeSelectorProps,
+  ColorPickerModeSelectorItemProps,
   ColorPickerAreaProps,
+  ColorPickerAreaGradientProps,
+  ColorPickerAreaThumbProps,
   ColorPickerSliderProps,
+  ColorPickerHueSliderTrackProps,
+  ColorPickerHueSliderThumbProps,
+  ColorPickerAlphaSliderTrackProps,
+  ColorPickerAlphaSliderThumbProps,
   ColorPickerInputProps,
   ColorPickerSwatchesProps,
+  ColorPickerSwatchProps,
   ColorPickerGradientSwatchesProps,
+  ColorPickerGradientSwatchProps,
   ColorPickerTriggerProps,
   ColorPickerInputTriggerProps,
   ColorPickerContentProps,

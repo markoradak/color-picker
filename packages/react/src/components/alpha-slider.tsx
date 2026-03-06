@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import type { ColorPickerSliderProps } from "../types";
+import type { ColorPickerSliderProps, ColorPickerAlphaSliderTrackProps, ColorPickerAlphaSliderThumbProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
 import { fromHSVA } from "../utils/color";
@@ -7,12 +7,79 @@ import { clamp } from "../utils/position";
 import { CHECKERBOARD_STYLE } from "./shared";
 
 /**
+ * Renders the checkerboard + alpha gradient track for the alpha slider.
+ */
+export function ColorPickerAlphaSliderTrack({ className }: ColorPickerAlphaSliderTrackProps) {
+  const { hsva } = useColorPickerContext();
+
+  const solidColor = useMemo(
+    () => fromHSVA({ h: hsva.h, s: hsva.s, v: hsva.v, a: 1 }),
+    [hsva.h, hsva.s, hsva.v]
+  );
+
+  const alphaGradient = `linear-gradient(to right, transparent, ${solidColor})`;
+
+  return (
+    <>
+      {/* Checkerboard background */}
+      <div
+        data-cp-el="checkerboard"
+        className={className}
+        style={{ position: "absolute", inset: 0, ...CHECKERBOARD_STYLE }}
+        aria-hidden="true"
+      />
+      {/* Color gradient overlay */}
+      <div
+        data-cp-el="track"
+        className={className}
+        style={{ position: "absolute", inset: 0, background: alphaGradient }}
+        aria-hidden="true"
+      />
+    </>
+  );
+}
+
+/**
+ * Renders the draggable thumb indicator positioned by alpha value.
+ */
+export function ColorPickerAlphaSliderThumb({ className }: ColorPickerAlphaSliderThumbProps) {
+  const { hsva } = useColorPickerContext();
+
+  const thumbPosition = hsva.a * 100;
+  const thumbColor = useMemo(
+    () => fromHSVA(hsva),
+    [hsva.h, hsva.s, hsva.v, hsva.a]
+  );
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: `${thumbPosition}%`,
+        transform: "translate(-50%, -50%)",
+        pointerEvents: "none",
+      }}
+      aria-hidden="true"
+    >
+      <div
+        data-cp-el="thumb"
+        className={className}
+        style={{ backgroundColor: thumbColor }}
+      />
+    </div>
+  );
+}
+
+/**
  * Horizontal alpha/opacity slider with a checkerboard background
  * and a color overlay going from transparent to the current solid color.
  *
  * Keyboard: left/right arrows (step=0.01, shift=0.1).
+ *
+ * When children are provided, they replace the default track + thumb rendering.
  */
-export function ColorPickerAlphaSlider({ className, classNames }: ColorPickerSliderProps) {
+export function ColorPickerAlphaSlider({ className, children }: ColorPickerSliderProps) {
   const { hsva, setAlpha, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -49,19 +116,6 @@ export function ColorPickerAlphaSlider({ className, classNames }: ColorPickerSli
     [hsva.a, setAlpha, disabled]
   );
 
-  // Solid color at full opacity for the gradient overlay
-  const solidColor = useMemo(
-    () => fromHSVA({ h: hsva.h, s: hsva.s, v: hsva.v, a: 1 }),
-    [hsva.h, hsva.s, hsva.v]
-  );
-
-  const alphaGradient = `linear-gradient(to right, transparent, ${solidColor})`;
-  const thumbPosition = hsva.a * 100;
-  const thumbColor = useMemo(
-    () => fromHSVA(hsva),
-    [hsva.h, hsva.s, hsva.v, hsva.a]
-  );
-
   return (
     <div
       role="slider"
@@ -79,37 +133,12 @@ export function ColorPickerAlphaSlider({ className, classNames }: ColorPickerSli
       className={className}
       style={{ position: "relative" }}
     >
-      {/* Checkerboard background */}
-      <div
-        data-cp-el="checkerboard"
-        className={classNames?.checkerboard}
-        style={{ position: "absolute", inset: 0, ...CHECKERBOARD_STYLE }}
-        aria-hidden="true"
-      />
-      {/* Color gradient overlay */}
-      <div
-        data-cp-el="track"
-        className={classNames?.track}
-        style={{ position: "absolute", inset: 0, background: alphaGradient }}
-        aria-hidden="true"
-      />
-      {/* Thumb indicator */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: `${thumbPosition}%`,
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-        }}
-        aria-hidden="true"
-      >
-        <div
-          data-cp-el="thumb"
-          className={classNames?.thumb}
-          style={{ backgroundColor: thumbColor }}
-        />
-      </div>
+      {children ?? (
+        <>
+          <ColorPickerAlphaSliderTrack />
+          <ColorPickerAlphaSliderThumb />
+        </>
+      )}
     </div>
   );
 }
