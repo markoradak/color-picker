@@ -58,12 +58,12 @@ export function ColorPickerControls({
   return (
     <>
       {showModeSelector && (
-        <ColorPickerModeSelector className="flex overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 p-0.5 dark:border-zinc-700 dark:bg-zinc-800">
+        <ColorPickerModeSelector className="flex justify-between overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 p-0.5 dark:border-zinc-700 dark:bg-zinc-800">
           {(["solid", "linear", "radial", "conic", "mesh"] as const).map((mode) => (
             <ColorPickerModeSelectorItem
               key={mode}
               value={mode}
-              className="min-w-0 flex-1 cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100"
+              className="cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100"
             />
           ))}
         </ColorPickerModeSelector>
