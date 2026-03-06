@@ -196,6 +196,7 @@ export function ColorPickerInputTrigger({
     (name: string) => {
       setColorFromString(name);
       setTokenListOpen(false);
+      tokenBadgeRef.current?.focus();
     },
     [setColorFromString]
   );
@@ -205,8 +206,23 @@ export function ColorPickerInputTrigger({
       e.stopPropagation();
       setTokenListOpen((prev) => !prev);
     },
-    []
+    [],
   );
+
+  const handleTokenBadgeKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setTokenListOpen(true);
+      }
+    },
+    [],
+  );
+
+  const handleTokenListClose = useCallback(() => {
+    setTokenListOpen(false);
+    tokenBadgeRef.current?.focus();
+  }, []);
 
   // Clicking the container (thumbnail or empty space) opens the popover
   const handleContainerClick = useCallback(() => {
@@ -305,6 +321,7 @@ export function ColorPickerInputTrigger({
                   type="button"
                   disabled={disabled}
                   onClick={handleTokenBadgeClick}
+                  onKeyDown={handleTokenBadgeKeyDown}
                   aria-label={matchedToken ? `Matches token: ${matchedToken}. Click to browse tokens.` : "Browse color tokens"}
                   aria-expanded={tokenListOpen}
                   aria-haspopup="listbox"
@@ -352,6 +369,7 @@ export function ColorPickerInputTrigger({
                       tokens={tokens!}
                       matchedToken={matchedToken}
                       onSelect={handleTokenSelect}
+                      onClose={handleTokenListClose}
                       disabled={disabled}
                       className={classNames?.tokenList}
                       classNames={{

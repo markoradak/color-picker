@@ -92,12 +92,28 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
     (name: string) => {
       setColorFromString(name);
       setTokenListOpen(false);
+      tokenBadgeRef.current?.focus();
     },
     [setColorFromString]
   );
 
   const handleBadgeClick = useCallback(() => {
     setTokenListOpen((prev) => !prev);
+  }, []);
+
+  const handleBadgeKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setTokenListOpen(true);
+      }
+    },
+    [],
+  );
+
+  const handleTokenListClose = useCallback(() => {
+    setTokenListOpen(false);
+    tokenBadgeRef.current?.focus();
   }, []);
 
   const formatLabel = format.toUpperCase();
@@ -144,6 +160,7 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
               type="button"
               disabled={disabled}
               onClick={handleBadgeClick}
+              onKeyDown={handleBadgeKeyDown}
               aria-label={matchedToken ? `Matches token: ${matchedToken}. Click to browse tokens.` : "Browse color tokens"}
               aria-expanded={tokenListOpen}
               aria-haspopup="listbox"
@@ -185,6 +202,7 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
                   tokens={tokens!}
                   matchedToken={matchedToken}
                   onSelect={handleTokenSelect}
+                  onClose={handleTokenListClose}
                   disabled={disabled}
                   className={classNames?.tokenList}
                   classNames={{

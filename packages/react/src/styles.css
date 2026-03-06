@@ -693,20 +693,20 @@
   text-align: left;
   font-size: 0.75rem;
   outline: none;
-  background: transparent;
+  background-color: transparent;
   border: none;
   cursor: pointer;
   color: var(--cp-text);
   transition: background-color 0.1s;
 }
 
-[data-cp-part="token-list"] [data-cp-el="token-item"]:hover:not(:disabled):not([data-active]) {
+[data-cp-part="token-list"] [data-cp-el="token-item"][data-focused]:not(:disabled),
+[data-cp-part="token-list"] [data-cp-el="token-item"]:hover:not(:disabled) {
   background-color: var(--cp-hover-bg);
 }
 
 [data-cp-part="token-list"] [data-cp-el="token-item"][data-active] {
   font-weight: 500;
-  background-color: var(--cp-hover-bg);
 }
 
 [data-cp-part="token-list"] [data-cp-el="token-item"]:disabled {

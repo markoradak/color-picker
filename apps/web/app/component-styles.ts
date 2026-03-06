@@ -41,7 +41,7 @@ export const styles = {
     tokenList:
       "max-h-48 overflow-y-auto rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
     tokenListItem:
-      "flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-xs outline-none hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-300 dark:hover:bg-zinc-800",
+      "flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-xs outline-none hover:bg-zinc-100 data-[focused]:bg-zinc-100 disabled:opacity-50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:data-[focused]:bg-zinc-800",
     tokenListSwatch:
       "inline-block h-3.5 w-3.5 shrink-0 rounded-sm border border-zinc-200 dark:border-zinc-600",
     tokenListName: "min-w-0 flex-1 truncate",
@@ -109,7 +109,7 @@ export const styles = {
     tokenList:
       "max-h-48 overflow-y-auto rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
     tokenListItem:
-      "flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-xs outline-none hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-300 dark:hover:bg-zinc-800",
+      "flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-xs outline-none hover:bg-zinc-100 data-[focused]:bg-zinc-100 disabled:opacity-50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:data-[focused]:bg-zinc-800",
     tokenListSwatch:
       "inline-block h-3.5 w-3.5 shrink-0 rounded-sm border border-zinc-200 dark:border-zinc-600",
     tokenListName: "min-w-0 flex-1 truncate",
