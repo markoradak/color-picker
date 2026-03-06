@@ -17,7 +17,7 @@ export const ColorPickerContent = forwardRef<
   HTMLDivElement,
   ColorPickerContentProps
 >(function ColorPickerContent(
-  { className, side = "bottom", align = "center", sideOffset = 4, onOpenAutoFocus, children, ...props },
+  { className, style, side = "bottom", align = "center", sideOffset = 4, onOpenAutoFocus, children, ...props },
   ref
 ) {
   const { preserveFocusRef } = useColorPickerContext();
@@ -66,6 +66,7 @@ export const ColorPickerContent = forwardRef<
         onInteractOutside={handleInteractOutside}
         data-cp-part="content"
         className={className}
+        style={style}
         {...props}
       >
         {children}

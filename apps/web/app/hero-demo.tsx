@@ -31,7 +31,7 @@ export function HeroDemo() {
           classNames={styles.inputTriggerClassNames}
         />
       </div>
-      <ColorPickerContent className={styles.content}>
+      <ColorPickerContent className={styles.content} style={{ width: "var(--radix-popper-anchor-width)" }}>
         <ColorPickerModeSelector
           className={styles.modeSelector}
           classNames={styles.modeSelectorClassNames}

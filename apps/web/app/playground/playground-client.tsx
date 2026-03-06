@@ -491,7 +491,7 @@ function PopoverPicker({
           classNames={styles.triggerClassNames}
         />
       )}
-      <ColorPickerContent className={styles.content}>
+      <ColorPickerContent className={styles.content} style={{ width: "var(--radix-popper-anchor-width)" }}>
         {options.enableGradient && (
           <ColorPickerModeSelector
             className={styles.modeSelector}

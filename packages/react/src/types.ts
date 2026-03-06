@@ -213,6 +213,7 @@ export interface ColorPickerInputTriggerProps {
  */
 export interface ColorPickerContentProps {
   className?: string;
+  style?: React.CSSProperties;
   side?: "top" | "right" | "bottom" | "left";
   align?: "start" | "center" | "end";
   sideOffset?: number;
