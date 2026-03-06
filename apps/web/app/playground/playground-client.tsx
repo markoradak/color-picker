@@ -728,7 +728,7 @@ function InlinePicker({
   return (
     <div className="w-72">
       <ColorPicker value={value} onValueChange={onValueChange}>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-[14.4px]">
           {options.enableGradient && (
             <ColorPickerModeSelector className={styles.modeSelector}>
               {(["solid", "linear", "radial", "conic", "mesh"] as const).map((mode) => (
