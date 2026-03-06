@@ -1,9 +1,12 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { AutoTokensConfig, ColorTokens } from "../types";
 import { getCSSColorTokens } from "../utils/color";
 
 /**
  * Merges auto-detected CSS color tokens with manually provided tokens.
+ *
+ * Auto-detection is deferred to after mount to avoid SSR hydration
+ * mismatches (CSS custom properties are only available in the browser).
  *
  * @param autoTokens - Auto-detection config: `true` (detect all), `false` (disabled), or `{ prefix }` to filter.
  * @param manualTokens - Manually provided tokens (override auto-detected on conflict).
@@ -20,9 +23,18 @@ export function useAutoTokens(
         ? autoTokens.prefix
         : undefined; // true or undefined → detect all
 
-  const autoDetected = useMemo(() => {
-    if (prefix === null) return undefined;
-    return getCSSColorTokens(prefix);
+  // Defer auto-detection to after mount so server and initial client
+  // render both produce the same output (no auto-detected tokens).
+  const [autoDetected, setAutoDetected] = useState<ColorTokens | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    if (prefix === null) {
+      setAutoDetected(undefined);
+      return;
+    }
+    setAutoDetected(getCSSColorTokens(prefix));
   }, [prefix]);
 
   return useMemo(() => {
