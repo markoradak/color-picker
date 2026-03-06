@@ -142,7 +142,77 @@ function SegmentedControl({
   );
 }
 
-function generateCode(options: PlaygroundOptions): string {
+type CompositionMode = "preset" | "composable";
+type StyleMode = "tailwind" | "css" | "unstyled";
+
+function generateCode(
+  options: PlaygroundOptions,
+  composition: CompositionMode,
+  style: StyleMode,
+): string {
+  if (composition === "preset") {
+    return generatePresetCode(options, style);
+  }
+  return generateComposableCode(options, style);
+}
+
+function generatePresetCode(options: PlaygroundOptions, style: StyleMode): string {
+  const component = options.variant === "popover" ? "ColorPickerPopover" : "ColorPickerInline";
+  const importLine = `import { ${component} } from "@markoradak/color-picker/presets";`;
+
+  const extraImports: string[] = [];
+  if (style === "css") {
+    extraImports.push(`import "@markoradak/color-picker/styles";`);
+  }
+
+  let typeLine = "";
+  if (options.enableGradient) {
+    typeLine = `\nimport type { ColorPickerValue } from "@markoradak/color-picker";\n`;
+  }
+
+  let stateLine: string;
+  if (options.enableGradient) {
+    stateLine = `const [value, setValue] = useState<ColorPickerValue>("#16db89");`;
+  } else {
+    stateLine = `const [color, setColor] = useState("#16db89");`;
+  }
+
+  const valueVar = options.enableGradient ? "value" : "color";
+  const setterVar = options.enableGradient ? "setValue" : "setColor";
+
+  const props: string[] = [
+    `value={${valueVar}}`,
+    `onValueChange={${setterVar}}`,
+  ];
+
+  if (options.enableGradient) props.push("enableGradient");
+  if (!options.showAlpha) props.push("enableAlpha={false}");
+  if (!options.showEyeDropper) props.push("enableEyeDropper={false}");
+  if (!options.showInput) props.push("enableFormatToggle={false}");
+  if (options.showSwatches) {
+    props.push(`swatches={["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"]}`);
+  }
+  if (options.variant === "popover" && options.triggerMode === "input") {
+    props.push(`triggerMode="input"`);
+  }
+
+  const propsStr = props.map((p) => `      ${p}`).join("\n");
+  const allImports = [importLine, ...extraImports].join("\n");
+
+  return `${allImports}${typeLine}
+
+function MyColorPicker() {
+  ${stateLine}
+
+  return (
+    <${component}
+${propsStr}
+    />
+  );
+}`;
+}
+
+function generateComposableCode(options: PlaygroundOptions, style: StyleMode): string {
   const imports: string[] = ["ColorPicker", "ColorPickerArea", "ColorPickerHueSlider"];
 
   if (options.showAlpha) imports.push("ColorPickerAlphaSlider");
@@ -163,7 +233,10 @@ function generateCode(options: PlaygroundOptions): string {
     imports.push("ColorPickerContent");
   }
 
-  const importLine = `import {\n  ${imports.join(",\n  ")},\n} from "@markoradak/color-picker";`;
+  let importLine = `import {\n  ${imports.join(",\n  ")},\n} from "@markoradak/color-picker";`;
+  if (style === "css") {
+    importLine += `\nimport "@markoradak/color-picker/styles";`;
+  }
 
   let typeLine = "";
   if (options.enableGradient) {
@@ -180,24 +253,26 @@ function generateCode(options: PlaygroundOptions): string {
   const valueVar = options.enableGradient ? "value" : "color";
   const setterVar = options.enableGradient ? "setValue" : "setColor";
 
+  // Unstyled shows className hints, Tailwind shows example classes, CSS shows nothing (styled via CSS)
+  const cls = style === "unstyled" ? ` className="..."` : style === "tailwind" ? ` className="..."` : "";
+
   const parts: string[] = [];
   if (options.enableGradient) {
-    parts.push("    <ColorPickerModeSelector />");
+    parts.push(`    <ColorPickerModeSelector${cls} />`);
   }
-  parts.push("    <ColorPickerArea />");
-  parts.push("    <ColorPickerHueSlider />");
-  if (options.showAlpha) parts.push("    <ColorPickerAlphaSlider />");
-
-  if (options.showInput) parts.push("    <ColorPickerInput />");
-  if (options.showEyeDropper) parts.push("    <ColorPickerEyeDropper />");
+  parts.push(`    <ColorPickerArea${cls} />`);
+  parts.push(`    <ColorPickerHueSlider${cls} />`);
+  if (options.showAlpha) parts.push(`    <ColorPickerAlphaSlider${cls} />`);
+  if (options.showInput) parts.push(`    <ColorPickerInput${cls} />`);
+  if (options.showEyeDropper) parts.push(`    <ColorPickerEyeDropper${cls} />`);
 
   if (options.showSwatches) {
-    parts.push("    <ColorPickerSwatches {/* values={[...]} */} />");
+    parts.push(`    <ColorPickerSwatches values={[...]}${cls} />`);
   }
 
   if (options.enableGradient) {
-    parts.push("    <ColorPickerGradientEditor />");
-    parts.push("    <ColorPickerGradientSwatches {/* values={[...]} */} />");
+    parts.push(`    <ColorPickerGradientEditor${cls} />`);
+    parts.push(`    <ColorPickerGradientSwatches values={[...]}${cls} />`);
   }
 
   const innerJsx = parts.join("\n");
@@ -205,11 +280,11 @@ function generateCode(options: PlaygroundOptions): string {
   let jsx: string;
   if (options.variant === "popover") {
     const triggerTag = options.triggerMode === "input"
-      ? "<ColorPickerInputTrigger />"
-      : "<ColorPickerTrigger />";
+      ? `<ColorPickerInputTrigger${cls} />`
+      : `<ColorPickerTrigger${cls} />`;
     jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}>
     ${triggerTag}
-    <ColorPickerContent>
+    <ColorPickerContent${cls}>
 ${innerJsx}
     </ColorPickerContent>
   </ColorPicker>`;
@@ -243,9 +318,14 @@ export function PlaygroundClient() {
   });
 
   const [value, setValue] = useState<ColorPickerValue>(DEFAULT_VALUE);
+  const [compositionMode, setCompositionMode] = useState<CompositionMode>("preset");
+  const [styleMode, setStyleMode] = useState<StyleMode>("tailwind");
   const cssValue = typeof value === "string" ? value : toCSS(value);
 
-  const generatedCode = useMemo(() => generateCode(options), [options]);
+  const generatedCode = useMemo(
+    () => generateCode(options, compositionMode, styleMode),
+    [options, compositionMode, styleMode],
+  );
 
   const updateOption = useCallback(
     <K extends keyof PlaygroundOptions>(key: K, val: PlaygroundOptions[K]) => {
@@ -369,10 +449,63 @@ export function PlaygroundClient() {
 
       {/* Generated code */}
       <div className="rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-900 sm:p-6">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
             Generated Code
           </h2>
+          <div className="flex gap-2">
+            <div
+              className="flex gap-1 rounded-lg border border-neutral-200 bg-neutral-50 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
+              role="radiogroup"
+              aria-label="Composition"
+            >
+              {(["preset", "composable"] as const).map((mode) => {
+                const isActive = compositionMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    role="radio"
+                    aria-checked={isActive}
+                    onClick={() => setCompositionMode(mode)}
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                      isActive
+                        ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100"
+                        : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                    }`}
+                  >
+                    {mode === "preset" ? "Preset" : "Composable"}
+                  </button>
+                );
+              })}
+            </div>
+            <div
+              className="flex gap-1 rounded-lg border border-neutral-200 bg-neutral-50 p-0.5 dark:border-neutral-700 dark:bg-neutral-800"
+              role="radiogroup"
+              aria-label="Styling"
+            >
+              {(["tailwind", "css", "unstyled"] as const).map((mode) => {
+                const isActive = styleMode === mode;
+                const label = mode === "tailwind" ? "Tailwind" : mode === "css" ? "CSS" : "Unstyled";
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    role="radio"
+                    aria-checked={isActive}
+                    onClick={() => setStyleMode(mode)}
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                      isActive
+                        ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100"
+                        : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
         <div className="relative">
           <pre className="overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-xs leading-relaxed dark:border-neutral-700 dark:bg-neutral-800">
