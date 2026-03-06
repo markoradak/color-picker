@@ -101,7 +101,7 @@ export function ColorPickerControls({
       ) : (
         // Solid mode: show standard color picker controls
         <>
-          <ColorPickerArea className="relative h-44 w-full cursor-crosshair rounded-lg outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
+          <ColorPickerArea className="relative aspect-[3/2] w-full cursor-crosshair rounded-lg outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
             <ColorPickerAreaGradient className="rounded-lg" />
             <ColorPickerAreaThumb className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]" />
           </ColorPickerArea>

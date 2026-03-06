@@ -12,7 +12,7 @@ export const styles = {
   modeSelectorItem:
     "min-w-0 flex-1 cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100",
 
-  area: "relative h-44 w-full cursor-crosshair rounded-lg outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
+  area: "relative aspect-[3/2] w-full cursor-crosshair rounded-lg outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
   areaGradient: "rounded-lg",
   areaThumb:
     "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]",
