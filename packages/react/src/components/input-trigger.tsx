@@ -44,6 +44,7 @@ export function ColorPickerInputTrigger({
   classNames,
   enableFormatToggle = true,
   enableEyeDropper = true,
+  enableTokenSearch = true,
 }: ColorPickerInputTriggerProps) {
   const {
     hsva,
@@ -161,18 +162,30 @@ export function ColorPickerInputTrigger({
 
   // --- Token dropdown ---
   const [tokenListOpen, setTokenListOpen] = useState(false);
+  const [tokenSearch, setTokenSearch] = useState("");
   const tokenDropdownRef = useRef<HTMLDivElement>(null);
   const tokenBadgeRef = useRef<HTMLButtonElement>(null);
+  const tokenSearchInputRef = useRef<HTMLInputElement>(null);
+  const tokenSearchWrapperRef = useRef<HTMLDivElement>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
 
-  // Position the portal dropdown relative to the badge.
+  // Position the portal dropdown relative to the badge/search area.
   useLayoutEffect(() => {
-    if (!tokenListOpen || !tokenBadgeRef.current) return;
-    const rect = tokenBadgeRef.current.getBoundingClientRect();
+    if (!tokenListOpen) return;
+    const anchor = tokenSearchWrapperRef.current ?? tokenBadgeRef.current;
+    if (!anchor) return;
+    const rect = anchor.getBoundingClientRect();
     setDropdownPos({
       top: rect.bottom + 4,
       right: window.innerWidth - rect.right,
     });
+  }, [tokenListOpen]);
+
+  // Auto-focus the search input when dropdown opens
+  useEffect(() => {
+    if (tokenListOpen) {
+      tokenSearchInputRef.current?.focus();
+    }
   }, [tokenListOpen]);
 
   // Click-outside to close token dropdown.
@@ -182,23 +195,30 @@ export function ColorPickerInputTrigger({
       const target = e.target as Node;
       if (
         tokenDropdownRef.current?.contains(target) ||
+        (target as Element).closest?.('[data-cp-el="token-search"]') ||
         tokenBadgeRef.current?.contains(target)
       ) {
         return;
       }
       setTokenListOpen(false);
+      setTokenSearch("");
     };
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [tokenListOpen]);
 
+  const closeTokenDropdown = useCallback(() => {
+    setTokenListOpen(false);
+    setTokenSearch("");
+    requestAnimationFrame(() => tokenBadgeRef.current?.focus());
+  }, []);
+
   const handleTokenSelect = useCallback(
     (name: string) => {
       setColorFromString(name);
-      setTokenListOpen(false);
-      tokenBadgeRef.current?.focus();
+      closeTokenDropdown();
     },
-    [setColorFromString]
+    [setColorFromString, closeTokenDropdown]
   );
 
   const handleTokenBadgeClick = useCallback(
@@ -219,10 +239,30 @@ export function ColorPickerInputTrigger({
     [],
   );
 
-  const handleTokenListClose = useCallback(() => {
-    setTokenListOpen(false);
-    tokenBadgeRef.current?.focus();
-  }, []);
+  const handleTokenSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setTokenSearch(e.target.value);
+    },
+    [],
+  );
+
+  const handleTokenSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const firstItem = tokenDropdownRef.current?.querySelector('[data-cp-el="token-item"]') as HTMLElement;
+        firstItem?.focus();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        closeTokenDropdown();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        const focused = tokenDropdownRef.current?.querySelector('[data-cp-el="token-item"][data-focused]') as HTMLButtonElement;
+        focused?.click();
+      }
+    },
+    [closeTokenDropdown],
+  );
 
   // Clicking the container (thumbnail or empty space) opens the popover
   const handleContainerClick = useCallback(() => {
@@ -316,12 +356,14 @@ export function ColorPickerInputTrigger({
             />
             {hasTokens && (
               <>
+                {/* Badge — fades out when searching */}
                 <button
                   ref={tokenBadgeRef}
                   type="button"
-                  disabled={disabled}
+                  disabled={disabled || (enableTokenSearch && tokenListOpen)}
                   onClick={handleTokenBadgeClick}
                   onKeyDown={handleTokenBadgeKeyDown}
+                  tabIndex={enableTokenSearch && tokenListOpen ? -1 : undefined}
                   aria-label={matchedToken ? `Matches token: ${matchedToken}. Click to browse tokens.` : "Browse color tokens"}
                   aria-expanded={tokenListOpen}
                   aria-haspopup="listbox"
@@ -329,7 +371,9 @@ export function ColorPickerInputTrigger({
                   data-matched={matchedToken ? "" : undefined}
                   data-editing={isEditing ? "" : undefined}
                   className={classNames?.tokenBadge}
-                  style={{ position: "absolute" }}
+                  style={enableTokenSearch && tokenListOpen
+                    ? { position: "absolute", opacity: 0, pointerEvents: "none" as const, transform: "scale(0.95)" }
+                    : { position: "absolute" }}
                 >
                   {matchedToken ? (
                     matchedToken
@@ -352,6 +396,47 @@ export function ColorPickerInputTrigger({
                     </svg>
                   )}
                 </button>
+                {/* Search input — fades in when searching */}
+                {enableTokenSearch && (
+                  <div
+                    ref={tokenSearchWrapperRef}
+                    data-cp-el="token-search"
+                    className={classNames?.tokenSearch}
+                    onClick={(e) => e.stopPropagation()}
+                    style={!tokenListOpen
+                      ? { position: "absolute", opacity: 0, pointerEvents: "none" as const, transform: "scale(0.95)" }
+                      : { position: "absolute" }}
+                  >
+                    <input
+                      ref={tokenSearchInputRef}
+                      type="text"
+                      value={tokenSearch}
+                      onChange={handleTokenSearchChange}
+                      onKeyDown={handleTokenSearchKeyDown}
+                      tabIndex={!tokenListOpen ? -1 : undefined}
+                      placeholder="Search..."
+                      spellCheck={false}
+                      autoComplete="off"
+                      aria-label="Search color tokens"
+                      data-cp-el="token-search-input"
+                      className={classNames?.tokenSearchInput}
+                    />
+                    <svg
+                      data-cp-el="token-search-icon"
+                      className={classNames?.tokenSearchIcon}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.3-4.3" />
+                    </svg>
+                  </div>
+                )}
                 {tokenListOpen && createPortal(
                   <div
                     ref={tokenDropdownRef}
@@ -368,8 +453,9 @@ export function ColorPickerInputTrigger({
                     <TokenList
                       tokens={tokens!}
                       matchedToken={matchedToken}
+                      search={enableTokenSearch ? tokenSearch : undefined}
                       onSelect={handleTokenSelect}
-                      onClose={handleTokenListClose}
+                      onClose={closeTokenDropdown}
                       disabled={disabled}
                       className={classNames?.tokenList}
                       classNames={{
@@ -377,6 +463,7 @@ export function ColorPickerInputTrigger({
                         swatch: classNames?.tokenListSwatch,
                         name: classNames?.tokenListName,
                         check: classNames?.tokenListCheck,
+                        empty: classNames?.tokenListEmpty,
                       }}
                     />
                   </div>,

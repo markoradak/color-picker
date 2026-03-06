@@ -156,18 +156,24 @@ export interface ColorPickerAlphaSliderThumbProps {
 export interface ColorPickerInputProps {
   className?: string;
   enableFormatToggle?: boolean;
+  /** Enable search filtering in the token dropdown. Default: true */
+  enableTokenSearch?: boolean;
   /** Class names for inner elements. */
   classNames?: {
     formatToggle?: string;
     field?: string;
     tokenBadge?: string;
     tokenIcon?: string;
+    tokenSearch?: string;
+    tokenSearchInput?: string;
+    tokenSearchIcon?: string;
     tokenListContainer?: string;
     tokenList?: string;
     tokenListItem?: string;
     tokenListSwatch?: string;
     tokenListName?: string;
     tokenListCheck?: string;
+    tokenListEmpty?: string;
   };
 }
 
@@ -238,6 +244,8 @@ export interface ColorPickerInputTriggerProps {
   enableFormatToggle?: boolean;
   /** Show the eye dropper button inline (auto-hidden if browser unsupported). Default: true */
   enableEyeDropper?: boolean;
+  /** Enable search filtering in the token dropdown. Default: true */
+  enableTokenSearch?: boolean;
   /** Class names for inner elements. */
   classNames?: {
     thumbnail?: string;
@@ -251,6 +259,9 @@ export interface ColorPickerInputTriggerProps {
     eyeDropperSpinner?: string;
     tokenBadge?: string;
     tokenIcon?: string;
+    tokenSearch?: string;
+    tokenSearchInput?: string;
+    tokenSearchIcon?: string;
     gradientDisplay?: string;
     tokenListContainer?: string;
     tokenList?: string;
@@ -258,6 +269,7 @@ export interface ColorPickerInputTriggerProps {
     tokenListSwatch?: string;
     tokenListName?: string;
     tokenListCheck?: string;
+    tokenListEmpty?: string;
   };
 }
 

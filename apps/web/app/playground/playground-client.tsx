@@ -51,6 +51,17 @@ const DEFAULT_SWATCHES = [
   "#ec4899",
 ];
 
+const DEMO_TOKENS: Record<string, string> = {
+  "brand-primary": "#16db89",
+  "brand-secondary": "#3b82f6",
+  "danger": "#ef4444",
+  "warning": "#eab308",
+  "success": "#22c55e",
+  "info": "#06b6d4",
+  "accent-purple": "#8b5cf6",
+  "accent-pink": "#ec4899",
+};
+
 interface PlaygroundOptions {
   variant: "inline" | "popover";
   triggerMode: "thumbnail" | "input";
@@ -59,6 +70,8 @@ interface PlaygroundOptions {
   showSwatches: boolean;
   showInput: boolean;
   enableGradient: boolean;
+  enableTokens: boolean;
+  enableTokenSearch: boolean;
   swatchColors: string[];
 }
 
@@ -508,6 +521,8 @@ export function PlaygroundClient() {
     showSwatches: true,
     showInput: true,
     enableGradient: true,
+    enableTokens: false,
+    enableTokenSearch: true,
     swatchColors: DEFAULT_SWATCHES,
   });
 
@@ -618,6 +633,20 @@ export function PlaygroundClient() {
               checked={options.showSwatches}
               onChange={(v) => updateOption("showSwatches", v)}
             />
+            <Toggle
+              label="Color tokens"
+              description="Named color palette with badge and dropdown"
+              checked={options.enableTokens}
+              onChange={(v) => updateOption("enableTokens", v)}
+            />
+            {options.enableTokens && (
+              <Toggle
+                label="Token search"
+                description="Type-to-filter in the token dropdown"
+                checked={options.enableTokenSearch}
+                onChange={(v) => updateOption("enableTokenSearch", v)}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -727,7 +756,7 @@ function InlinePicker({
 
   return (
     <div className="w-72">
-      <ColorPicker value={value} onValueChange={onValueChange}>
+      <ColorPicker value={value} onValueChange={onValueChange} tokens={options.enableTokens ? DEMO_TOKENS : undefined}>
         <div className="flex flex-col gap-[14.4px]">
           {options.enableGradient && (
             <ColorPickerModeSelector className={styles.modeSelector}>
@@ -765,7 +794,7 @@ function InlinePicker({
               {(options.showInput || options.showEyeDropper) && (
                 <div className="flex items-center gap-2">
                   {options.showInput && (
-                    <ColorPickerInput className={`${styles.input} flex-1`} classNames={styles.inputClassNames} />
+                    <ColorPickerInput className={`${styles.input} flex-1`} classNames={styles.inputClassNames} enableTokenSearch={options.enableTokenSearch} />
                   )}
                   {options.showEyeDropper && (
                     <ColorPickerEyeDropper className={styles.eyeDropper} classNames={styles.eyeDropperClassNames} />
@@ -799,12 +828,13 @@ function PopoverPicker({
   const isGradientMode = typeof value !== "string";
 
   return (
-    <ColorPicker value={value} onValueChange={onValueChange}>
+    <ColorPicker value={value} onValueChange={onValueChange} tokens={options.enableTokens ? DEMO_TOKENS : undefined}>
       {options.triggerMode === "input" ? (
         <div className="w-72">
           <ColorPickerInputTrigger
             className={styles.inputTrigger}
             classNames={styles.inputTriggerClassNames}
+            enableTokenSearch={options.enableTokenSearch}
           />
         </div>
       ) : (
@@ -850,7 +880,7 @@ function PopoverPicker({
             {(options.showInput || options.showEyeDropper) && (
               <div className="flex items-center gap-2">
                 {options.showInput && (
-                  <ColorPickerInput className={`${styles.input} flex-1`} classNames={styles.inputClassNames} />
+                  <ColorPickerInput className={`${styles.input} flex-1`} classNames={styles.inputClassNames} enableTokenSearch={options.enableTokenSearch} />
                 )}
                 {options.showEyeDropper && (
                   <ColorPickerEyeDropper className={styles.eyeDropper} classNames={styles.eyeDropperClassNames} />

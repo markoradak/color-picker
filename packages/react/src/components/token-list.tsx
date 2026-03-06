@@ -11,6 +11,8 @@ export interface TokenListProps {
   onSelect: (name: string) => void;
   /** Called when the user presses Escape to close the list. */
   onClose?: () => void;
+  /** Search string to filter tokens by name. */
+  search?: string;
   /** Whether interactions are disabled. */
   disabled: boolean;
   /** Additional CSS class for the container. */
@@ -21,6 +23,7 @@ export interface TokenListProps {
     swatch?: string;
     name?: string;
     check?: string;
+    empty?: string;
   };
 }
 
@@ -32,9 +35,13 @@ export interface TokenListProps {
  * Supports full keyboard navigation: Arrow Up/Down to move between items,
  * Home/End to jump to first/last, Escape to close.
  */
-export function TokenList({ tokens, matchedToken, onSelect, onClose, disabled, className, classNames }: TokenListProps) {
-  const entries = Object.entries(tokens);
+export function TokenList({ tokens, matchedToken, onSelect, onClose, search, disabled, className, classNames }: TokenListProps) {
+  const allEntries = Object.entries(tokens);
+  const entries = search
+    ? allEntries.filter(([name]) => name.toLowerCase().includes(search.toLowerCase()))
+    : allEntries;
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const mountedRef = useRef(false);
 
   // Compute initial focused index (matched token or first item)
   const getInitialIndex = () => {
@@ -47,9 +54,17 @@ export function TokenList({ tokens, matchedToken, onSelect, onClose, disabled, c
 
   const [focusedIndex, setFocusedIndex] = useState(getInitialIndex);
 
-  // Focus + scroll the item into view on mount
+  // Reset focused index when search filter changes (skip initial mount)
   useEffect(() => {
-    if (focusedIndex >= 0) {
+    if (!mountedRef.current) return;
+    setFocusedIndex(entries.length > 0 ? 0 : -1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  // Focus + scroll the item into view on mount (only when no search input above)
+  useEffect(() => {
+    mountedRef.current = true;
+    if (search === undefined && focusedIndex >= 0) {
       itemRefs.current[focusedIndex]?.focus();
       itemRefs.current[focusedIndex]?.scrollIntoView({ block: "nearest" });
     }
@@ -98,7 +113,18 @@ export function TokenList({ tokens, matchedToken, onSelect, onClose, disabled, c
     [entries.length, focusedIndex, moveFocus, onClose],
   );
 
-  if (entries.length === 0) return null;
+  if (entries.length === 0) {
+    if (search) {
+      return (
+        <div data-cp-part="token-list" className={className}>
+          <span data-cp-el="token-empty" className={classNames?.empty}>
+            No matches
+          </span>
+        </div>
+      );
+    }
+    return null;
+  }
 
   return (
     <div

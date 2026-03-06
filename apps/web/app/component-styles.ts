@@ -36,8 +36,13 @@ export const styles = {
     field:
       "w-full rounded-md border border-zinc-300 bg-white px-2 h-8 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100",
     tokenBadge:
-      "right-2.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-2 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:not-data-[matched]:opacity-40",
+      "right-2.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none transition-[opacity,transform] duration-150 data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-2 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:not-data-[matched]:opacity-40",
     tokenIcon: "h-3.5 w-3.5",
+    tokenSearch:
+      "right-1 top-1/2 -translate-y-1/2 flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-50 px-2 py-0.5 transition-[opacity,transform] duration-150 dark:border-zinc-600 dark:bg-zinc-800",
+    tokenSearchInput:
+      "w-16 border-none bg-transparent text-[10px] outline-none placeholder:text-zinc-400 dark:text-zinc-100 dark:placeholder:text-zinc-500",
+    tokenSearchIcon: "h-3 w-3 shrink-0 text-zinc-400 dark:text-zinc-500",
     tokenList:
       "max-h-48 overflow-y-auto rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
     tokenListItem:
@@ -46,6 +51,7 @@ export const styles = {
       "inline-block h-3.5 w-3.5 shrink-0 rounded-sm border border-zinc-200 dark:border-zinc-600",
     tokenListName: "min-w-0 flex-1 truncate",
     tokenListCheck: "h-3 w-3 shrink-0",
+    tokenListEmpty: "block px-2.5 py-3 text-center text-xs text-zinc-400 dark:text-zinc-500",
   },
 
   eyeDropper:
@@ -102,8 +108,13 @@ export const styles = {
     eyeDropperIcon: "h-3 w-3",
     eyeDropperSpinner: "h-3 w-3 animate-spin",
     tokenBadge:
-      "right-1.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-1.5 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:opacity-40",
+      "right-1.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none transition-[opacity,transform] duration-150 data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-1.5 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:opacity-40",
     tokenIcon: "h-3.5 w-3.5",
+    tokenSearch:
+      "right-0.5 top-1/2 -translate-y-1/2 flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-50 px-1.5 py-0.5 transition-[opacity,transform] duration-150 dark:border-zinc-600 dark:bg-zinc-800",
+    tokenSearchInput:
+      "w-14 border-none bg-transparent text-[10px] outline-none placeholder:text-zinc-400 dark:text-zinc-100 dark:placeholder:text-zinc-500",
+    tokenSearchIcon: "h-2.5 w-2.5 shrink-0 text-zinc-400 dark:text-zinc-500",
     gradientDisplay:
       "min-w-0 flex-1 truncate font-mono text-xs dark:text-zinc-100",
     tokenList:
@@ -114,5 +125,6 @@ export const styles = {
       "inline-block h-3.5 w-3.5 shrink-0 rounded-sm border border-zinc-200 dark:border-zinc-600",
     tokenListName: "min-w-0 flex-1 truncate",
     tokenListCheck: "h-3 w-3 shrink-0",
+    tokenListEmpty: "block px-2.5 py-3 text-center text-xs text-zinc-400 dark:text-zinc-500",
   },
 } as const;

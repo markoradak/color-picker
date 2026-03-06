@@ -43,3 +43,10 @@ body {
 [data-radix-popper-content-wrapper] [data-state="closed"] {
   animation: cp-fade-out 100ms ease-in;
 }
+
+/* Token list dropdown enter animation */
+[data-cp-el="token-list-popover"],
+[data-cp-token-portal] {
+  animation: cp-fade-in 100ms ease-out 50ms both;
+  transform-origin: top center;
+}

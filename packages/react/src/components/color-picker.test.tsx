@@ -424,7 +424,7 @@ describe("Color tokens support", () => {
       </ColorPicker>
     );
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("textbox", { name: /color value/i });
     // HSVA roundtrip may shift the hex slightly, so check it's a valid hex
     expect(input.getAttribute("value")).toMatch(/^#[0-9a-f]{6}$/i);
   });
@@ -457,7 +457,7 @@ describe("Color tokens support", () => {
       </ColorPicker>
     );
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("textbox", { name: /color value/i });
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "brand" } });
     fireEvent.blur(input);
@@ -473,7 +473,7 @@ describe("Color tokens support", () => {
       </ColorPicker>
     );
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("textbox", { name: /color value/i });
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "primary" } });
     fireEvent.blur(input);
@@ -490,7 +490,7 @@ describe("Color tokens support", () => {
       />
     );
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("textbox", { name: /color value/i });
     // HSVA roundtrip may shift the hex slightly
     expect(input.getAttribute("value")).toMatch(/^#[0-9a-f]{6}$/i);
     expect(screen.getByLabelText(/matches token: brand/i)).toBeInTheDocument();

@@ -737,6 +737,44 @@
   color: var(--cp-text-muted);
 }
 
+[data-cp-part="token-list"] [data-cp-el="token-empty"] {
+  display: block;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--cp-text-muted);
+}
+
+[data-cp-el="token-badge"],
+[data-cp-el="token-search"] {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+[data-cp-el="token-search"] {
+  display: flex;
+  align-items: center;
+}
+
+[data-cp-el="token-search-input"] {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.75rem;
+  color: var(--cp-text);
+  width: 100%;
+}
+
+[data-cp-el="token-search-input"]::placeholder {
+  color: var(--cp-text-muted);
+}
+
+[data-cp-el="token-search-icon"] {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  color: var(--cp-text-muted);
+}
+
 /* ------------------------------------------------------------------ */
 /* Focus ring & hover states                                          */
 /* ------------------------------------------------------------------ */
@@ -786,6 +824,27 @@
 [data-cp-part="token-list"] [data-cp-el="token-item"]:focus-visible {
   outline: none;
   box-shadow: var(--cp-ring);
+}
+
+/* ------------------------------------------------------------------ */
+/* Token list popover enter animation                                 */
+/* ------------------------------------------------------------------ */
+
+@keyframes cp-token-list-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+[data-cp-el="token-list-popover"],
+[data-cp-token-portal] {
+  animation: cp-token-list-in 100ms ease-out 50ms both;
+  transform-origin: top center;
 }
 
 /* ------------------------------------------------------------------ */
