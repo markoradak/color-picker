@@ -5,6 +5,7 @@ import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerProvider } from "./color-picker-provider";
 import { ColorPickerControls } from "./presets";
 import { interpolateColorAt, sortStops } from "../utils/gradient";
+import { sanitizeColor } from "../utils/css";
 import { clamp } from "../utils/position";
 
 /**
@@ -38,7 +39,7 @@ export function GradientStops({ className, classNames }: GradientStopsProps) {
   const barCSS = (() => {
     const sorted = sortStops(gradientValue.stops);
     const stopsCSS = sorted
-      .map((stop) => `${stop.color} ${stop.position}%`)
+      .map((stop) => `${sanitizeColor(stop.color)} ${stop.position}%`)
       .join(", ");
     return `linear-gradient(to right, ${stopsCSS})`;
   })();

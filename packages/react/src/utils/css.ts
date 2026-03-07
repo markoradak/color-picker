@@ -5,7 +5,7 @@ import { sortStops } from "./gradient";
 /**
  * Sanitize a color string, returning "transparent" for invalid values.
  */
-function sanitizeColor(color: string): string {
+export function sanitizeColor(color: string): string {
   return isValidColor(color) ? color : "transparent";
 }
 

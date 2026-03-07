@@ -90,7 +90,7 @@ export function getContrastColor(bg: string): "black" | "white" {
  * Otherwise returns the value unchanged.
  */
 export function resolveToken(value: string, tokens?: ColorTokens): string {
-  if (tokens && value in tokens) {
+  if (tokens && Object.hasOwn(tokens, value)) {
     return tokens[value]!;
   }
   return value;
