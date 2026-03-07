@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { forwardRef, useCallback, useRef } from "react";
 import type { ColorPickerMode, ColorPickerModeSelectorProps, ColorPickerModeSelectorItemProps, GradientValue } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { isGradient } from "../utils/css";
@@ -98,7 +98,10 @@ export function ColorPickerModeSelectorItem({ value: mode, className }: ColorPic
  *
  * When children are provided, they replace the default mode buttons.
  */
-export function ColorPickerModeSelector({ className, children }: ColorPickerModeSelectorProps) {
+export const ColorPickerModeSelector = forwardRef<
+  HTMLDivElement,
+  ColorPickerModeSelectorProps
+>(function ColorPickerModeSelector({ className, children }, ref) {
   const { disabled } = useColorPickerContext();
   const groupRef = useRef<HTMLDivElement>(null);
 
@@ -132,7 +135,11 @@ export function ColorPickerModeSelector({ className, children }: ColorPickerMode
 
   return (
     <div
-      ref={groupRef}
+      ref={(node) => {
+        groupRef.current = node;
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
+      }}
       data-cp-part="mode-selector"
       data-disabled={disabled ? "" : undefined}
       className={className}
@@ -145,4 +152,4 @@ export function ColorPickerModeSelector({ className, children }: ColorPickerMode
       ))}
     </div>
   );
-}
+});

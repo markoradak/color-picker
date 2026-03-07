@@ -6,19 +6,8 @@ import { ColorPickerControls } from "./presets";
 import { toCSS } from "../utils/css";
 import { interpolateColorAt } from "../utils/gradient";
 import { clamp } from "../utils/position";
-import type { GradientStop, GradientValue } from "../types";
+import type { GradientStop, GradientValue, GradientPreviewProps } from "../types";
 import { CHECKERBOARD_STYLE } from "./shared";
-
-interface GradientPreviewProps {
-  className?: string;
-  classNames?: {
-    stopDot?: string;
-    baseColor?: string;
-    contextMenu?: string;
-    contextMenuItem?: string;
-    popoverContent?: string;
-  };
-}
 
 interface ContextMenuState {
   x: number;

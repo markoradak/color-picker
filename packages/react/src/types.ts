@@ -19,10 +19,16 @@ export type ColorTokens = Record<string, string>;
 export type AutoTokensConfig = { prefix?: string } | boolean;
 
 /**
+ * The type of gradient (linear, radial, conic, or mesh).
+ * Shared between `GradientValue.type` and `ColorPickerMode`.
+ */
+export type GradientType = "linear" | "radial" | "conic" | "mesh";
+
+/**
  * The active mode of the color picker.
  * "solid" for a flat color string, or a gradient type.
  */
-export type ColorPickerMode = "solid" | "linear" | "radial" | "conic" | "mesh";
+export type ColorPickerMode = "solid" | GradientType;
 
 /**
  * Supported color format identifiers.
@@ -34,7 +40,7 @@ export type ColorFormat = "hex" | "rgb" | "hsl";
  */
 export interface GradientStop {
   id: string;
-  color: string;
+  color: SolidColor;
   position: number; // 0-100
   x?: number; // mesh only, 0-100
   y?: number; // mesh only, 0-100
@@ -44,13 +50,13 @@ export interface GradientStop {
  * Structured representation of a CSS gradient.
  */
 export interface GradientValue {
-  type: "linear" | "radial" | "conic" | "mesh";
+  type: GradientType;
   stops: GradientStop[];
   angle?: number; // degrees, for linear and conic
   centerX?: number; // 0-100, for radial and conic
   centerY?: number; // 0-100, for radial and conic
   /** Solid color behind all radial blobs (mesh gradients only). */
-  baseColor?: string;
+  baseColor?: SolidColor;
   /** Explicit gradient line start point in preview coordinates (0-100). Used by linear, radial, and conic. */
   startPoint?: { x: number; y: number };
   /** Explicit gradient line end point in preview coordinates (0-100). Used by linear, radial, and conic. */
@@ -384,6 +390,102 @@ export interface ColorPickerModeSelectorProps {
 export interface ColorPickerModeSelectorItemProps {
   value: ColorPickerMode;
   className?: string;
+}
+
+/**
+ * Props for the ColorPickerFormatToggle component.
+ * Button that cycles through color formats (HEX, RGB, HSL).
+ */
+export interface ColorPickerFormatToggleProps {
+  className?: string;
+}
+
+/**
+ * Props for the ColorPickerEyeDropper component.
+ * Button that activates the browser's EyeDropper API to sample a color from the screen.
+ */
+export interface ColorPickerEyeDropperProps {
+  className?: string;
+  /** Class names for inner elements. */
+  classNames?: {
+    icon?: string;
+    spinner?: string;
+    check?: string;
+  };
+}
+
+/**
+ * Props for the ColorPickerGradientEditor component.
+ * Self-contained gradient editing UI with preview and stop manipulation.
+ */
+export interface ColorPickerGradientEditorProps {
+  className?: string;
+  /** Class names for inner elements. */
+  classNames?: {
+    preview?: string;
+    stopDot?: string;
+    baseColor?: string;
+    contextMenu?: string;
+    contextMenuItem?: string;
+    popoverContent?: string;
+  };
+}
+
+/**
+ * Props for the GradientPreview component.
+ * All-in-one gradient editor preview with stop dots and manipulation.
+ */
+export interface GradientPreviewProps {
+  className?: string;
+  /** Class names for inner elements. */
+  classNames?: {
+    stopDot?: string;
+    baseColor?: string;
+    contextMenu?: string;
+    contextMenuItem?: string;
+    popoverContent?: string;
+  };
+}
+
+/**
+ * Props for the GradientStops component.
+ * Horizontal gradient stop bar with draggable stop markers.
+ */
+export interface GradientStopsProps {
+  className?: string;
+  /** Class names for inner elements. */
+  classNames?: {
+    bar?: string;
+    stopMarker?: string;
+    popoverContent?: string;
+  };
+}
+
+/**
+ * Props for the ColorPickerControls component.
+ * Shared inner controls rendered by both popover and inline presets.
+ */
+export interface ColorPickerControlsProps {
+  /** Show alpha/opacity slider. Default: true */
+  enableAlpha?: boolean;
+  /** Show the gradient editor controls (only when value is a GradientValue). Default: true */
+  enableGradient?: boolean;
+  /** Show the solid/gradient mode selector. Default: true when enableGradient is true */
+  enableModeSelector?: boolean;
+  /** Show the EyeDropper button (auto-hidden if browser unsupported). Default: true */
+  enableEyeDropper?: boolean;
+  /** Show the color format toggle button. Default: true */
+  enableFormatToggle?: boolean;
+  /** Show the type-to-filter search in the token dropdown. Default: true */
+  enableTokenSearch?: boolean;
+  /** Show preset swatches. Default: true */
+  enableSwatches?: boolean;
+  /** Preset swatch colors to display (solid mode). Defaults to a built-in palette when omitted. */
+  swatches?: string[];
+  /** Number of columns for the swatch grid. Default: 8 */
+  swatchColumns?: number;
+  /** Preset gradient swatches to display (gradient mode) */
+  gradientSwatches?: GradientValue[];
 }
 
 /**

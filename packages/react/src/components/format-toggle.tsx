@@ -1,9 +1,6 @@
-import type { ColorFormat } from "../types";
+import { forwardRef } from "react";
+import type { ColorFormat, ColorPickerFormatToggleProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
-
-interface ColorPickerFormatToggleProps {
-  className?: string;
-}
 
 const FORMAT_LABELS: Record<ColorFormat, string> = {
   hex: "HEX",
@@ -16,13 +13,15 @@ const FORMAT_LABELS: Record<ColorFormat, string> = {
  * Displays the current format label. Updating the format changes
  * what the Input component displays.
  */
-export function ColorPickerFormatToggle({
-  className,
-}: ColorPickerFormatToggleProps) {
+export const ColorPickerFormatToggle = forwardRef<
+  HTMLButtonElement,
+  ColorPickerFormatToggleProps
+>(function ColorPickerFormatToggle({ className }, ref) {
   const { format, toggleFormat, disabled } = useColorPickerContext();
 
   return (
     <button
+      ref={ref}
       type="button"
       onClick={toggleFormat}
       disabled={disabled}
@@ -34,4 +33,4 @@ export function ColorPickerFormatToggle({
       {FORMAT_LABELS[format]}
     </button>
   );
-}
+});

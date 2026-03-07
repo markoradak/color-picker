@@ -1,19 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
+import type { GradientStopsProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerProvider } from "./color-picker-provider";
 import { ColorPickerControls } from "./presets";
 import { interpolateColorAt, sortStops } from "../utils/gradient";
 import { clamp } from "../utils/position";
-
-interface GradientStopsProps {
-  className?: string;
-  classNames?: {
-    bar?: string;
-    stopMarker?: string;
-    popoverContent?: string;
-  };
-}
 
 /**
  * Horizontal gradient stop bar.

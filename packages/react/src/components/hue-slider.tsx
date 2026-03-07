@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { forwardRef, useCallback, useMemo } from "react";
 import type { ColorPickerSliderProps, ColorPickerHueSliderTrackProps, ColorPickerHueSliderThumbProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
@@ -62,7 +62,10 @@ export function ColorPickerHueSliderThumb({ className }: ColorPickerHueSliderThu
  *
  * When children are provided, they replace the default track + thumb rendering.
  */
-export function ColorPickerHueSlider({ className, children }: ColorPickerSliderProps) {
+export const ColorPickerHueSlider = forwardRef<
+  HTMLDivElement,
+  ColorPickerSliderProps
+>(function ColorPickerHueSlider({ className, children }, ref) {
   const { hsva, setHue, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -101,6 +104,7 @@ export function ColorPickerHueSlider({ className, children }: ColorPickerSliderP
 
   return (
     <div
+      ref={ref}
       role="slider"
       aria-label="Hue"
       aria-valuemin={0}
@@ -124,4 +128,4 @@ export function ColorPickerHueSlider({ className, children }: ColorPickerSliderP
       )}
     </div>
   );
-}
+});

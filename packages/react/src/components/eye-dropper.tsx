@@ -1,14 +1,6 @@
-import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { forwardRef, useCallback, useRef, useState, useSyncExternalStore } from "react";
+import type { ColorPickerEyeDropperProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
-
-interface ColorPickerEyeDropperProps {
-  className?: string;
-  classNames?: {
-    icon?: string;
-    spinner?: string;
-    check?: string;
-  };
-}
 
 // Type for the EyeDropper API (not yet in all TypeScript lib definitions)
 interface EyeDropperAPI {
@@ -49,10 +41,10 @@ function useEyeDropperSupported(): boolean {
  *
  * Shows a pipette icon and a loading state while the picker is active.
  */
-export function ColorPickerEyeDropper({
-  className,
-  classNames,
-}: ColorPickerEyeDropperProps) {
+export const ColorPickerEyeDropper = forwardRef<
+  HTMLButtonElement,
+  ColorPickerEyeDropperProps
+>(function ColorPickerEyeDropper({ className, classNames }, ref) {
   const { setColorFromString, disabled } = useColorPickerContext();
   const [isPicking, setIsPicking] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
@@ -90,6 +82,7 @@ export function ColorPickerEyeDropper({
 
   return (
     <button
+      ref={ref}
       type="button"
       onClick={handleClick}
       disabled={disabled || isPicking}
@@ -173,4 +166,4 @@ export function ColorPickerEyeDropper({
       </span>
     </button>
   );
-}
+});

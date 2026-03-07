@@ -7,7 +7,7 @@
  * Dark mode uses Tailwind's `dark:` variant (`.dark` class strategy).
  */
 
-import type { ColorPickerPopoverProps, ColorPickerInlineProps } from "../types";
+import type { ColorPickerPopoverProps, ColorPickerInlineProps, ColorPickerControlsProps } from "../types";
 import { ColorPicker } from "./color-picker";
 import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerTrigger } from "./trigger";
@@ -56,18 +56,7 @@ export function ColorPickerControls({
   swatches = DEFAULT_PRESET_SWATCHES,
   swatchColumns = 8,
   gradientSwatches,
-}: {
-  enableAlpha?: boolean;
-  enableGradient?: boolean;
-  enableModeSelector?: boolean;
-  enableEyeDropper?: boolean;
-  enableFormatToggle?: boolean;
-  enableTokenSearch?: boolean;
-  enableSwatches?: boolean;
-  swatches?: string[];
-  swatchColumns?: number;
-  gradientSwatches?: import("../types").GradientValue[];
-}) {
+}: ColorPickerControlsProps) {
   const { isGradientMode } = useColorPickerContext();
   const showModeSelector = enableModeSelector ?? enableGradient;
 

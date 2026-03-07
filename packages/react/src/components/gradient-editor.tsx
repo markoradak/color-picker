@@ -1,17 +1,7 @@
+import { forwardRef } from "react";
+import type { ColorPickerGradientEditorProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { GradientPreview } from "./gradient-preview";
-
-interface GradientEditorProps {
-  className?: string;
-  classNames?: {
-    preview?: string;
-    stopDot?: string;
-    baseColor?: string;
-    contextMenu?: string;
-    contextMenuItem?: string;
-    popoverContent?: string;
-  };
-}
 
 /**
  * Self-contained gradient editing UI.
@@ -28,7 +18,10 @@ interface GradientEditorProps {
  *
  * Only renders content when the current value is a gradient.
  */
-export function ColorPickerGradientEditor({ className, classNames }: GradientEditorProps) {
+export const ColorPickerGradientEditor = forwardRef<
+  HTMLDivElement,
+  ColorPickerGradientEditorProps
+>(function ColorPickerGradientEditor({ className, classNames }, ref) {
   const { isGradientMode } = useColorPickerContext();
 
   if (!isGradientMode) {
@@ -37,6 +30,7 @@ export function ColorPickerGradientEditor({ className, classNames }: GradientEdi
 
   return (
     <div
+      ref={ref}
       data-cp-part="gradient-editor"
       className={className}
     >
@@ -52,4 +46,4 @@ export function ColorPickerGradientEditor({ className, classNames }: GradientEdi
       />
     </div>
   );
-}
+});

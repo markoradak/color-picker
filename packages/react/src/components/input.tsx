@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import type { ColorPickerInputProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { isValidColor, resolveToken } from "../utils/color";
@@ -13,7 +13,10 @@ import { TokenList } from "./token-list";
  * When tokens are available, a clickable badge opens a dropdown listing all tokens.
  * The badge transforms into a search input when the dropdown is open.
  */
-export function ColorPickerInput({ className, classNames, enableFormatToggle = true, enableTokenSearch = true }: ColorPickerInputProps) {
+export const ColorPickerInput = forwardRef<
+  HTMLDivElement,
+  ColorPickerInputProps
+>(function ColorPickerInput({ className, classNames, enableFormatToggle = true, enableTokenSearch = true }, ref) {
   const { formattedValue, format, toggleFormat, setColorFromString, disabled, matchedToken, tokens } =
     useColorPickerContext();
 
@@ -91,6 +94,7 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
 
   return (
     <div
+      ref={ref}
       data-cp-part="input"
       data-disabled={disabled ? "" : undefined}
       className={className}
@@ -236,4 +240,4 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
       </div>
     </div>
   );
-}
+});

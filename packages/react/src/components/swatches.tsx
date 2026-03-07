@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { forwardRef, useCallback, useEffect } from "react";
 import type { ColorPickerSwatchesProps, ColorPickerSwatchProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { fromHSVA, getContrastColor } from "../utils/color";
@@ -69,13 +69,16 @@ export function ColorPickerSwatch({ value, className, style }: ColorPickerSwatch
  *
  * When children are provided, they replace the auto-rendered swatches.
  */
-export function ColorPickerSwatches({
+export const ColorPickerSwatches = forwardRef<
+  HTMLDivElement,
+  ColorPickerSwatchesProps
+>(function ColorPickerSwatches({
   values = DEFAULT_SWATCH_COLORS,
   columns = 8,
   className,
   swatchClassName,
   children,
-}: ColorPickerSwatchesProps) {
+}, ref) {
   const { disabled, setSwatches } = useColorPickerContext();
 
   // Register swatch values in context so gradient stop popovers can use them
@@ -85,6 +88,7 @@ export function ColorPickerSwatches({
 
   return (
     <div
+      ref={ref}
       role="group"
       aria-label="Color swatches"
       data-cp-part="swatches"
@@ -105,4 +109,4 @@ export function ColorPickerSwatches({
       ))}
     </div>
   );
-}
+});

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { forwardRef, useCallback } from "react";
 import type { ColorPickerAreaProps, ColorPickerAreaGradientProps, ColorPickerAreaThumbProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { usePointerDrag } from "../hooks/use-pointer-drag";
@@ -85,7 +85,10 @@ export function ColorPickerAreaThumb({ className }: ColorPickerAreaThumbProps) {
  *
  * When children are provided, they replace the default gradient + thumb rendering.
  */
-export function ColorPickerArea({ className, children }: ColorPickerAreaProps) {
+export const ColorPickerArea = forwardRef<
+  HTMLDivElement,
+  ColorPickerAreaProps
+>(function ColorPickerArea({ className, children }, ref) {
   const { hsva, setSaturationValue, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -133,6 +136,7 @@ export function ColorPickerArea({ className, children }: ColorPickerAreaProps) {
 
   return (
     <div
+      ref={ref}
       role="slider"
       aria-label="Color"
       aria-roledescription="2D color picker"
@@ -157,4 +161,4 @@ export function ColorPickerArea({ className, children }: ColorPickerAreaProps) {
       )}
     </div>
   );
-}
+});
