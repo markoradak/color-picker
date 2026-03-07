@@ -131,7 +131,7 @@ if (listenersRef.current) return;
 
 ## Phase 4: Code Quality & DRY
 
-### Task 4.1: Extract shared `useTokenDropdown` hook
+### Task 4.1: Extract shared `useTokenDropdown` hook [x]
 **Files:** New file `packages/react/src/hooks/use-token-dropdown.ts`, then refactor `packages/react/src/components/input.tsx` and `packages/react/src/components/input-trigger.tsx`
 **Problem:** ~120 lines of token dropdown state machine (open/close, search, refs, click-outside, keyboard handlers) duplicated verbatim between two files.
 **Fix:** Create `useTokenDropdown` hook that encapsulates:
@@ -143,22 +143,22 @@ if (listenersRef.current) return;
 
 Both `input.tsx` and `input-trigger.tsx` then consume this hook, keeping only their rendering differences (inline vs portal).
 
-### Task 4.2: Fix `ColorPickerTrigger` to display gradients
+### Task 4.2: Fix `ColorPickerTrigger` to display gradients [x]
 **Files:** `packages/react/src/components/trigger.tsx`
 **Problem:** Always shows solid-color swatch from `fromHSVA(hsva)`, even in gradient mode. `InputTrigger` handles this correctly.
 **Fix:** Read `isGradientMode` and `gradient` from context. When in gradient mode, use `toCSS(gradient.gradient)` as the `background` CSS property instead of `backgroundColor`.
 
-### Task 4.3: Hoist `emptySwatches` to module scope
+### Task 4.3: Hoist `emptySwatches` to module scope [x]
 **Files:** `packages/react/src/components/color-picker-provider.tsx`
 **Problem:** `const emptySwatches: string[] = []` inside function body creates new reference every render.
 **Fix:** Move to module-level constant: `const EMPTY_SWATCHES: string[] = [];`
 
-### Task 4.4: Fix `GradientSwatches` array index key
+### Task 4.4: Fix `GradientSwatches` array index key [x]
 **Files:** `packages/react/src/components/gradient-swatches.tsx`
 **Problem:** Uses array index as React key, causing incorrect DOM recycling when filter changes.
 **Fix:** Use `toCSS(gradient)` as key for stability.
 
-### Task 4.5: Extract IIFE in `GradientPreview`
+### Task 4.5: Extract IIFE in `GradientPreview` [x]
 **Files:** `packages/react/src/components/gradient-preview.tsx`
 **Problem:** IIFE inside JSX at ~L442-466 for gradient line SVG.
 **Fix:** Extract to a local variable computed before the return statement.
@@ -234,22 +234,22 @@ const [format, setFormat] = useState<ColorFormat>(() => {
 
 ## Phase 7: CSS Theming
 
-### Task 7.1: Make checkerboard dark-mode aware
+### Task 7.1: Make checkerboard dark-mode aware [x]
 **Files:** `packages/react/src/components/shared.ts`, `packages/react/src/styles.css`
 **Problem:** `CHECKERBOARD_STYLE` hardcodes `#e5e5e5`, invisible in dark mode.
 **Fix:** Change to `var(--cp-checkerboard-color, #e5e5e5)` in the inline style. Add `--cp-checkerboard-color` to `styles.css` with appropriate dark-mode value (e.g., `#404040`).
 
-### Task 7.2: Unify z-index values
+### Task 7.2: Unify z-index values [x]
 **Files:** `packages/react/src/components/input.tsx`, `packages/react/src/components/input-trigger.tsx`, `packages/react/src/styles.css`
 **Problem:** Token dropdown uses `zIndex: 50` in one file and `99999` in another.
 **Fix:** Use a CSS custom property `var(--cp-z-index-dropdown, 50)` in both components. For the portal version in `input-trigger.tsx`, use a higher default via a separate property or document that consumers should set this when using portals.
 
-### Task 7.3: Add `--cp-font-family` and `--cp-transition-duration` tokens
+### Task 7.3: Add `--cp-font-family` and `--cp-transition-duration` tokens [x]
 **Files:** `packages/react/src/styles.css`
 **Problem:** Font sizes and transition durations hardcoded across many selectors.
 **Fix:** Add `--cp-font-family` and `--cp-transition-duration` CSS custom properties to `:root`. Replace hardcoded values in component selectors.
 
-### Task 7.4: Fix token list animation delay
+### Task 7.4: Fix token list animation delay [x]
 **Files:** `packages/react/src/styles.css`
 **Problem:** 50ms delay with `both` fill causes a flash (element appears, vanishes, then fades in).
 **Fix:** Remove the delay or switch to `forwards` fill mode.
@@ -271,11 +271,11 @@ Or use colord to create the transparent version properly. Update `css.test.ts`.
 
 ## Phase 9: Build & Packaging
 
-### Task 9.1: Add missing `package.json` fields
+### Task 9.1: Add missing `package.json` fields [x]
 **Files:** `packages/react/package.json`
 **Fix:** Add `"bugs"`, `"homepage"`, and `"engines"` fields.
 
-### Task 9.2: Add test output caching to Turborepo
+### Task 9.2: Add test output caching to Turborepo [x]
 **Files:** `turbo.json`
 **Fix:** Add `"outputs": []` to the `"test"` task to enable Turborepo result caching.
 
@@ -283,22 +283,22 @@ Or use colord to create the transparent version properly. Update `css.test.ts`.
 
 ## Phase 10: Demo Site Fixes
 
-### Task 10.1: Create `/playground` route
+### Task 10.1: Create `/playground` route [x]
 **Files:** `apps/web/app/playground/page.tsx` (new file)
 **Problem:** `/playground` returns 404. Only works as a section on the homepage.
 **Fix:** Create `page.tsx` that imports and renders `PlaygroundClient`.
 
-### Task 10.2: Fix preset code generation for `showInput`
+### Task 10.2: Fix preset code generation for `showInput` [x]
 **Files:** `apps/web/app/playground/playground-client.tsx`
 **Problem:** Generates `enableFormatToggle={false}` when `showInput` is toggled off, but that only hides the format toggle, not the input.
 **Fix:** Change the mapping so disabling `showInput` generates a comment explaining how to hide the input via `className` or composition, rather than emitting a misleading prop.
 
-### Task 10.3: Remove dead import from code example
+### Task 10.3: Remove dead import from code example [x]
 **Files:** `apps/web/app/page.tsx`
 **Problem:** `COMPOUND_EXAMPLE` imports `ColorPickerGradientEditor` but never uses it.
 **Fix:** Remove from import list.
 
-### Task 10.4: Add missing components to reference table
+### Task 10.4: Add missing components to reference table [x]
 **Files:** `apps/web/app/page.tsx`
 **Problem:** Reference table missing `ColorPickerProvider`, `ColorPickerControls`, `GradientStops`, `TokenList`, hooks, and utilities.
 **Fix:** Add missing entries to the `API_COMPONENTS` array. Add a separate hooks/utilities section.

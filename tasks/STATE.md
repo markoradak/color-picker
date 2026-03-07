@@ -1,9 +1,9 @@
 # State
 
-**Active**: 01_FIXES
-**File**: tasks/plans/PLAN_01_FIXES.md
-**Phase**: 1
-**Status**: In Progress
+**Active**: None
+**File**: --
+**Phase**: --
+**Status**: Complete
 **Updated**: 2026-03-07
 
 ---
@@ -13,7 +13,7 @@
 | # | Plan | File | Status | Progress |
 |---|------|------|--------|----------|
 | 00 | INITIAL | PLAN_00_INITIAL.md | Complete | 50/50 tasks |
-| 01 | FIXES | PLAN_01_FIXES.md | In Progress | 0/33 tasks |
+| 01 | FIXES | PLAN_01_FIXES.md | Complete | 37/37 tasks |
 
 ---
 
@@ -113,89 +113,89 @@
 
 ### PLAN_01_FIXES
 
-#### Phase 1: P0 Bugs -- In Progress
+#### Phase 1: P0 Bugs -- Complete
 
 | Task | Status |
 |------|--------|
-| 1.1 Fix fromCSS stub returning wrong type | Pending |
-| 1.2 Fix initialHSVA always black when tokens are used | Pending |
-| 1.3 Fix gradient activeStop becoming null on external value replacement | Pending |
-| 1.4 Fix createDefaultGradient called on every render | Pending |
-| 1.5 Fix getRelativePosition NaN when element has zero size | Pending |
-| 1.6 Add toHSVA invalid-input guard | Pending |
+| 1.1 Fix fromCSS stub returning wrong type | Complete |
+| 1.2 Fix initialHSVA always black when tokens are used | Complete |
+| 1.3 Fix gradient activeStop becoming null on external value replacement | Complete |
+| 1.4 Fix createDefaultGradient called on every render | Complete |
+| 1.5 Fix getRelativePosition NaN when element has zero size | Complete |
+| 1.6 Add toHSVA invalid-input guard | Complete |
 
-#### Phase 2: P1 Memory Leaks & Event Handling -- Pending
-
-| Task | Status |
-|------|--------|
-| 2.1 Add pointercancel handler to usePointerDrag | Pending |
-| 2.2 Guard against double event listeners on multi-touch | Pending |
-| 2.3 Add drag listener cleanup to gradient components | Pending |
-
-#### Phase 3: Accessibility -- Pending
+#### Phase 2: P1 Memory Leaks & Event Handling -- Complete
 
 | Task | Status |
 |------|--------|
-| 3.1 Fix ColorPickerArea ARIA attributes | Pending |
-| 3.2 Add keyboard operation to gradient stop dots | Pending |
-| 3.3 Fix ColorPickerModeSelector roving tabIndex | Pending |
-| 3.4 Add live region to eye dropper | Pending |
-| 3.5 Fix token list disabled vs aria-disabled | Pending |
-| 3.6 Add prefers-reduced-motion to styles | Pending |
+| 2.1 Add pointercancel handler to usePointerDrag | Complete |
+| 2.2 Guard against double event listeners on multi-touch | Complete |
+| 2.3 Add drag listener cleanup to gradient components | Complete |
 
-#### Phase 4: Code Quality & DRY -- Pending
+#### Phase 3: Accessibility -- Complete
 
 | Task | Status |
 |------|--------|
-| 4.1 Extract shared useTokenDropdown hook | Pending |
-| 4.2 Fix ColorPickerTrigger to display gradients | Pending |
-| 4.3 Hoist emptySwatches to module scope | Pending |
-| 4.4 Fix GradientSwatches array index key | Pending |
-| 4.5 Extract IIFE in GradientPreview | Pending |
+| 3.1 Fix ColorPickerArea ARIA attributes | Complete |
+| 3.2 Add keyboard operation to gradient stop dots | Complete |
+| 3.3 Fix ColorPickerModeSelector roving tabIndex | Complete |
+| 3.4 Add live region to eye dropper | Complete |
+| 3.5 Fix token list disabled vs aria-disabled | Complete |
+| 3.6 Add prefers-reduced-motion to styles | Complete |
 
-#### Phase 5: Performance -- Pending
-
-| Task | Status |
-|------|--------|
-| 5.1 Deduplicate fromHSVA calls per drag frame | Pending |
-| 5.2 Build reverse token lookup map | Pending |
-| 5.3 Fix format detection to resolve tokens first | Pending |
-
-#### Phase 6: Component API Consistency -- Pending
+#### Phase 4: Code Quality & DRY -- Complete
 
 | Task | Status |
 |------|--------|
-| 6.1 Add forwardRef to remaining components | Pending |
-| 6.2 Export missing component prop types | Pending |
-| 6.3 Improve type safety for color fields | Pending |
+| 4.1 Extract shared useTokenDropdown hook | Complete |
+| 4.2 Fix ColorPickerTrigger to display gradients | Complete |
+| 4.3 Hoist emptySwatches to module scope | Complete |
+| 4.4 Fix GradientSwatches array index key | Complete |
+| 4.5 Extract IIFE in GradientPreview | Complete |
 
-#### Phase 7: CSS Theming -- Pending
-
-| Task | Status |
-|------|--------|
-| 7.1 Make checkerboard dark-mode aware | Pending |
-| 7.2 Unify z-index values | Pending |
-| 7.3 Add cp-font-family and cp-transition-duration tokens | Pending |
-| 7.4 Fix token list animation delay | Pending |
-
-#### Phase 8: Mesh Gradient Fix -- Pending
+#### Phase 5: Performance -- Complete
 
 | Task | Status |
 |------|--------|
-| 8.1 Fix mesh gradient transparent blending | Pending |
+| 5.1 Deduplicate fromHSVA calls per drag frame | Complete |
+| 5.2 Build reverse token lookup map | Complete |
+| 5.3 Fix format detection to resolve tokens first | Complete |
 
-#### Phase 9: Build & Packaging -- Pending
-
-| Task | Status |
-|------|--------|
-| 9.1 Add missing package.json fields | Pending |
-| 9.2 Add test output caching to Turborepo | Pending |
-
-#### Phase 10: Demo Site Fixes -- Pending
+#### Phase 6: Component API Consistency -- Complete
 
 | Task | Status |
 |------|--------|
-| 10.1 Create /playground route | Pending |
-| 10.2 Fix preset code generation for showInput | Pending |
-| 10.3 Remove dead import from code example | Pending |
-| 10.4 Add missing components to reference table | Pending |
+| 6.1 Add forwardRef to remaining components | Complete |
+| 6.2 Export missing component prop types | Complete |
+| 6.3 Improve type safety for color fields | Complete |
+
+#### Phase 7: CSS Theming -- Complete
+
+| Task | Status |
+|------|--------|
+| 7.1 Make checkerboard dark-mode aware | Complete |
+| 7.2 Unify z-index values | Complete |
+| 7.3 Add cp-font-family and cp-transition-duration tokens | Complete |
+| 7.4 Fix token list animation delay | Complete |
+
+#### Phase 8: Mesh Gradient Fix -- Complete
+
+| Task | Status |
+|------|--------|
+| 8.1 Fix mesh gradient transparent blending | Complete |
+
+#### Phase 9: Build & Packaging -- Complete
+
+| Task | Status |
+|------|--------|
+| 9.1 Add missing package.json fields | Complete |
+| 9.2 Add test output caching to Turborepo | Complete |
+
+#### Phase 10: Demo Site Fixes -- Complete
+
+| Task | Status |
+|------|--------|
+| 10.1 Create /playground route | Complete |
+| 10.2 Fix preset code generation for showInput | Complete |
+| 10.3 Remove dead import from code example | Complete |
+| 10.4 Add missing components to reference table | Complete |

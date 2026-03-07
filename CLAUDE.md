@@ -1,7 +1,7 @@
 # @markoradak/color-picker
 
 <!-- auto-start: overview -->
-A production-ready compound-component React color picker and gradient editor library (`@markoradak/color-picker`), built as a pnpm monorepo with Turborepo orchestration. The library provides a Radix-style composable API for solid color selection (HEX/RGB/HSL) and gradient editing (linear, radial, conic, mesh). All 8 implementation phases are complete with 165 tests passing, full accessibility support, and CSS custom properties theming.
+A production-ready compound-component React color picker and gradient editor library (`@markoradak/color-picker`), built as a pnpm monorepo with Turborepo orchestration. The library provides a Radix-style composable API for solid color selection (HEX/RGB/HSL) and gradient editing (linear, radial, conic, mesh). All 8 implementation phases are complete with 234 tests passing, full accessibility support, forwardRef on all components, and CSS custom properties theming.
 <!-- auto-end: overview -->
 
 ## Quick Reference
@@ -49,8 +49,9 @@ color-picker/
           page.tsx          # Playground server page
           playground-client.tsx  # Live configurator
         hero-demo.tsx       # Animated color picker demo
-        nav.tsx             # Navigation bar
         theme-provider.tsx  # Dark mode context
+        theme-toggle.tsx    # Dark mode toggle button
+        component-styles.ts # Shared component style constants
         code-block.tsx      # Syntax-highlighted code display
         copy-button.tsx     # Copy-to-clipboard button
       components/           # Additional shared web components
@@ -62,8 +63,12 @@ color-picker/
           shared.ts         # Shared style constants (checkerboard pattern)
           presets.tsx        # Pre-composed ColorPickerPopover, ColorPickerInline
           color-picker.tsx  # Root provider + context
+          color-picker-context.ts  # Context definition
+          color-picker-provider.tsx  # Context-only provider (no Popover.Root)
+          token-list.tsx    # Shared token list dropdown component
+          input-trigger.tsx # Input-style trigger with inline controls
           *.test.tsx        # Component integration tests
-        hooks/              # useColorPicker, useGradient, usePointerDrag
+        hooks/              # useColorPicker, useGradient, usePointerDrag, useTokenDropdown, useAutoTokens
         utils/              # Color math, gradient ops, CSS conversion, position
           *.test.ts         # Utility unit tests
         types.ts            # All public TypeScript types
@@ -80,10 +85,10 @@ color-picker/
 ```
 
 **Key Paths**:
-- `packages/react/src/components/` -- Compound component files (color-picker, area, sliders, input, trigger, content, swatches, gradient-*, presets)
-- `packages/react/src/hooks/` -- State management hooks (use-color-picker, use-gradient, use-pointer-drag)
+- `packages/react/src/components/` -- Compound component files (color-picker, area, sliders, input, input-trigger, trigger, content, swatches, gradient-*, token-list, presets)
+- `packages/react/src/hooks/` -- State management hooks (use-color-picker, use-gradient, use-pointer-drag, use-token-dropdown, use-auto-tokens)
 - `packages/react/src/utils/` -- Pure utility functions (color.ts, gradient.ts, css.ts, position.ts)
-- `packages/react/src/types.ts` -- All shared TypeScript types (ColorPickerValue, GradientValue, HSVA, prop interfaces)
+- `packages/react/src/types.ts` -- All shared TypeScript types (ColorPickerValue, GradientValue, GradientType, HSVA, prop interfaces)
 - `packages/react/src/styles.css` -- CSS custom properties theme with light/dark defaults
 - `apps/web/` -- Next.js demo site consuming the library via `workspace:*`
 <!-- auto-end: structure -->
@@ -103,7 +108,7 @@ color-picker/
 
 **Styling**: Tailwind CSS v4 (demo site), CSS custom properties theme API (`styles.css` shipped with library)
 
-**Testing**: Vitest 3.0 + @testing-library/react 16.3 + jsdom (165 tests)
+**Testing**: Vitest 3.0 + @testing-library/react 16.3 + jsdom (234 tests)
 
 **Key Dependencies**:
 - `colord` -- Color parsing, conversion, and manipulation (~1.7kB, with `names` + `a11y` plugins)
@@ -119,7 +124,7 @@ color-picker/
 - Components: `PascalCase` (e.g., `ColorPicker`, `GradientEditor`)
 - Hooks: `camelCase` with `use` prefix (e.g., `useColorPicker`, `usePointerDrag`)
 - Utilities: `camelCase` (e.g., `formatColor`, `createGradientStop`)
-- Types/Interfaces: `PascalCase` (e.g., `ColorPickerValue`, `HSVA`)
+- Types/Interfaces: `PascalCase` (e.g., `ColorPickerValue`, `HSVA`, `GradientType`)
 
 **Imports**:
 - Path alias `@/*` maps to `packages/react/src/*` (configured in tsconfig + vitest)
@@ -129,6 +134,7 @@ color-picker/
 **Component Architecture**:
 - **Compound component pattern** -- `ColorPicker` is the root provider, sub-components (Area, HueSlider, Input, etc.) consume context
 - Context via `createContext` + `useContext` with a `useColorPickerContext()` hook that throws if used outside provider
+- **All components support `forwardRef`** -- Area, HueSlider, AlphaSlider, Input, Trigger, Content, FormatToggle, EyeDropper, Swatches, ModeSelector, GradientEditor (11 components)
 - Function components only, no class components
 - Props defined as `interface` (not `type`)
 - JSDoc comments on all public exports
@@ -137,10 +143,15 @@ color-picker/
 - Internal HSVA state for smooth drag interactions (avoids HEX rounding during pointer movement)
 - Controlled/uncontrolled pattern (`value` + `onValueChange` + `defaultValue`)
 - `useRef` for synchronizing controlled value changes without re-render loops
+- `useTokenDropdown` hook -- shared state machine for token dropdown open/close, search, keyboard navigation, and click-outside dismissal (used by both `ColorPickerInput` and `ColorPickerInputTrigger`)
+- `useAutoTokens` hook -- merges auto-detected CSS custom property color tokens with manually provided tokens, deferred to post-mount for SSR safety
 
 **Value System**:
 - `ColorPickerValue = SolidColor | GradientValue` -- structured types, not raw CSS strings
+- `GradientType = "linear" | "radial" | "conic" | "mesh"` -- shared gradient type union
 - Utility functions `toCSS()` / `fromCSS()` for converting to/from CSS strings
+- `fromCSS()` fully parses CSS gradient strings (`linear-gradient`, `radial-gradient`, `conic-gradient`) into structured `GradientValue` objects with proper stop positions, angles, and center coordinates
+- `sanitizeColor()` exported from `utils/css.ts` -- returns `"transparent"` for invalid color strings
 - Type guards `isGradient()` / `isSolidColor()` for narrowing
 
 **Library Exports**:
@@ -149,12 +160,22 @@ color-picker/
 - Sub-path: `@markoradak/color-picker/styles` or `./styles.css` -- CSS custom properties theme
 - Dual format: ESM (`.js`) + CJS (`.cjs`) with `.d.ts` declarations
 - `sideEffects: ["*.css"]` -- only CSS files have side effects, rest is tree-shakeable
+- Exported prop types include: `ColorPickerFormatToggleProps`, `ColorPickerEyeDropperProps`, `ColorPickerGradientEditorProps`, `GradientPreviewProps`, `GradientStopsProps`, `ColorPickerControlsProps`, `ColorPickerInputTriggerProps`, `ColorPickerProviderProps`, `TokenListProps`
+
+**CSS Custom Properties Theme**:
+- All styling driven by `--cp-*` custom properties for easy theming
+- Key properties: `--cp-bg`, `--cp-border`, `--cp-radius`, `--cp-text`, `--cp-shadow`, `--cp-width`, etc.
+- Additional properties: `--cp-checkerboard-color`, `--cp-z-index-dropdown`, `--cp-z-index-portal`, `--cp-font-family`, `--cp-transition-duration`
+- Automatic dark mode via `prefers-color-scheme: dark` and `.dark` class override
+- Components targeted via `data-cp-part` and `data-cp-el` attribute selectors
+- Animations: `cp-spin` (eye dropper loading), `cp-token-list-in` (dropdown entrance)
+- Respects `prefers-reduced-motion: reduce`
 
 **Testing**:
 - Test files co-located with source: `*.test.ts` / `*.test.tsx` next to source files
 - Vitest with jsdom environment and global test APIs
 - `@testing-library/jest-dom/vitest` setup for DOM matchers
-- 165 tests across utils (color, gradient, css, position) and components (color-picker, gradient-editor)
+- 234 tests across utils (color, gradient, css, position), hooks (use-auto-tokens), and components (color-picker, color-picker-provider, gradient-editor, mode-selector)
 
 **Audit Fixes Applied**:
 - Stale HSVA closure fix in useColorPicker (ref-based sync)
@@ -162,6 +183,7 @@ color-picker/
 - `stopIdCounter` SSR safety (module-scoped counter)
 - `usePointerDrag` cleanup (proper event listener removal)
 - `sanitizeColor` guard in `toCSS` for malformed color strings
+- Mesh gradient zero-alpha blending to prevent black-fringing artifacts
 <!-- auto-end: patterns -->
 
 ## Development Workflow
@@ -181,9 +203,9 @@ color-picker/
 - `files` field limits published contents to `dist/` and `README.md`
 - Package includes `exports` map with conditional `import`/`require` entries for `.`, `./presets`, `./styles`, `./styles.css`
 
-**Commit Convention**: Conventional commits (`feat:`, `fix:`, `test:`, `chore:`) with optional scope (e.g., `feat(react):`)
+**Commit Convention**: Conventional commits (`feat:`, `fix:`, `test:`, `chore:`, `perf:`, `refactor:`) with optional scope (e.g., `feat(react):`)
 
-**Branch Strategy**: Single `main` branch
+**Branch Strategy**: Feature branches off `feat/color-picker` (main development branch)
 <!-- auto-end: workflow -->
 
 ## Notes
