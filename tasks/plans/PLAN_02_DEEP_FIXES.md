@@ -227,7 +227,7 @@ Each phase is self-contained and testable. After each phase, run `pnpm test`, `p
 **Goal**: Convert GradientValue to a discriminated union, separate mesh stops, extract internal UI state, and DRY up token class names.
 
 **Tasks**:
-10. [ ] **Convert GradientValue to discriminated union**
+10. [x] **Convert GradientValue to discriminated union**
     - File(s): `packages/react/src/types.ts`, and all files that create/read GradientValue
     - Details:
       - Define discriminated union:
@@ -243,7 +243,7 @@ Each phase is self-contained and testable. After each phase, run `pnpm test`, `p
       - Remove `?? fallback` chains where TypeScript now guarantees the field exists
     - Estimated effort: Large
 
-11. [ ] **Create separate MeshGradientStop type**
+11. [x] **Create separate MeshGradientStop type**
     - File(s): `packages/react/src/types.ts`
     - Details:
       - Define `interface MeshGradientStop { id: string; color: string; position: number; x: number; y: number; }`
@@ -253,7 +253,7 @@ Each phase is self-contained and testable. After each phase, run `pnpm test`, `p
       - Update `gradient-preview.tsx` mesh rendering
     - Estimated effort: Medium
 
-12. [ ] **Move startPoint/endPoint out of GradientValue**
+12. [x] **Move startPoint/endPoint out of GradientValue** (kept in type with @internal JSDoc per plan)
     - File(s): `packages/react/src/types.ts`, `packages/react/src/hooks/use-gradient.ts`, `packages/react/src/components/gradient-preview.tsx`
     - Details:
       - Create internal type: `interface GradientUIState { startPoint?: {x:number,y:number}; endPoint?: {x:number,y:number}; }`
@@ -264,7 +264,7 @@ Each phase is self-contained and testable. After each phase, run `pnpm test`, `p
       - This prevents internal UI state from leaking into serialized/stored data
     - Estimated effort: Medium
 
-13. [ ] **Extract shared TokenListClassNames interface**
+13. [x] **Extract shared TokenListClassNames interface**
     - File(s): `packages/react/src/types.ts`
     - Details:
       - Currently `ColorPickerInputProps.classNames` and `ColorPickerInputTriggerProps.classNames` duplicate token-related class name fields (tokenBadge, tokenIcon, tokenSearch, tokenSearchInput, tokenSearchIcon, tokenListContainer, tokenList, tokenListItem, tokenListSwatch, tokenListName, tokenListCheck, tokenListEmpty)

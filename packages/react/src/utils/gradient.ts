@@ -1,4 +1,4 @@
-import type { GradientStop, GradientValue } from "../types";
+import type { GradientStop, GradientValue, MeshGradientStop } from "../types";
 import { colord } from "./color";
 
 /**
@@ -23,28 +23,51 @@ export function createGradientStop(
 }
 
 /**
- * Sort stops by position (ascending).
+ * Create a new mesh gradient stop with 2D coordinates.
  */
-export function sortStops(stops: GradientStop[]): GradientStop[] {
+export function createMeshGradientStop(
+  color: string,
+  position: number,
+  x: number,
+  y: number
+): MeshGradientStop {
+  return {
+    id: generateStopId(),
+    color,
+    position: Math.max(0, Math.min(100, position)),
+    x,
+    y,
+  };
+}
+
+/**
+ * Sort stops by position (ascending).
+ * Works with both GradientStop and MeshGradientStop.
+ */
+export function sortStops<T extends GradientStop | MeshGradientStop>(stops: T[]): T[] {
   return [...stops].sort((a, b) => a.position - b.position);
 }
 
 /**
  * Add a stop to a gradient.
+ * For mesh gradients, use addStopWithCoordinates instead.
  */
 export function addStop(
   gradient: GradientValue,
   color: string,
   position: number
 ): GradientValue {
-  return {
-    ...gradient,
-    stops: sortStops([...gradient.stops, createGradientStop(color, position)]),
-  };
+  if (gradient.type === "mesh") {
+    // For mesh gradients, default coordinates to center
+    const meshStop = createMeshGradientStop(color, position, 50, 50);
+    return { ...gradient, stops: [...gradient.stops, meshStop] };
+  }
+  const newStop = createGradientStop(color, position);
+  return { ...gradient, stops: sortStops([...gradient.stops, newStop]) } as GradientValue;
 }
 
 /**
- * Add a stop to a gradient with 2D coordinates (for mesh gradients).
+ * Add a stop to a mesh gradient with explicit 2D coordinates.
  */
 export function addStopWithCoordinates(
   gradient: GradientValue,
@@ -53,11 +76,12 @@ export function addStopWithCoordinates(
   x: number,
   y: number
 ): GradientValue {
-  const stop = { ...createGradientStop(color, position), x, y };
-  return {
-    ...gradient,
-    stops: [...gradient.stops, stop],
-  };
+  if (gradient.type === "mesh") {
+    const stop = createMeshGradientStop(color, position, x, y);
+    return { ...gradient, stops: [...gradient.stops, stop] };
+  }
+  // For non-mesh gradients, ignore coordinates
+  return addStop(gradient, color, position);
 }
 
 /**
@@ -68,10 +92,10 @@ export function removeStop(
   stopId: string
 ): GradientValue {
   if (gradient.stops.length <= 2) return gradient;
-  return {
-    ...gradient,
-    stops: gradient.stops.filter((s) => s.id !== stopId),
-  };
+  if (gradient.type === "mesh") {
+    return { ...gradient, stops: gradient.stops.filter((s) => s.id !== stopId) };
+  }
+  return { ...gradient, stops: gradient.stops.filter((s) => s.id !== stopId) } as GradientValue;
 }
 
 /**
@@ -80,14 +104,22 @@ export function removeStop(
 export function updateStop(
   gradient: GradientValue,
   stopId: string,
-  updates: Partial<GradientStop>
+  updates: Partial<GradientStop> | Partial<MeshGradientStop>
 ): GradientValue {
+  if (gradient.type === "mesh") {
+    return {
+      ...gradient,
+      stops: gradient.stops.map((s) =>
+        s.id === stopId ? { ...s, ...updates } as MeshGradientStop : s
+      ),
+    };
+  }
   return {
     ...gradient,
     stops: gradient.stops.map((s) =>
       s.id === stopId ? { ...s, ...updates } : s
     ),
-  };
+  } as GradientValue;
 }
 
 /**
@@ -131,15 +163,19 @@ export function moveStop(
     }
   }
 
-  return { ...gradient, stops };
+  if (gradient.type === "mesh") {
+    return { ...gradient, stops: stops as MeshGradientStop[] };
+  }
+  return { ...gradient, stops: stops as GradientStop[] } as GradientValue;
 }
 
 /**
  * Interpolate a color at a given position (0-100) between sorted stops.
  * Returns the mixed color as a hex string.
+ * Works with both GradientStop and MeshGradientStop arrays.
  */
 export function interpolateColorAt(
-  stops: GradientStop[],
+  stops: (GradientStop | MeshGradientStop)[],
   position: number
 ): string {
   const sorted = sortStops(stops);
@@ -173,32 +209,37 @@ export function createDefaultGradientFromColor(
   type: GradientValue["type"],
   color: string
 ): GradientValue {
-  const base: GradientValue = {
-    type,
-    stops: [
-      createGradientStop(color, 0),
-      createGradientStop("#ffffff", 100),
-    ],
-  };
-
   switch (type) {
     case "linear":
-      return { ...base, angle: 90 };
+      return {
+        type: "linear",
+        angle: 90,
+        stops: [createGradientStop(color, 0), createGradientStop("#ffffff", 100)],
+      };
     case "radial":
-      return { ...base, centerX: 50, centerY: 50 };
+      return {
+        type: "radial",
+        centerX: 50,
+        centerY: 50,
+        stops: [createGradientStop(color, 0), createGradientStop("#ffffff", 100)],
+      };
     case "conic":
-      return { ...base, angle: 0, centerX: 50, centerY: 50 };
+      return {
+        type: "conic",
+        angle: 0,
+        centerX: 50,
+        centerY: 50,
+        stops: [createGradientStop(color, 0), createGradientStop("#ffffff", 100)],
+      };
     case "mesh":
       return {
-        ...base,
+        type: "mesh",
         baseColor: "#ffffff",
         stops: [
-          { ...base.stops[0]!, x: 25, y: 25 },
-          { ...base.stops[1]!, x: 75, y: 75 },
+          createMeshGradientStop(color, 0, 25, 25),
+          createMeshGradientStop("#ffffff", 100, 75, 75),
         ],
       };
-    default:
-      return base;
   }
 }
 
@@ -208,31 +249,36 @@ export function createDefaultGradientFromColor(
 export function createDefaultGradient(
   type: GradientValue["type"] = "linear"
 ): GradientValue {
-  const base: GradientValue = {
-    type,
-    stops: [
-      createGradientStop("#000000", 0),
-      createGradientStop("#ffffff", 100),
-    ],
-  };
-
   switch (type) {
     case "linear":
-      return { ...base, angle: 90 };
+      return {
+        type: "linear",
+        angle: 90,
+        stops: [createGradientStop("#000000", 0), createGradientStop("#ffffff", 100)],
+      };
     case "radial":
-      return { ...base, centerX: 50, centerY: 50 };
+      return {
+        type: "radial",
+        centerX: 50,
+        centerY: 50,
+        stops: [createGradientStop("#000000", 0), createGradientStop("#ffffff", 100)],
+      };
     case "conic":
-      return { ...base, angle: 0, centerX: 50, centerY: 50 };
+      return {
+        type: "conic",
+        angle: 0,
+        centerX: 50,
+        centerY: 50,
+        stops: [createGradientStop("#000000", 0), createGradientStop("#ffffff", 100)],
+      };
     case "mesh":
       return {
-        ...base,
+        type: "mesh",
         baseColor: "#ffffff",
         stops: [
-          { ...base.stops[0]!, x: 25, y: 25 },
-          { ...base.stops[1]!, x: 75, y: 75 },
+          createMeshGradientStop("#000000", 0, 25, 25),
+          createMeshGradientStop("#ffffff", 100, 75, 75),
         ],
       };
-    default:
-      return base;
   }
 }

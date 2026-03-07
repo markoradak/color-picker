@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useRef } from "react";
-import type { ColorPickerMode, ColorPickerModeSelectorProps, ColorPickerModeSelectorItemProps, GradientValue } from "../types";
+import type { ColorPickerMode, ColorPickerModeSelectorProps, ColorPickerModeSelectorItemProps, GradientType, GradientValue } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { isGradient } from "../utils/css";
 import { createDefaultGradientFromColor } from "../utils/gradient";
@@ -52,20 +52,9 @@ export const ColorPickerModeSelectorItem = forwardRef<
           const currentColor = fromHSVA(hsva);
           updateValue(createDefaultGradientFromColor(mode, currentColor));
         } else {
-          // Gradient A -> Gradient B: change type, keep stops
+          // Gradient A -> Gradient B: change type via gradient hook which handles the discriminated union
           if (isGradient(value as string | GradientValue)) {
-            const grad = value as GradientValue;
-            const updated: GradientValue = { ...grad, type: mode };
-
-            if (mode === "linear" || mode === "conic") {
-              updated.angle = updated.angle ?? (mode === "linear" ? 90 : 0);
-            }
-            if (mode === "radial" || mode === "conic") {
-              updated.centerX = updated.centerX ?? 50;
-              updated.centerY = updated.centerY ?? 50;
-            }
-
-            updateValue(updated);
+            gradient.setGradientType(mode as GradientType);
           }
         }
       }

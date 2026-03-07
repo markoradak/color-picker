@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { GradientValue } from "../types";
+import type { GradientValue, MeshGradientStop } from "../types";
 import {
   addStop,
   addStopWithCoordinates,
@@ -8,6 +8,52 @@ import {
   removeStop,
   updateStop,
 } from "../utils/gradient";
+
+/**
+ * Construct a new GradientValue with a different type, preserving compatible fields.
+ * Required fields for each type are provided with sensible defaults when missing.
+ */
+function changeGradientType(current: GradientValue, newType: GradientValue["type"]): GradientValue {
+  switch (newType) {
+    case "linear":
+      return {
+        type: "linear",
+        stops: current.type === "mesh"
+          ? current.stops.map(({ x: _x, y: _y, ...rest }) => rest)
+          : current.stops,
+        angle: (current.type === "linear" || current.type === "conic") ? current.angle : 90,
+      };
+    case "radial":
+      return {
+        type: "radial",
+        stops: current.type === "mesh"
+          ? current.stops.map(({ x: _x, y: _y, ...rest }) => rest)
+          : current.stops,
+        centerX: (current.type === "radial" || current.type === "conic") ? current.centerX : 50,
+        centerY: (current.type === "radial" || current.type === "conic") ? current.centerY : 50,
+      };
+    case "conic":
+      return {
+        type: "conic",
+        stops: current.type === "mesh"
+          ? current.stops.map(({ x: _x, y: _y, ...rest }) => rest)
+          : current.stops,
+        angle: (current.type === "linear" || current.type === "conic") ? current.angle : 0,
+        centerX: (current.type === "radial" || current.type === "conic") ? current.centerX : 50,
+        centerY: (current.type === "radial" || current.type === "conic") ? current.centerY : 50,
+      };
+    case "mesh":
+      return {
+        type: "mesh",
+        stops: current.stops.map((s, i) => ({
+          ...s,
+          x: "x" in s && typeof s.x === "number" ? s.x : (i / Math.max(1, current.stops.length - 1)) * 80 + 10,
+          y: "y" in s && typeof s.y === "number" ? s.y : (i / Math.max(1, current.stops.length - 1)) * 80 + 10,
+        })) as MeshGradientStop[],
+        baseColor: current.type === "mesh" ? current.baseColor : undefined,
+      };
+  }
+}
 
 interface UseGradientOptions {
   value?: GradientValue;
@@ -117,7 +163,7 @@ export function useGradient(options: UseGradientOptions) {
 
   const updateStopCoordinates = useCallback(
     (stopId: string, x: number, y: number) => {
-      const updated = updateStop(gradientRef.current, stopId, { x, y });
+      const updated = updateStop(gradientRef.current, stopId, { x, y } as Partial<MeshGradientStop>);
       update(updated);
     },
     [update]
@@ -125,28 +171,42 @@ export function useGradient(options: UseGradientOptions) {
 
   const setGradientType = useCallback(
     (type: GradientValue["type"]) => {
-      update({ ...gradientRef.current, type, startPoint: undefined, endPoint: undefined });
+      const current = gradientRef.current;
+      update(changeGradientType(current, type));
     },
     [update]
   );
 
   const setAngle = useCallback(
     (angle: number) => {
-      update({ ...gradientRef.current, angle, startPoint: undefined, endPoint: undefined });
+      const current = gradientRef.current;
+      if (current.type === "linear") {
+        update({ ...current, angle, startPoint: undefined, endPoint: undefined });
+      } else if (current.type === "conic") {
+        update({ ...current, angle, startPoint: undefined, endPoint: undefined });
+      }
     },
     [update]
   );
 
   const setCenter = useCallback(
     (centerX: number, centerY: number) => {
-      update({ ...gradientRef.current, centerX, centerY, startPoint: undefined, endPoint: undefined });
+      const current = gradientRef.current;
+      if (current.type === "radial") {
+        update({ ...current, centerX, centerY, startPoint: undefined, endPoint: undefined });
+      } else if (current.type === "conic") {
+        update({ ...current, centerX, centerY, startPoint: undefined, endPoint: undefined });
+      }
     },
     [update]
   );
 
   const setBaseColor = useCallback(
     (color: string) => {
-      update({ ...gradientRef.current, baseColor: color });
+      const current = gradientRef.current;
+      if (current.type === "mesh") {
+        update({ ...current, baseColor: color });
+      }
     },
     [update]
   );

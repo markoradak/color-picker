@@ -61,9 +61,10 @@ describe("css utilities", () => {
       );
     });
 
-    it("generates linear gradient with default angle when missing", () => {
+    it("generates linear gradient with explicit angle", () => {
       const gradient: GradientValue = {
         type: "linear",
+        angle: 90,
         stops: [
           { id: "1", color: "#000", position: 0 },
           { id: "2", color: "#fff", position: 100 },
@@ -89,9 +90,11 @@ describe("css utilities", () => {
       );
     });
 
-    it("generates radial gradient with default center when missing", () => {
+    it("generates radial gradient with explicit center", () => {
       const gradient: GradientValue = {
         type: "radial",
+        centerX: 50,
+        centerY: 50,
         stops: [
           { id: "1", color: "red", position: 0 },
           { id: "2", color: "blue", position: 100 },

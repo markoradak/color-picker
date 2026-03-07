@@ -6,7 +6,7 @@ import { ColorPickerControls } from "./presets";
 import { toCSS } from "../utils/css";
 import { interpolateColorAt } from "../utils/gradient";
 import { clamp } from "../utils/position";
-import type { GradientStop, GradientValue, GradientPreviewProps } from "../types";
+import type { GradientStop, GradientValue, GradientPreviewProps, MeshGradientStop } from "../types";
 import { CHECKERBOARD_STYLE } from "./shared";
 
 interface ContextMenuState {
@@ -32,12 +32,15 @@ function getLineDirection(gradient: GradientValue): { dx: number; dy: number } {
       return { dx: 1, dy: 0 };
     }
     case "conic": {
-      const rad = (((gradient.angle ?? 0) - 90) * Math.PI) / 180;
+      const rad = ((gradient.angle - 90) * Math.PI) / 180;
       return { dx: Math.cos(rad), dy: Math.sin(rad) };
     }
-    default: {
-      const rad = (((gradient.angle ?? 90) - 90) * Math.PI) / 180;
+    case "linear": {
+      const rad = ((gradient.angle - 90) * Math.PI) / 180;
       return { dx: Math.cos(rad), dy: Math.sin(rad) };
+    }
+    case "mesh": {
+      return { dx: 1, dy: 0 };
     }
   }
 }
@@ -66,8 +69,8 @@ function getLineStopVisual(
     };
   }
 
-  const cx = gradient.centerX ?? 50;
-  const cy = gradient.centerY ?? 50;
+  const cx = gradient.type === "radial" || gradient.type === "conic" ? gradient.centerX : 50;
+  const cy = gradient.type === "radial" || gradient.type === "conic" ? gradient.centerY : 50;
 
   return {
     x: cx + (stop.position / 100) * 50 * dx,
@@ -76,22 +79,21 @@ function getLineStopVisual(
 }
 
 function getStopDotPosition(
-  stop: GradientStop,
+  stop: GradientStop | MeshGradientStop,
   gradient: GradientValue
 ): { x: number; y: number } {
   switch (gradient.type) {
     case "linear":
     case "radial":
     case "conic":
-      return getLineStopVisual(stop, gradient);
+      return getLineStopVisual(stop as GradientStop, gradient);
     case "mesh": {
+      const meshStop = stop as MeshGradientStop;
       return {
-        x: clamp(stop.x ?? 50, 2, 98),
-        y: clamp(stop.y ?? 50, 2, 98),
+        x: clamp(meshStop.x, 2, 98),
+        y: clamp(meshStop.y, 2, 98),
       };
     }
-    default:
-      return { x: stop.position, y: 50 };
   }
 }
 
@@ -112,11 +114,11 @@ function positionFromCoords(
     case "radial":
     case "conic": {
       const { dx, dy } = getLineDirection(gradient);
-      const cx = gradient.centerX ?? 50;
-      const cy = gradient.centerY ?? 50;
+      const cx = gradient.centerX;
+      const cy = gradient.centerY;
       return round2(clamp(((mx - cx) * dx + (my - cy) * dy) * 2, 0, 100));
     }
-    default:
+    case "mesh":
       return round2(clamp(mx, 0, 100));
   }
 }
@@ -254,10 +256,14 @@ export const GradientPreview = forwardRef<
           const ddx = ep.x - sp.x;
           const ddy = ep.y - sp.y;
           const len = Math.sqrt(ddx * ddx + ddy * ddy);
+          const fallbackAngle =
+            (gradientValue.type === "linear" || gradientValue.type === "conic")
+              ? gradientValue.angle
+              : 0;
           const newAngle =
             len > 1
               ? (((Math.atan2(ddy, ddx) * 180) / Math.PI + 90) % 360 + 360) % 360
-              : gradientValue.angle ?? (gradientValue.type === "linear" ? 90 : 0);
+              : fallbackAngle;
 
           if (gradientValue.type === "linear") {
             const newRad = ((newAngle - 90) * Math.PI) / 180;
@@ -279,7 +285,21 @@ export const GradientPreview = forwardRef<
               endPoint: { x: round2(ep.x), y: round2(ep.y) },
               stops: newStops,
             });
-          } else {
+          } else if (gradientValue.type === "radial") {
+            const newStops = gradientValue.stops.map((s) => {
+              const t = stopProportions?.get(s.id) ?? 0.5;
+              return { ...s, position: round2(t * len * 2) };
+            });
+
+            replaceGradient({
+              ...gradientValue,
+              centerX: round2(sp.x),
+              centerY: round2(sp.y),
+              startPoint: { x: round2(sp.x), y: round2(sp.y) },
+              endPoint: { x: round2(ep.x), y: round2(ep.y) },
+              stops: newStops,
+            });
+          } else if (gradientValue.type === "conic") {
             const newStops = gradientValue.stops.map((s) => {
               const t = stopProportions?.get(s.id) ?? 0.5;
               return { ...s, position: round2(t * len * 2) };
@@ -510,11 +530,12 @@ export const GradientPreview = forwardRef<
                 onKeyDown={(e) => {
                   if (disabled) return;
                   const step = e.shiftKey ? 10 : 1;
+                  const meshStop = stop as MeshGradientStop;
                   switch (e.key) {
                     case "ArrowLeft": {
                       e.preventDefault();
                       if (gradientValue.type === "mesh") {
-                        updateStopCoordinates(stop.id, clamp((stop.x ?? 50) - step, 0, 100), stop.y ?? 50);
+                        updateStopCoordinates(stop.id, clamp(meshStop.x - step, 0, 100), meshStop.y);
                       } else {
                         updateStopPosition(stop.id, clamp(stop.position - step, 0, 100));
                       }
@@ -523,7 +544,7 @@ export const GradientPreview = forwardRef<
                     case "ArrowRight": {
                       e.preventDefault();
                       if (gradientValue.type === "mesh") {
-                        updateStopCoordinates(stop.id, clamp((stop.x ?? 50) + step, 0, 100), stop.y ?? 50);
+                        updateStopCoordinates(stop.id, clamp(meshStop.x + step, 0, 100), meshStop.y);
                       } else {
                         updateStopPosition(stop.id, clamp(stop.position + step, 0, 100));
                       }
@@ -532,14 +553,14 @@ export const GradientPreview = forwardRef<
                     case "ArrowUp": {
                       if (gradientValue.type === "mesh") {
                         e.preventDefault();
-                        updateStopCoordinates(stop.id, stop.x ?? 50, clamp((stop.y ?? 50) - step, 0, 100));
+                        updateStopCoordinates(stop.id, meshStop.x, clamp(meshStop.y - step, 0, 100));
                       }
                       break;
                     }
                     case "ArrowDown": {
                       if (gradientValue.type === "mesh") {
                         e.preventDefault();
-                        updateStopCoordinates(stop.id, stop.x ?? 50, clamp((stop.y ?? 50) + step, 0, 100));
+                        updateStopCoordinates(stop.id, meshStop.x, clamp(meshStop.y + step, 0, 100));
                       }
                       break;
                     }

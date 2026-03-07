@@ -1,4 +1,4 @@
-import type { ColorPickerValue, GradientValue, SolidColor } from "../types";
+import type { ColorPickerValue, GradientValue, MeshGradientStop, SolidColor } from "../types";
 import { colord, isValidColor } from "./color";
 import { sortStops } from "./gradient";
 
@@ -43,20 +43,30 @@ export function toCSS(value: ColorPickerValue): string {
     return sanitizeColor(value);
   }
 
-  const sorted = sortStops(value.stops);
-  const stopsCSS = sorted
-    .map((stop) => `${sanitizeColor(stop.color)} ${Math.min(100, Math.max(0, stop.position))}%`)
-    .join(", ");
-
   switch (value.type) {
-    case "linear":
-      return `linear-gradient(${value.angle ?? 90}deg, ${stopsCSS})`;
+    case "linear": {
+      const sorted = sortStops(value.stops);
+      const stopsCSS = sorted
+        .map((stop) => `${sanitizeColor(stop.color)} ${Math.min(100, Math.max(0, stop.position))}%`)
+        .join(", ");
+      return `linear-gradient(${value.angle}deg, ${stopsCSS})`;
+    }
 
-    case "radial":
-      return `radial-gradient(circle at ${value.centerX ?? 50}% ${value.centerY ?? 50}%, ${stopsCSS})`;
+    case "radial": {
+      const sorted = sortStops(value.stops);
+      const stopsCSS = sorted
+        .map((stop) => `${sanitizeColor(stop.color)} ${Math.min(100, Math.max(0, stop.position))}%`)
+        .join(", ");
+      return `radial-gradient(circle at ${value.centerX}% ${value.centerY}%, ${stopsCSS})`;
+    }
 
-    case "conic":
-      return `conic-gradient(from ${value.angle ?? 0}deg at ${value.centerX ?? 50}% ${value.centerY ?? 50}%, ${stopsCSS})`;
+    case "conic": {
+      const sorted = sortStops(value.stops);
+      const stopsCSS = sorted
+        .map((stop) => `${sanitizeColor(stop.color)} ${Math.min(100, Math.max(0, stop.position))}%`)
+        .join(", ");
+      return `conic-gradient(from ${value.angle}deg at ${value.centerX}% ${value.centerY}%, ${stopsCSS})`;
+    }
 
     case "mesh": {
       // Mesh gradients are simulated as layered radial gradients.
@@ -66,7 +76,7 @@ export function toCSS(value: ColorPickerValue): string {
         .map(
           (stop) => {
             const color = sanitizeColor(stop.color);
-            return `radial-gradient(circle at ${stop.x ?? 50}% ${stop.y ?? 50}%, ${color} 0%, ${toZeroAlpha(color)} 50%)`;
+            return `radial-gradient(circle at ${stop.x}% ${stop.y}%, ${color} 0%, ${toZeroAlpha(color)} 50%)`;
           }
         );
       if (value.baseColor) {
@@ -74,9 +84,6 @@ export function toCSS(value: ColorPickerValue): string {
       }
       return layers.join(", ");
     }
-
-    default:
-      return stopsCSS;
   }
 }
 

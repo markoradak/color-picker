@@ -36,32 +36,86 @@ export type ColorPickerMode = "solid" | GradientType;
 export type ColorFormat = "hex" | "rgb" | "hsl";
 
 /**
- * A single gradient stop with position and optional 2D coordinates (for mesh gradients).
+ * A single gradient stop with a color and position along the gradient axis.
+ * Used by linear, radial, and conic gradient types.
  */
 export interface GradientStop {
   id: string;
   color: SolidColor;
   position: number; // 0-100
-  x?: number; // mesh only, 0-100
-  y?: number; // mesh only, 0-100
 }
 
 /**
- * Structured representation of a CSS gradient.
+ * A gradient stop for mesh gradients, which requires explicit 2D coordinates.
  */
-export interface GradientValue {
-  type: GradientType;
-  stops: GradientStop[];
-  angle?: number; // degrees, for linear and conic
-  centerX?: number; // 0-100, for radial and conic
-  centerY?: number; // 0-100, for radial and conic
-  /** Solid color behind all radial blobs (mesh gradients only). */
-  baseColor?: SolidColor;
-  /** Explicit gradient line start point in preview coordinates (0-100). Used by linear, radial, and conic. */
+export interface MeshGradientStop {
+  id: string;
+  color: SolidColor;
+  position: number; // 0-100
+  x: number; // 0-100
+  y: number; // 0-100
+}
+
+/**
+ * Shared fields for all gradient types.
+ */
+interface BaseGradientFields {
+  /** @internal UI state for gradient line drag handles. Not part of the serialized value -- consumers should strip these before persisting. */
   startPoint?: { x: number; y: number };
-  /** Explicit gradient line end point in preview coordinates (0-100). Used by linear, radial, and conic. */
+  /** @internal UI state for gradient line drag handles. Not part of the serialized value -- consumers should strip these before persisting. */
   endPoint?: { x: number; y: number };
 }
+
+/**
+ * A linear gradient with an angle in degrees.
+ */
+export interface LinearGradientValue extends BaseGradientFields {
+  type: "linear";
+  stops: GradientStop[];
+  angle: number;
+}
+
+/**
+ * A radial gradient with a center position.
+ */
+export interface RadialGradientValue extends BaseGradientFields {
+  type: "radial";
+  stops: GradientStop[];
+  centerX: number;
+  centerY: number;
+}
+
+/**
+ * A conic gradient with an angle and center position.
+ */
+export interface ConicGradientValue extends BaseGradientFields {
+  type: "conic";
+  stops: GradientStop[];
+  angle: number;
+  centerX: number;
+  centerY: number;
+}
+
+/**
+ * A mesh gradient simulated as layered radial gradients.
+ * Each stop has explicit 2D coordinates for blob placement.
+ */
+export interface MeshGradientValue extends BaseGradientFields {
+  type: "mesh";
+  stops: MeshGradientStop[];
+  /** Solid color behind all radial blobs. */
+  baseColor?: SolidColor;
+}
+
+/**
+ * Discriminated union of all gradient types.
+ * Use `value.type` to narrow to a specific gradient variant.
+ */
+export type GradientValue =
+  | LinearGradientValue
+  | RadialGradientValue
+  | ConicGradientValue
+  | MeshGradientValue;
 
 /**
  * The unified value type for the color picker.
@@ -156,6 +210,25 @@ export interface ColorPickerAlphaSliderThumbProps
 }
 
 /**
+ * Shared class name overrides for the token list dropdown.
+ * Used by both ColorPickerInput and ColorPickerInputTrigger.
+ */
+export interface TokenListClassNames {
+  tokenBadge?: string;
+  tokenIcon?: string;
+  tokenSearch?: string;
+  tokenSearchInput?: string;
+  tokenSearchIcon?: string;
+  tokenListContainer?: string;
+  tokenList?: string;
+  tokenListItem?: string;
+  tokenListSwatch?: string;
+  tokenListName?: string;
+  tokenListCheck?: string;
+  tokenListEmpty?: string;
+}
+
+/**
  * Props for the ColorPicker.Input component.
  */
 export interface ColorPickerInputProps {
@@ -167,19 +240,7 @@ export interface ColorPickerInputProps {
   classNames?: {
     formatToggle?: string;
     field?: string;
-    tokenBadge?: string;
-    tokenIcon?: string;
-    tokenSearch?: string;
-    tokenSearchInput?: string;
-    tokenSearchIcon?: string;
-    tokenListContainer?: string;
-    tokenList?: string;
-    tokenListItem?: string;
-    tokenListSwatch?: string;
-    tokenListName?: string;
-    tokenListCheck?: string;
-    tokenListEmpty?: string;
-  };
+  } & TokenListClassNames;
 }
 
 /**
@@ -261,20 +322,8 @@ export interface ColorPickerInputTriggerProps
     eyeDropperIcon?: string;
     eyeDropperSpinner?: string;
     eyeDropperCheck?: string;
-    tokenBadge?: string;
-    tokenIcon?: string;
-    tokenSearch?: string;
-    tokenSearchInput?: string;
-    tokenSearchIcon?: string;
     gradientDisplay?: string;
-    tokenListContainer?: string;
-    tokenList?: string;
-    tokenListItem?: string;
-    tokenListSwatch?: string;
-    tokenListName?: string;
-    tokenListCheck?: string;
-    tokenListEmpty?: string;
-  };
+  } & TokenListClassNames;
 }
 
 /**

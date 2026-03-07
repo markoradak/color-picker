@@ -24,7 +24,7 @@ export { ColorPickerPopover, ColorPickerInline, ColorPickerControls } from "./co
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
 export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor, resolveToken, findMatchingToken, getCSSColorTokens } from "./utils/color";
-export { createGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, moveStop, createDefaultGradient, createDefaultGradientFromColor, interpolateColorAt } from "./utils/gradient";
+export { createGradientStop, createMeshGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, moveStop, createDefaultGradient, createDefaultGradientFromColor, interpolateColorAt } from "./utils/gradient";
 export { clamp, getRelativePosition, angleFromPosition } from "./utils/position";
 
 // Hooks
@@ -41,6 +41,11 @@ export type {
   ColorPickerMode,
   GradientType,
   GradientStop,
+  MeshGradientStop,
+  LinearGradientValue,
+  RadialGradientValue,
+  ConicGradientValue,
+  MeshGradientValue,
   GradientValue,
   ColorPickerValue,
   ColorPickerProps,
@@ -67,6 +72,7 @@ export type {
   GradientStopsProps,
   ColorPickerControlsProps,
   ColorPickerTriggerProps,
+  TokenListClassNames,
   ColorPickerInputTriggerProps,
   ColorPickerContentProps,
   ColorPickerPresetProps,
