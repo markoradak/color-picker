@@ -32,6 +32,7 @@ export { usePointerDrag } from "./hooks/use-pointer-drag";
 export { useColorPicker } from "./hooks/use-color-picker";
 export { useGradient } from "./hooks/use-gradient";
 export { useAutoTokens } from "./hooks/use-auto-tokens";
+export { useTokenDropdown } from "./hooks/use-token-dropdown";
 
 // Types
 export type {

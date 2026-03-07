@@ -132,9 +132,9 @@ export function ColorPickerGradientSwatches({
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
       }}
     >
-      {children ?? filtered.map((gradient, i) => (
+      {children ?? filtered.map((gradient) => (
         <ColorPickerGradientSwatch
-          key={i}
+          key={toCSS(gradient)}
           value={gradient}
           className={swatchClassName}
           style={swatchClassName ? undefined : { width: '100%', aspectRatio: '1 / 1', position: 'relative' }}

@@ -6,6 +6,7 @@ import { useColorPickerContext } from "./color-picker-context";
 import { fromHSVA, isValidColor, resolveToken } from "../utils/color";
 import { toCSS } from "../utils/css";
 import { CHECKERBOARD_STYLE } from "./shared";
+import { useTokenDropdown } from "../hooks/use-token-dropdown";
 import { TokenList } from "./token-list";
 
 // Type for the EyeDropper API
@@ -167,12 +168,23 @@ export function ColorPickerInputTrigger({
   );
 
   // --- Token dropdown ---
-  const [tokenListOpen, setTokenListOpen] = useState(false);
-  const [tokenSearch, setTokenSearch] = useState("");
-  const tokenDropdownRef = useRef<HTMLDivElement>(null);
-  const tokenBadgeRef = useRef<HTMLButtonElement>(null);
-  const tokenSearchInputRef = useRef<HTMLInputElement>(null);
-  const tokenSearchWrapperRef = useRef<HTMLDivElement>(null);
+  const {
+    tokenListOpen,
+    tokenSearch,
+    tokenDropdownRef,
+    tokenBadgeRef,
+    tokenSearchInputRef,
+    tokenSearchWrapperRef,
+    closeTokenDropdown,
+    handleTokenSelect,
+    handleBadgeClick,
+    handleBadgeKeyDown,
+    handleSearchChange,
+    handleSearchKeyDown,
+  } = useTokenDropdown({
+    onSelectToken: setColorFromString,
+  });
+
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
 
   // Position the portal dropdown relative to the badge/search area.
@@ -185,89 +197,15 @@ export function ColorPickerInputTrigger({
       top: rect.bottom + 4,
       right: window.innerWidth - rect.right,
     });
-  }, [tokenListOpen]);
+  }, [tokenListOpen, tokenSearchWrapperRef, tokenBadgeRef]);
 
-  // Auto-focus the search input when dropdown opens
-  useEffect(() => {
-    if (tokenListOpen) {
-      tokenSearchInputRef.current?.focus();
-    }
-  }, [tokenListOpen]);
-
-  // Click-outside to close token dropdown.
-  useEffect(() => {
-    if (!tokenListOpen) return;
-    const handlePointerDown = (e: PointerEvent) => {
-      const target = e.target as Node;
-      if (
-        tokenDropdownRef.current?.contains(target) ||
-        (target as Element).closest?.('[data-cp-el="token-search"]') ||
-        tokenBadgeRef.current?.contains(target)
-      ) {
-        return;
-      }
-      setTokenListOpen(false);
-      setTokenSearch("");
-    };
-    document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [tokenListOpen]);
-
-  const closeTokenDropdown = useCallback(() => {
-    setTokenListOpen(false);
-    setTokenSearch("");
-    requestAnimationFrame(() => tokenBadgeRef.current?.focus());
-  }, []);
-
-  const handleTokenSelect = useCallback(
-    (name: string) => {
-      setColorFromString(name);
-      closeTokenDropdown();
-    },
-    [setColorFromString, closeTokenDropdown]
-  );
-
+  // Wrap badge click to also stopPropagation (prevent container from opening popover)
   const handleTokenBadgeClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      setTokenListOpen((prev) => !prev);
+      handleBadgeClick();
     },
-    [],
-  );
-
-  const handleTokenBadgeKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        e.preventDefault();
-        setTokenListOpen(true);
-      }
-    },
-    [],
-  );
-
-  const handleTokenSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setTokenSearch(e.target.value);
-    },
-    [],
-  );
-
-  const handleTokenSearchKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        const firstItem = tokenDropdownRef.current?.querySelector('[data-cp-el="token-item"]') as HTMLElement;
-        firstItem?.focus();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        closeTokenDropdown();
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        const focused = tokenDropdownRef.current?.querySelector('[data-cp-el="token-item"][data-focused]') as HTMLButtonElement;
-        focused?.click();
-      }
-    },
-    [closeTokenDropdown],
+    [handleBadgeClick],
   );
 
   // Clicking the container (thumbnail or empty space) opens the popover
@@ -295,7 +233,7 @@ export function ColorPickerInputTrigger({
         onClick={handleContainerClick}
         className={className}
       >
-        {/* Hidden trigger for Radix — keeps popover wired for keyboard/a11y */}
+        {/* Hidden trigger for Radix -- keeps popover wired for keyboard/a11y */}
         <Popover.Trigger
           disabled={disabled}
           aria-label="Open color picker"
@@ -364,13 +302,13 @@ export function ColorPickerInputTrigger({
             />
             {hasTokens && (
               <>
-                {/* Badge — fades out when searching */}
+                {/* Badge -- fades out when searching */}
                 <button
                   ref={tokenBadgeRef}
                   type="button"
                   disabled={disabled || (enableTokenSearch && tokenListOpen)}
                   onClick={handleTokenBadgeClick}
-                  onKeyDown={handleTokenBadgeKeyDown}
+                  onKeyDown={handleBadgeKeyDown}
                   tabIndex={enableTokenSearch && tokenListOpen ? -1 : undefined}
                   aria-label={matchedToken ? `Matches token: ${matchedToken}. Click to browse tokens.` : "Browse color tokens"}
                   aria-expanded={tokenListOpen}
@@ -404,7 +342,7 @@ export function ColorPickerInputTrigger({
                     </svg>
                   )}
                 </button>
-                {/* Search input — fades in when searching */}
+                {/* Search input -- fades in when searching */}
                 {enableTokenSearch && (
                   <div
                     ref={tokenSearchWrapperRef}
@@ -419,8 +357,8 @@ export function ColorPickerInputTrigger({
                       ref={tokenSearchInputRef}
                       type="text"
                       value={tokenSearch}
-                      onChange={handleTokenSearchChange}
-                      onKeyDown={handleTokenSearchKeyDown}
+                      onChange={handleSearchChange}
+                      onKeyDown={handleSearchKeyDown}
                       tabIndex={!tokenListOpen ? -1 : undefined}
                       placeholder="Search..."
                       spellCheck={false}

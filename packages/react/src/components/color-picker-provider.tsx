@@ -4,6 +4,9 @@ import { useColorPicker } from "../hooks/use-color-picker";
 import { useGradient } from "../hooks/use-gradient";
 import { ColorPickerContext } from "./color-picker-context";
 
+/** Stable empty array to avoid re-creating on every render. */
+const EMPTY_SWATCHES: string[] = [];
+
 /**
  * Context-only color picker provider (no Popover.Root).
  *
@@ -44,8 +47,6 @@ export function ColorPickerProvider({
   // No-op popover state — this provider has no popover
   const noop = useCallback(() => {}, []);
   const preserveFocusRef = useRef(false);
-  const emptySwatches: string[] = [];
-
   const contextValue = useMemo(
     () => ({
       ...pickerState,
@@ -54,7 +55,7 @@ export function ColorPickerProvider({
       popoverOpen: false,
       setPopoverOpen: noop,
       preserveFocusRef,
-      swatches: emptySwatches,
+      swatches: EMPTY_SWATCHES,
       setSwatches: noop as (swatches: string[]) => void,
     }),
     [pickerState, disabled, gradientState, noop]

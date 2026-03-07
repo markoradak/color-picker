@@ -394,6 +394,38 @@ export function GradientPreview({ className, classNames }: GradientPreviewProps)
 
   const isMesh = gradientValue.type === "mesh";
 
+  // Line between first and last stops (linear, radial, conic)
+  const showGradientLine =
+    (gradientValue.type === "linear" || gradientValue.type === "radial" || gradientValue.type === "conic") &&
+    gradientValue.stops.length >= 2;
+
+  let gradientLineSVG: React.ReactNode = null;
+  if (showGradientLine) {
+    const sorted = [...gradientValue.stops].sort((a, b) => a.position - b.position);
+    const first = getStopDotPosition(sorted[0]!, gradientValue);
+    const last = getStopDotPosition(sorted[sorted.length - 1]!, gradientValue);
+    gradientLineSVG = (
+      <svg
+        data-cp-el="gradient-line"
+        style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none" }}
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <line
+          x1={first.x}
+          y1={first.y}
+          x2={last.x}
+          y2={last.y}
+          stroke="white"
+          strokeWidth="1.5"
+          vectorEffect="non-scaling-stroke"
+          strokeOpacity="0.6"
+        />
+      </svg>
+    );
+  }
+
   return (
     <div
       data-cp-part="gradient-preview"
@@ -455,31 +487,7 @@ export function GradientPreview({ className, classNames }: GradientPreviewProps)
       )}
 
       {/* Line between first and last stops (linear, radial, conic) */}
-      {(gradientValue.type === "linear" || gradientValue.type === "radial" || gradientValue.type === "conic") && gradientValue.stops.length >= 2 && (() => {
-        const sorted = [...gradientValue.stops].sort((a, b) => a.position - b.position);
-        const first = getStopDotPosition(sorted[0]!, gradientValue);
-        const last = getStopDotPosition(sorted[sorted.length - 1]!, gradientValue);
-        return (
-          <svg
-            data-cp-el="gradient-line"
-            style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none" }}
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <line
-              x1={first.x}
-              y1={first.y}
-              x2={last.x}
-              y2={last.y}
-              stroke="white"
-              strokeWidth="1.5"
-              vectorEffect="non-scaling-stroke"
-              strokeOpacity="0.6"
-            />
-          </svg>
-        );
-      })()}
+      {gradientLineSVG}
 
       {/* Stop dots with popovers */}
       {gradientValue.stops.map((stop) => {

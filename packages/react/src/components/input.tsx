@@ -2,12 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ColorPickerInputProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { isValidColor, resolveToken } from "../utils/color";
+import { useTokenDropdown } from "../hooks/use-token-dropdown";
 import { TokenList } from "./token-list";
 
 /**
  * Text input showing the current color in the selected format (HEX, RGB, HSL).
  * Validates on blur and Enter key, reverting to the last valid value on invalid input.
- * Includes a built-in format toggle button on the left that cycles HEX → RGB → HSL.
+ * Includes a built-in format toggle button on the left that cycles HEX -> RGB -> HSL.
  *
  * When tokens are available, a clickable badge opens a dropdown listing all tokens.
  * The badge transforms into a search input when the dropdown is open.
@@ -18,12 +19,23 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
 
   const [inputValue, setInputValue] = useState(formattedValue);
   const [isEditing, setIsEditing] = useState(false);
-  const [tokenListOpen, setTokenListOpen] = useState(false);
-  const [tokenSearch, setTokenSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const tokenDropdownRef = useRef<HTMLDivElement>(null);
-  const tokenBadgeRef = useRef<HTMLButtonElement>(null);
-  const tokenSearchInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    tokenListOpen,
+    tokenSearch,
+    tokenDropdownRef,
+    tokenBadgeRef,
+    tokenSearchInputRef,
+    closeTokenDropdown,
+    handleTokenSelect,
+    handleBadgeClick,
+    handleBadgeKeyDown,
+    handleSearchChange,
+    handleSearchKeyDown,
+  } = useTokenDropdown({
+    onSelectToken: setColorFromString,
+  });
 
   // Sync external value changes when not actively editing
   useEffect(() => {
@@ -31,32 +43,6 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
       setInputValue(formattedValue);
     }
   }, [formattedValue, isEditing]);
-
-  // Auto-focus the search input when dropdown opens
-  useEffect(() => {
-    if (tokenListOpen) {
-      tokenSearchInputRef.current?.focus();
-    }
-  }, [tokenListOpen]);
-
-  // Click-outside to close token dropdown
-  useEffect(() => {
-    if (!tokenListOpen) return;
-    const handlePointerDown = (e: PointerEvent) => {
-      const target = e.target as Node;
-      if (
-        tokenDropdownRef.current?.contains(target) ||
-        (target as Element).closest?.('[data-cp-el="token-search"]') ||
-        tokenBadgeRef.current?.contains(target)
-      ) {
-        return;
-      }
-      setTokenListOpen(false);
-      setTokenSearch("");
-    };
-    document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [tokenListOpen]);
 
   const commitValue = useCallback(() => {
     setIsEditing(false);
@@ -100,59 +86,6 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
     [commitValue, formattedValue]
   );
 
-  const closeTokenDropdown = useCallback(() => {
-    setTokenListOpen(false);
-    setTokenSearch("");
-    requestAnimationFrame(() => tokenBadgeRef.current?.focus());
-  }, []);
-
-  const handleTokenSelect = useCallback(
-    (name: string) => {
-      setColorFromString(name);
-      closeTokenDropdown();
-    },
-    [setColorFromString, closeTokenDropdown]
-  );
-
-  const handleBadgeClick = useCallback(() => {
-    setTokenListOpen((prev) => !prev);
-  }, []);
-
-  const handleBadgeKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        e.preventDefault();
-        setTokenListOpen(true);
-      }
-    },
-    [],
-  );
-
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setTokenSearch(e.target.value);
-    },
-    [],
-  );
-
-  const handleSearchKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        const firstItem = tokenDropdownRef.current?.querySelector('[data-cp-el="token-item"]') as HTMLElement;
-        firstItem?.focus();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        closeTokenDropdown();
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        const focused = tokenDropdownRef.current?.querySelector('[data-cp-el="token-item"][data-focused]') as HTMLButtonElement;
-        focused?.click();
-      }
-    },
-    [closeTokenDropdown],
-  );
-
   const formatLabel = format.toUpperCase();
   const hasTokens = tokens && Object.keys(tokens).length > 0;
 
@@ -194,7 +127,7 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
         />
         {hasTokens && (
           <>
-            {/* Badge — fades out when searching */}
+            {/* Badge -- fades out when searching */}
             <button
               ref={tokenBadgeRef}
               type="button"
@@ -234,7 +167,7 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
                 </svg>
               )}
             </button>
-            {/* Search input — fades in when searching */}
+            {/* Search input -- fades in when searching */}
             {enableTokenSearch && (
               <div
                 data-cp-el="token-search"
