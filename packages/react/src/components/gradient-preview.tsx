@@ -505,6 +505,52 @@ export function GradientPreview({ className, classNames }: GradientPreviewProps)
                 onClick={(e) => handleDotClick(stop.id, e)}
                 onDoubleClick={(e) => handleDotDoubleClick(stop.id, e)}
                 onContextMenu={(e) => handleContextMenu(stop.id, e)}
+                onKeyDown={(e) => {
+                  if (disabled) return;
+                  const step = e.shiftKey ? 10 : 1;
+                  switch (e.key) {
+                    case "ArrowLeft": {
+                      e.preventDefault();
+                      if (gradientValue.type === "mesh") {
+                        updateStopCoordinates(stop.id, clamp((stop.x ?? 50) - step, 0, 100), stop.y ?? 50);
+                      } else {
+                        updateStopPosition(stop.id, clamp(stop.position - step, 0, 100));
+                      }
+                      break;
+                    }
+                    case "ArrowRight": {
+                      e.preventDefault();
+                      if (gradientValue.type === "mesh") {
+                        updateStopCoordinates(stop.id, clamp((stop.x ?? 50) + step, 0, 100), stop.y ?? 50);
+                      } else {
+                        updateStopPosition(stop.id, clamp(stop.position + step, 0, 100));
+                      }
+                      break;
+                    }
+                    case "ArrowUp": {
+                      if (gradientValue.type === "mesh") {
+                        e.preventDefault();
+                        updateStopCoordinates(stop.id, stop.x ?? 50, clamp((stop.y ?? 50) - step, 0, 100));
+                      }
+                      break;
+                    }
+                    case "ArrowDown": {
+                      if (gradientValue.type === "mesh") {
+                        e.preventDefault();
+                        updateStopCoordinates(stop.id, stop.x ?? 50, clamp((stop.y ?? 50) + step, 0, 100));
+                      }
+                      break;
+                    }
+                    case "Delete":
+                    case "Backspace": {
+                      if (gradientValue.stops.length > 2) {
+                        e.preventDefault();
+                        removeStop(stop.id);
+                      }
+                      break;
+                    }
+                  }
+                }}
                 disabled={disabled}
                 aria-label={`Stop ${stop.color} at ${Math.round(stop.position)}%`}
                 className={classNames?.stopDot}

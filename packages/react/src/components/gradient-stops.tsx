@@ -183,6 +183,30 @@ export function GradientStops({ className, classNames }: GradientStopsProps) {
                   onPointerDown={(e) => handleStopPointerDown(stop.id, e)}
                   onClick={(e) => handleStopClick(stop.id, e)}
                   onDoubleClick={(e) => handleStopDoubleClick(stop.id, e)}
+                  onKeyDown={(e) => {
+                    if (disabled) return;
+                    const step = e.shiftKey ? 10 : 1;
+                    switch (e.key) {
+                      case "ArrowLeft": {
+                        e.preventDefault();
+                        updateStopPosition(stop.id, clamp(stop.position - step, 0, 100));
+                        break;
+                      }
+                      case "ArrowRight": {
+                        e.preventDefault();
+                        updateStopPosition(stop.id, clamp(stop.position + step, 0, 100));
+                        break;
+                      }
+                      case "Delete":
+                      case "Backspace": {
+                        if (gradientValue.stops.length > 2) {
+                          e.preventDefault();
+                          removeStop(stop.id);
+                        }
+                        break;
+                      }
+                    }
+                  }}
                   disabled={disabled}
                   aria-label={`Gradient stop at ${Math.round(stop.position)}%, color ${stop.color}`}
                   aria-pressed={isActive}

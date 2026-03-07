@@ -880,3 +880,27 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion: disable animations for users who prefer it         */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-cp-part="eye-dropper"] [data-cp-el="spinner"] {
+    animation: none;
+  }
+
+  [data-cp-el="token-list-popover"],
+  [data-cp-token-portal] {
+    animation: none;
+  }
+
+  [data-cp-part="mode-selector"] [data-cp-el="mode-button"],
+  [data-cp-el="token-badge"],
+  [data-cp-el="token-search"],
+  [data-cp-part="token-list"] [data-cp-el="token-item"],
+  [data-cp-part="eye-dropper"] svg,
+  [data-cp-part="eye-dropper"] span {
+    transition-duration: 0s;
+  }
+}

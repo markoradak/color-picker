@@ -1,3 +1,4 @@
+import { useCallback, useRef } from "react";
 import type { ColorPickerMode, ColorPickerModeSelectorProps, ColorPickerModeSelectorItemProps, GradientValue } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { isGradient } from "../utils/css";
@@ -75,6 +76,7 @@ export function ColorPickerModeSelectorItem({ value: mode, className }: ColorPic
       type="button"
       role="radio"
       aria-checked={isActive}
+      tabIndex={isActive ? 0 : -1}
       onClick={handleClick}
       disabled={disabled}
       data-cp-el="mode-button"
@@ -98,14 +100,45 @@ export function ColorPickerModeSelectorItem({ value: mode, className }: ColorPic
  */
 export function ColorPickerModeSelector({ className, children }: ColorPickerModeSelectorProps) {
   const { disabled } = useColorPickerContext();
+  const groupRef = useRef<HTMLDivElement>(null);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (disabled) return;
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+
+      e.preventDefault();
+      const group = groupRef.current;
+      if (!group) return;
+
+      const buttons = Array.from(
+        group.querySelectorAll<HTMLButtonElement>('[data-cp-el="mode-button"]:not(:disabled)')
+      );
+      if (buttons.length === 0) return;
+
+      const currentIndex = buttons.findIndex((btn) => btn.getAttribute("tabindex") === "0");
+      let nextIndex: number;
+      if (e.key === "ArrowRight") {
+        nextIndex = currentIndex < buttons.length - 1 ? currentIndex + 1 : 0;
+      } else {
+        nextIndex = currentIndex > 0 ? currentIndex - 1 : buttons.length - 1;
+      }
+
+      buttons[nextIndex]?.focus();
+      buttons[nextIndex]?.click();
+    },
+    [disabled]
+  );
 
   return (
     <div
+      ref={groupRef}
       data-cp-part="mode-selector"
       data-disabled={disabled ? "" : undefined}
       className={className}
       role="radiogroup"
       aria-label="Color picker mode"
+      onKeyDown={handleKeyDown}
     >
       {children ?? MODES.map((mode) => (
         <ColorPickerModeSelectorItem key={mode.value} value={mode.value} />

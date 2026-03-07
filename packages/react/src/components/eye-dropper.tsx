@@ -93,7 +93,7 @@ export function ColorPickerEyeDropper({
       type="button"
       onClick={handleClick}
       disabled={disabled || isPicking}
-      aria-label="Pick a color from the screen"
+      aria-label={showCheck ? "Color picked" : isPicking ? "Picking color..." : "Pick a color from the screen"}
       data-cp-part="eye-dropper"
       data-disabled={disabled ? "" : undefined}
       data-picking={isPicking ? "" : undefined}

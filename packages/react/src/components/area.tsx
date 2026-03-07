@@ -136,6 +136,9 @@ export function ColorPickerArea({ className, children }: ColorPickerAreaProps) {
       role="slider"
       aria-label="Color"
       aria-roledescription="2D color picker"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(hsva.s)}
       aria-valuetext={`Saturation ${Math.round(hsva.s)}%, Brightness ${Math.round(hsva.v)}%`}
       tabIndex={disabled ? -1 : 0}
       onPointerDown={handlePointerDown}

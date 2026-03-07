@@ -144,9 +144,9 @@ export function TokenList({ tokens, matchedToken, onSelect, onClose, search, dis
             type="button"
             role="option"
             aria-selected={isActive}
-            disabled={disabled}
+            aria-disabled={disabled || undefined}
             tabIndex={isFocused ? 0 : -1}
-            onClick={() => onSelect(name)}
+            onClick={() => { if (!disabled) onSelect(name); }}
             onPointerEnter={() => setFocusedIndex(index)}
             data-cp-el="token-item"
             data-active={isActive ? "" : undefined}
