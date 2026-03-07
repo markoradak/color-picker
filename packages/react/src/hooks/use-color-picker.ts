@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { AutoTokensConfig, ColorFormat, ColorPickerValue, ColorTokens, HSVA } from "../types";
-import { detectFormat, findMatchingToken, formatColor, fromHSVA, isValidColor, resolveToken, toHSVA } from "../utils/color";
+import { detectFormat, formatColor, fromHSVA, isValidColor, resolveToken, toHSVA } from "../utils/color";
 import { isGradient } from "../utils/css";
 import { useAutoTokens } from "./use-auto-tokens";
 
@@ -34,9 +34,13 @@ export function useColorPicker(options: UseColorPickerOptions) {
     return { h: 0, s: 0, v: 0, a: 1 };
   });
   const hsvaRef = useRef<HSVA>(hsva);
-  const [format, setFormat] = useState<ColorFormat>(() =>
-    typeof currentValue === "string" ? detectFormat(currentValue) : "hex"
-  );
+  const [format, setFormat] = useState<ColorFormat>(() => {
+    if (typeof currentValue !== "string") return "hex";
+    // Resolve token names first so a token like "rgb-accent" doesn't
+    // falsely trigger RGB format detection from the raw name.
+    const resolved = resolveToken(currentValue, tokens ?? {});
+    return detectFormat(resolved);
+  });
 
   // Track whether the current value change was initiated internally.
   // When we update HSVA via setHue/setSaturationValue/setAlpha, the hex
@@ -137,18 +141,32 @@ export function useColorPicker(options: UseColorPickerOptions) {
     });
   }, []);
 
-  const formattedValue = useMemo(() => {
-    const hex = fromHSVA(hsva);
-    return formatColor(hex, format);
-  }, [hsva, format]);
-
+  // Compute cssValue first so formattedValue can reuse it instead of
+  // calling fromHSVA a second time (avoids duplicate colord allocation per frame).
   const cssValue = useMemo(() => fromHSVA(hsva), [hsva]);
+
+  const formattedValue = useMemo(
+    () => formatColor(cssValue, format),
+    [cssValue, format]
+  );
 
   const isGradientMode = isGradient(currentValue);
 
+  // Build a reverse lookup map once when tokens change, normalizing each token
+  // color through the same HSVA pipeline the picker uses. This avoids iterating
+  // all tokens with HSVA round-trips on every drag frame.
+  const tokenReverseMap = useMemo(() => {
+    if (!tokens) return null;
+    const map: Record<string, string> = {};
+    for (const [name, color] of Object.entries(tokens)) {
+      map[fromHSVA(toHSVA(color))] = name;
+    }
+    return map;
+  }, [tokens]);
+
   const matchedToken = useMemo(
-    () => findMatchingToken(cssValue, tokens),
-    [cssValue, tokens]
+    () => (tokenReverseMap ? tokenReverseMap[cssValue] ?? undefined : undefined),
+    [cssValue, tokenReverseMap]
   );
 
   return {
