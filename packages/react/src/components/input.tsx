@@ -188,7 +188,9 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
           autoComplete="off"
           aria-label={`Color value in ${formatLabel} format`}
           data-cp-el="field"
+          data-has-tokens={hasTokens && !isEditing ? (matchedToken ? "matched" : "icon") : undefined}
           className={classNames?.field}
+          style={{ textOverflow: "ellipsis", overflow: "hidden" }}
         />
         {hasTokens && (
           <>
@@ -205,7 +207,7 @@ export function ColorPickerInput({ className, classNames, enableFormatToggle = t
               aria-haspopup="listbox"
               data-cp-el="token-badge"
               data-matched={matchedToken ? "" : undefined}
-              data-editing={isEditing && !matchedToken ? "" : undefined}
+              data-editing={isEditing ? "" : undefined}
               className={classNames?.tokenBadge}
               style={enableTokenSearch && tokenListOpen
                 ? { position: "absolute", opacity: 0, pointerEvents: "none", transform: "scale(0.95)" }

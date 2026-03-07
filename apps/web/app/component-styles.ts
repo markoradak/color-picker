@@ -34,9 +34,9 @@ export const styles = {
     formatToggle:
       "shrink-0 select-none rounded-md border border-zinc-300 bg-white px-2 h-8 text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-700",
     field:
-      "w-full rounded-md border border-zinc-300 bg-white px-2 h-8 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100",
+      "w-full rounded-md border border-zinc-300 bg-white px-2 h-8 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 data-[has-tokens=icon]:pr-8 data-[has-tokens=matched]:pr-18",
     tokenBadge:
-      "right-2.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none transition-[opacity,transform] duration-150 data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-2 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:not-data-[matched]:opacity-40",
+      "right-2.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none transition-[opacity,transform] duration-150 data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-2 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:opacity-20 data-[editing]:hover:opacity-80",
     tokenIcon: "h-3.5 w-3.5",
     tokenSearch:
       "right-1 top-1/2 -translate-y-1/2 flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-50 px-2 py-0.5 transition-[opacity,transform] duration-150 dark:border-zinc-600 dark:bg-zinc-800",
@@ -102,13 +102,13 @@ export const styles = {
       "shrink-0 cursor-pointer select-none rounded px-1 text-xs font-medium opacity-50 outline-none hover:opacity-80 disabled:cursor-not-allowed",
     formatLabel: "shrink-0 select-none text-xs font-medium opacity-50",
     input:
-      "w-full cursor-text bg-transparent font-mono text-xs outline-none disabled:cursor-not-allowed dark:text-zinc-100",
+      "w-full cursor-text bg-transparent font-mono text-xs outline-none disabled:cursor-not-allowed dark:text-zinc-100 data-[has-tokens=icon]:pr-7 data-[has-tokens=matched]:pr-16",
     eyeDropper:
       "inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded opacity-60 outline-none hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30",
     eyeDropperIcon: "h-3 w-3",
     eyeDropperSpinner: "h-3 w-3 animate-spin",
     tokenBadge:
-      "right-1.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none transition-[opacity,transform] duration-150 data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-1.5 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:opacity-40",
+      "right-1.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none transition-[opacity,transform] duration-150 data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-1.5 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:opacity-20 data-[editing]:hover:opacity-80",
     tokenIcon: "h-3.5 w-3.5",
     tokenSearch:
       "right-0.5 top-1/2 -translate-y-1/2 flex items-center gap-1 rounded-full border border-zinc-300 bg-zinc-50 px-1.5 py-0.5 transition-[opacity,transform] duration-150 dark:border-zinc-600 dark:bg-zinc-800",

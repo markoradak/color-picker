@@ -279,6 +279,14 @@
   box-shadow: 0 0 0 1px var(--cp-border-focus);
 }
 
+[data-cp-part="input"] [data-cp-el="field"][data-has-tokens="icon"] {
+  padding-right: 2rem;
+}
+
+[data-cp-part="input"] [data-cp-el="field"][data-has-tokens="matched"] {
+  padding-right: 4.5rem;
+}
+
 [data-cp-part="input"] [data-cp-el="field"]:disabled {
   cursor: not-allowed;
   opacity: 0.5;
@@ -588,6 +596,14 @@
   color: var(--cp-text);
 }
 
+[data-cp-part="input-trigger"] [data-cp-el="input"][data-has-tokens="icon"] {
+  padding-right: 1.75rem;
+}
+
+[data-cp-part="input-trigger"] [data-cp-el="input"][data-has-tokens="matched"] {
+  padding-right: 4rem;
+}
+
 [data-cp-part="input-trigger"] [data-cp-el="input"]:disabled {
   cursor: not-allowed;
 }
@@ -663,8 +679,12 @@
   opacity: 1;
 }
 
-[data-cp-el="token-badge"][data-editing]:not([data-matched]) {
-  opacity: 0.4;
+[data-cp-el="token-badge"][data-editing] {
+  opacity: 0.2;
+}
+
+[data-cp-el="token-badge"][data-editing]:hover {
+  opacity: 0.8;
 }
 
 [data-cp-el="token-icon"] {

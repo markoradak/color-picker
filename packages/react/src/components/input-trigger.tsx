@@ -352,7 +352,9 @@ export function ColorPickerInputTrigger({
               autoComplete="off"
               aria-label={`Color value in ${formatLabel} format`}
               data-cp-el="input"
+              data-has-tokens={hasTokens && !isEditing ? (matchedToken ? "matched" : "icon") : undefined}
               className={classNames?.input}
+              style={{ textOverflow: "ellipsis", overflow: "hidden" }}
             />
             {hasTokens && (
               <>
