@@ -46,6 +46,11 @@
   --cp-width: 18rem;
   --cp-gap: 0.75rem;
   --cp-padding: 0.75rem;
+  --cp-checkerboard-color: #e5e5e5;
+  --cp-z-index-dropdown: 50;
+  --cp-z-index-portal: 99999;
+  --cp-font-family: monospace;
+  --cp-transition-duration: 0.15s;
 }
 
 /* ------------------------------------------------------------------ */
@@ -68,6 +73,7 @@
     --cp-ring: 0 0 0 2px #60a5fa;
     --cp-hover-bg: #3a3a3c;
     --cp-active-border: #d4d4d8;
+    --cp-checkerboard-color: #404040;
   }
 }
 
@@ -90,6 +96,7 @@
   --cp-ring: 0 0 0 2px #60a5fa;
   --cp-hover-bg: #3a3a3c;
   --cp-active-border: #d4d4d8;
+  --cp-checkerboard-color: #404040;
 }
 
 /* ------------------------------------------------------------------ */
@@ -391,7 +398,7 @@
   border: none;
   background: transparent;
   color: var(--cp-text-muted);
-  transition: color 0.15s, background-color 0.15s, box-shadow 0.15s;
+  transition: color var(--cp-transition-duration, 0.15s), background-color var(--cp-transition-duration, 0.15s), box-shadow var(--cp-transition-duration, 0.15s);
 }
 
 [data-cp-part="mode-selector"] [data-cp-el="mode-button"][data-active] {
@@ -594,7 +601,7 @@
   width: 100%;
   cursor: text;
   background: transparent;
-  font-family: monospace;
+  font-family: var(--cp-font-family, monospace);
   font-size: 0.75rem;
   outline: none;
   border: none;
@@ -649,7 +656,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: monospace;
+  font-family: var(--cp-font-family, monospace);
   font-size: 0.75rem;
   color: var(--cp-text);
 }
@@ -722,7 +729,7 @@
   border: none;
   cursor: pointer;
   color: var(--cp-text);
-  transition: background-color 0.1s;
+  transition: background-color var(--cp-transition-duration, 0.15s);
 }
 
 [data-cp-part="token-list"] [data-cp-el="token-item"][data-focused]:not(:disabled),
@@ -772,7 +779,7 @@
 
 [data-cp-el="token-badge"],
 [data-cp-el="token-search"] {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity var(--cp-transition-duration, 0.15s) ease, transform var(--cp-transition-duration, 0.15s) ease;
 }
 
 [data-cp-el="token-search"] {
@@ -868,7 +875,7 @@
 
 [data-cp-el="token-list-popover"],
 [data-cp-token-portal] {
-  animation: cp-token-list-in 100ms ease-out 50ms both;
+  animation: cp-token-list-in 100ms ease-out forwards;
   transform-origin: top center;
 }
 

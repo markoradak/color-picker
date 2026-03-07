@@ -393,7 +393,7 @@ export function ColorPickerInputTrigger({
                       position: "fixed",
                       top: dropdownPos.top,
                       right: dropdownPos.right,
-                      zIndex: 99999,
+                      zIndex: "var(--cp-z-index-portal, 99999)",
                     }}
                   >
                     <TokenList

@@ -215,7 +215,7 @@ export const ColorPickerInput = forwardRef<
                 ref={tokenDropdownRef}
                 data-cp-el="token-list-popover"
                 className={classNames?.tokenListContainer}
-                style={{ position: "absolute", right: 0, top: "100%", zIndex: 50, marginTop: 4 }}
+                style={{ position: "absolute", right: 0, top: "100%", zIndex: "var(--cp-z-index-dropdown, 50)", marginTop: 4 }}
               >
                 <TokenList
                   tokens={tokens!}

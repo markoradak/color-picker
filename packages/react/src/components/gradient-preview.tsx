@@ -592,7 +592,7 @@ export function GradientPreview({ className, classNames }: GradientPreviewProps)
             position: "fixed",
             left: contextMenu.x,
             top: contextMenu.y,
-            zIndex: 50,
+            zIndex: "var(--cp-z-index-dropdown, 50)",
             minWidth: 160,
           }}
         >

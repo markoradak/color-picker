@@ -8,6 +8,6 @@
  */
 export const CHECKERBOARD_STYLE = {
   backgroundImage:
-    "repeating-conic-gradient(#e5e5e5 0% 25%, transparent 0% 50%)",
+    "repeating-conic-gradient(var(--cp-checkerboard-color, #e5e5e5) 0% 25%, transparent 0% 50%)",
   backgroundSize: "8px 8px",
 } as const;
