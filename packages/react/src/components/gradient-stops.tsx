@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerProvider } from "./color-picker-provider";
@@ -37,6 +37,10 @@ export function GradientStops({ className, classNames }: GradientStopsProps) {
   const barRef = useRef<HTMLDivElement>(null);
   const draggingStopId = useRef<string | null>(null);
   const didDragRef = useRef(false);
+  const dragListenersRef = useRef<{
+    move: (e: PointerEvent) => void;
+    up: () => void;
+  } | null>(null);
   const [openStopId, setOpenStopId] = useState<string | null>(null);
 
   const barCSS = (() => {
@@ -88,10 +92,12 @@ export function GradientStops({ className, classNames }: GradientStopsProps) {
         draggingStopId.current = null;
         document.removeEventListener("pointermove", handleMove);
         document.removeEventListener("pointerup", handleUp);
+        dragListenersRef.current = null;
       };
 
       document.addEventListener("pointermove", handleMove);
       document.addEventListener("pointerup", handleUp);
+      dragListenersRef.current = { move: handleMove, up: handleUp };
     },
     [disabled, setActiveStopId, updateStopPosition]
   );
@@ -125,6 +131,16 @@ export function GradientStops({ className, classNames }: GradientStopsProps) {
     },
     [updateStopColor]
   );
+
+  // Clean up drag listeners on unmount to prevent leaks if component unmounts mid-drag
+  useEffect(() => {
+    return () => {
+      if (dragListenersRef.current) {
+        document.removeEventListener("pointermove", dragListenersRef.current.move);
+        document.removeEventListener("pointerup", dragListenersRef.current.up);
+      }
+    };
+  }, []);
 
   return (
     <div

@@ -23,11 +23,16 @@ export function usePointerDrag(
   const elementRef = useRef<HTMLElement | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
-  const listenersRef = useRef<{ move: (e: PointerEvent) => void; up: (e: PointerEvent) => void } | null>(null);
+  const listenersRef = useRef<{
+    move: (e: PointerEvent) => void;
+    up: (e: PointerEvent) => void;
+    cancel: (e: PointerEvent) => void;
+  } | null>(null);
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLElement>) => {
       if (event.button !== 0) return; // Only primary button
+      if (listenersRef.current) return; // Prevent double listeners on multi-touch
 
       const element = event.currentTarget;
       elementRef.current = element;
@@ -37,6 +42,15 @@ export function usePointerDrag(
       setIsDragging(true);
       optionsRef.current.onDragStart?.(position);
       optionsRef.current.onDrag(position);
+
+      const cleanup = () => {
+        setIsDragging(false);
+        elementRef.current = null;
+        document.removeEventListener("pointermove", handlePointerMove);
+        document.removeEventListener("pointerup", handlePointerUp);
+        document.removeEventListener("pointercancel", handlePointerCancel);
+        listenersRef.current = null;
+      };
 
       const handlePointerMove = (e: PointerEvent) => {
         if (!elementRef.current) return;
@@ -50,16 +64,29 @@ export function usePointerDrag(
           optionsRef.current.onDragEnd?.(pos);
           elementRef.current.releasePointerCapture(e.pointerId);
         }
-        setIsDragging(false);
-        elementRef.current = null;
-        document.removeEventListener("pointermove", handlePointerMove);
-        document.removeEventListener("pointerup", handlePointerUp);
-        listenersRef.current = null;
+        cleanup();
+      };
+
+      const handlePointerCancel = (e: PointerEvent) => {
+        if (elementRef.current) {
+          try {
+            elementRef.current.releasePointerCapture(e.pointerId);
+          } catch {
+            // Pointer capture may already be released by the browser
+          }
+        }
+        // Don't call onDragEnd — coordinates are unreliable on cancel
+        cleanup();
       };
 
       document.addEventListener("pointermove", handlePointerMove);
       document.addEventListener("pointerup", handlePointerUp);
-      listenersRef.current = { move: handlePointerMove, up: handlePointerUp };
+      document.addEventListener("pointercancel", handlePointerCancel);
+      listenersRef.current = {
+        move: handlePointerMove,
+        up: handlePointerUp,
+        cancel: handlePointerCancel,
+      };
     },
     []
   );
@@ -70,6 +97,7 @@ export function usePointerDrag(
       if (listenersRef.current) {
         document.removeEventListener("pointermove", listenersRef.current.move);
         document.removeEventListener("pointerup", listenersRef.current.up);
+        document.removeEventListener("pointercancel", listenersRef.current.cancel);
       }
     };
   }, []);
