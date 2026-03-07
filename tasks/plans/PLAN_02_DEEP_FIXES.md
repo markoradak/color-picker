@@ -284,7 +284,7 @@ Each phase is self-contained and testable. After each phase, run `pnpm test`, `p
 **Goal**: Close 5 accessibility gaps in slider ARIA attributes, gradient stop popover state, keyboard access to context menu, keyboard gradient stop creation, and input trigger labeling.
 
 **Tasks**:
-14. [ ] **Add aria-orientation to slider elements**
+14. [x] **Add aria-orientation to slider elements**
     - File(s): `packages/react/src/components/area.tsx`, `packages/react/src/components/hue-slider.tsx`, `packages/react/src/components/alpha-slider.tsx`
     - Details:
       - Area: already has `role="slider"` at L140; add `aria-orientation="horizontal"` (2D, but horizontal is the default and most appropriate)
@@ -292,14 +292,14 @@ Each phase is self-contained and testable. After each phase, run `pnpm test`, `p
       - AlphaSlider: add `aria-orientation="horizontal"` to the `role="slider"` div
     - Estimated effort: Small
 
-15. [ ] **Add aria-expanded to gradient stop triggers**
+15. [x] **Add aria-expanded to gradient stop triggers**
     - File(s): `packages/react/src/components/gradient-preview.tsx`, `packages/react/src/components/gradient-stops.tsx`
     - Details:
       - In gradient-preview.tsx: Stop dot buttons that act as `Popover.Trigger` -- add `aria-expanded={isOpen}` where `isOpen` tracks whether that stop's popover is open. Add `aria-controls` linking to the popover content ID.
       - In gradient-stops.tsx: Same pattern for stop markers
     - Estimated effort: Small
 
-16. [ ] **Add keyboard access to gradient context menu**
+16. [x] **Add keyboard access to gradient context menu**
     - File(s): `packages/react/src/components/gradient-preview.tsx`
     - Details:
       - On the focused stop dot button, handle `onKeyDown` for Shift+F10 or the Context Menu key
@@ -307,14 +307,14 @@ Each phase is self-contained and testable. After each phase, run `pnpm test`, `p
       - The context menu already renders button elements, so it just needs a trigger path
     - Estimated effort: Small
 
-17. [ ] **Add keyboard equivalent for adding gradient stops**
+17. [x] **Add keyboard equivalent for adding gradient stops**
     - File(s): `packages/react/src/components/gradient-stops.tsx`
     - Details:
       - Add a visually hidden "Add stop" button to the gradient stops area, OR handle a keyboard shortcut on the gradient bar
       - Alternative: Add an "Add Stop" button to the gradient controls in `presets.tsx`
     - Estimated effort: Small
 
-18. [ ] **Add aria-label to InputTrigger group**
+18. [x] **Add aria-label to InputTrigger group**
     - File(s): `packages/react/src/components/input-trigger.tsx` (L233)
     - Details:
       - The `role="group"` div at the InputTrigger root needs `aria-label="Color picker controls"` or a similar descriptive label

@@ -236,6 +236,7 @@ export const ColorPickerInputTrigger = forwardRef<
       <div
         ref={ref}
         role="group"
+        aria-label="Color picker input"
         data-cp-part="input-trigger"
         data-disabled={disabled ? "" : undefined}
         data-cp-anchor=""

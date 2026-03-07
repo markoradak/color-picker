@@ -2,7 +2,7 @@
 
 **Active**: 02_DEEP_FIXES
 **File**: tasks/plans/PLAN_02_DEEP_FIXES.md
-**Phase**: 4
+**Phase**: 5
 **Status**: In Progress
 **Updated**: 2026-03-07T00:00:00Z
 
@@ -14,7 +14,7 @@
 |---|------|------|--------|----------|
 | 00 | INITIAL | PLAN_00_INITIAL.md | Complete | 50/50 tasks |
 | 01 | FIXES | PLAN_01_FIXES.md | Complete | 37/37 tasks |
-| 02 | DEEP_FIXES | PLAN_02_DEEP_FIXES.md | In Progress | 4/39 tasks |
+| 02 | DEEP_FIXES | PLAN_02_DEEP_FIXES.md | In Progress | 9/39 tasks |
 
 ---
 
@@ -236,15 +236,15 @@
 | Move startPoint/endPoint out of GradientValue | Complete |
 | Extract shared TokenListClassNames interface | Complete |
 
-#### Phase 5: Accessibility
+#### Phase 5: Accessibility -- Complete
 
 | Task | Status |
 |------|--------|
-| Add aria-orientation to slider elements | Pending |
-| Add aria-expanded to gradient stop triggers | Pending |
-| Add keyboard access to gradient context menu | Pending |
-| Add keyboard equivalent for adding gradient stops | Pending |
-| Add aria-label to InputTrigger group | Pending |
+| Add aria-orientation to slider elements | Complete |
+| Add aria-expanded to gradient stop triggers | Complete |
+| Add keyboard access to gradient context menu | Complete |
+| Add keyboard equivalent for adding gradient stops | Complete |
+| Add aria-label to InputTrigger group | Complete |
 
 #### Phase 6: CSS Parsing & Utils
 

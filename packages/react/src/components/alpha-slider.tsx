@@ -135,6 +135,7 @@ export const ColorPickerAlphaSlider = forwardRef<
       ref={ref}
       role="slider"
       aria-label="Opacity"
+      aria-orientation="horizontal"
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(hsva.a * 100)}

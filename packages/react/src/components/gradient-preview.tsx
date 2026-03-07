@@ -400,8 +400,17 @@ export const GradientPreview = forwardRef<
         setContextMenu(null);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setContextMenu(null);
+      }
+    };
     document.addEventListener("pointerdown", handleClick);
-    return () => document.removeEventListener("pointerdown", handleClick);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handleClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [contextMenu]);
 
   const isMesh = gradientValue.type === "mesh";
@@ -572,6 +581,15 @@ export const GradientPreview = forwardRef<
                       }
                       break;
                     }
+                    case "ContextMenu":
+                    case "F10": {
+                      if (e.key === "F10" && !e.shiftKey) break;
+                      if (gradientValue.type !== "mesh") break;
+                      e.preventDefault();
+                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      setContextMenu({ x: rect.left, y: rect.bottom + 4, stopId: stop.id });
+                      break;
+                    }
                   }
                 }}
                 disabled={disabled}
@@ -612,6 +630,8 @@ export const GradientPreview = forwardRef<
       {contextMenu && isMesh && (
         <div
           ref={contextMenuRef}
+          role="menu"
+          aria-label="Stop layer order"
           data-cp-el="context-menu"
           className={classNames?.contextMenu}
           style={{
@@ -634,6 +654,7 @@ export const GradientPreview = forwardRef<
               <button
                 key={item.direction}
                 type="button"
+                role="menuitem"
                 disabled={isDisabled}
                 data-cp-el="context-menu-item"
                 className={classNames?.contextMenuItem}

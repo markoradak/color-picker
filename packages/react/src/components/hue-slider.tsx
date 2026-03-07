@@ -118,6 +118,7 @@ export const ColorPickerHueSlider = forwardRef<
       ref={ref}
       role="slider"
       aria-label="Hue"
+      aria-orientation="horizontal"
       aria-valuemin={0}
       aria-valuemax={360}
       aria-valuenow={Math.round(hsva.h)}

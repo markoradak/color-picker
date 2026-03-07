@@ -158,6 +158,24 @@ export const GradientStops = forwardRef<
         aria-label="Gradient stops"
       />
 
+      {/* Visually hidden button for keyboard/screen reader access to add stops */}
+      <button
+        type="button"
+        onClick={() => addStop(interpolateColorAt(gradientValue.stops, 50), 50)}
+        disabled={disabled}
+        aria-label="Add color stop"
+        data-cp-el="add-stop"
+        style={{
+          position: "absolute",
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+          clip: "rect(0,0,0,0)",
+          whiteSpace: "nowrap",
+          borderWidth: 0,
+        }}
+      />
+
       {/* Stop markers */}
       <div data-cp-el="markers" style={{ position: "relative" }}>
         {gradientValue.stops.map((stop) => {
