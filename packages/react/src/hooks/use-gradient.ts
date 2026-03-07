@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { GradientValue } from "../types";
 import {
   addStop,
@@ -20,10 +20,27 @@ interface UseGradientOptions {
 export function useGradient(options: UseGradientOptions) {
   const { value, onValueChange } = options;
 
-  const gradient = value ?? createDefaultGradient("linear");
+  // Stabilize the default gradient so it doesn't regenerate new stop IDs
+  // on every render when `value` is undefined.
+  const defaultGradientRef = useRef<GradientValue | null>(null);
+  if (!defaultGradientRef.current) {
+    defaultGradientRef.current = createDefaultGradient("linear");
+  }
+  const gradient = value ?? defaultGradientRef.current;
+
   const [activeStopId, setActiveStopId] = useState<string | null>(
     gradient.stops[0]?.id ?? null
   );
+
+  // When the parent replaces the gradient (e.g., selecting a swatch),
+  // the new stops have different IDs. Detect stale activeStopId and reset.
+  const prevValueRef = useRef(value);
+  if (value !== prevValueRef.current) {
+    prevValueRef.current = value;
+    if (value && !value.stops.some((s) => s.id === activeStopId)) {
+      setActiveStopId(value.stops[0]?.id ?? null);
+    }
+  }
 
   const update = useCallback(
     (newGradient: GradientValue) => {

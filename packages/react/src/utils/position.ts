@@ -13,6 +13,7 @@ export function getRelativePosition(
   element: HTMLElement
 ): { x: number; y: number } {
   const rect = element.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return { x: 0, y: 0 };
   return {
     x: clamp((event.clientX - rect.left) / rect.width, 0, 1),
     y: clamp((event.clientY - rect.top) / rect.height, 0, 1),

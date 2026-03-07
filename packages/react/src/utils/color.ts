@@ -52,8 +52,14 @@ export function isValidColor(input: string): boolean {
 
 /**
  * Convert a color string to HSVA for internal state.
+ * Returns white `{h:0, s:0, v:100, a:1}` for invalid input (CSS variables,
+ * empty strings, gradient strings) to make the fallback visible rather than
+ * silently producing black.
  */
 export function toHSVA(input: string): HSVA {
+  if (!isValidColor(input)) {
+    return { h: 0, s: 0, v: 100, a: 1 };
+  }
   const c = colord(input);
   const hsv = c.toHsv();
   return {

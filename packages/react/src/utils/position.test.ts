@@ -157,6 +157,75 @@ describe("position utilities", () => {
       expect(result.x).toBe(1);
       expect(result.y).toBe(1);
     });
+
+    it("returns 0,0 when element has zero width", () => {
+      const element = {
+        getBoundingClientRect: () => ({
+          left: 100,
+          top: 100,
+          width: 0,
+          height: 200,
+          right: 100,
+          bottom: 300,
+          x: 100,
+          y: 100,
+          toJSON: () => {},
+        }),
+      } as HTMLElement;
+
+      const result = getRelativePosition(
+        { clientX: 150, clientY: 200 },
+        element
+      );
+      expect(result.x).toBe(0);
+      expect(result.y).toBe(0);
+    });
+
+    it("returns 0,0 when element has zero height", () => {
+      const element = {
+        getBoundingClientRect: () => ({
+          left: 100,
+          top: 100,
+          width: 200,
+          height: 0,
+          right: 300,
+          bottom: 100,
+          x: 100,
+          y: 100,
+          toJSON: () => {},
+        }),
+      } as HTMLElement;
+
+      const result = getRelativePosition(
+        { clientX: 200, clientY: 150 },
+        element
+      );
+      expect(result.x).toBe(0);
+      expect(result.y).toBe(0);
+    });
+
+    it("returns 0,0 when element has zero width and height", () => {
+      const element = {
+        getBoundingClientRect: () => ({
+          left: 100,
+          top: 100,
+          width: 0,
+          height: 0,
+          right: 100,
+          bottom: 100,
+          x: 100,
+          y: 100,
+          toJSON: () => {},
+        }),
+      } as HTMLElement;
+
+      const result = getRelativePosition(
+        { clientX: 150, clientY: 200 },
+        element
+      );
+      expect(result.x).toBe(0);
+      expect(result.y).toBe(0);
+    });
   });
 
   describe("angleFromPosition", () => {

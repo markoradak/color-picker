@@ -202,6 +202,26 @@ describe("color utilities", () => {
       const hsva = toHSVA("transparent");
       expect(hsva.a).toBe(0);
     });
+
+    it("returns white for invalid input (CSS variable)", () => {
+      const hsva = toHSVA("var(--my-color)");
+      expect(hsva).toEqual({ h: 0, s: 0, v: 100, a: 1 });
+    });
+
+    it("returns white for empty string", () => {
+      const hsva = toHSVA("");
+      expect(hsva).toEqual({ h: 0, s: 0, v: 100, a: 1 });
+    });
+
+    it("returns white for gradient string", () => {
+      const hsva = toHSVA("linear-gradient(90deg, #000, #fff)");
+      expect(hsva).toEqual({ h: 0, s: 0, v: 100, a: 1 });
+    });
+
+    it("returns white for arbitrary non-color string", () => {
+      const hsva = toHSVA("not-a-color-at-all");
+      expect(hsva).toEqual({ h: 0, s: 0, v: 100, a: 1 });
+    });
   });
 
   describe("parseColor", () => {

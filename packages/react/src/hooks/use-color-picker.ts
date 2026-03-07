@@ -24,16 +24,16 @@ export function useColorPicker(options: UseColorPickerOptions) {
   const [internalValue, setInternalValue] = useState<ColorPickerValue>(defaultValue);
   const currentValue = isControlled ? controlledValue : internalValue;
 
-  // Internal HSVA state for smooth drag (avoids hex rounding during drag)
-  const initialHSVA = useMemo(() => {
+  // Internal HSVA state for smooth drag (avoids hex rounding during drag).
+  // Uses a lazy initializer so the initial HSVA is computed once on mount
+  // without capturing a stale `tokens` reference from useAutoTokens.
+  const [hsva, setHSVA] = useState<HSVA>(() => {
     if (typeof currentValue === "string") {
-      return toHSVA(resolveToken(currentValue, tokens));
+      return toHSVA(resolveToken(currentValue, tokens ?? {}));
     }
     return { h: 0, s: 0, v: 0, a: 1 };
-  }, []); // Only compute once on mount
-
-  const [hsva, setHSVA] = useState<HSVA>(initialHSVA);
-  const hsvaRef = useRef<HSVA>(initialHSVA);
+  });
+  const hsvaRef = useRef<HSVA>(hsva);
   const [format, setFormat] = useState<ColorFormat>(() =>
     typeof currentValue === "string" ? detectFormat(currentValue) : "hex"
   );
