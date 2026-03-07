@@ -1,5 +1,5 @@
 import type { ColorPickerValue, GradientValue, SolidColor } from "../types";
-import { isValidColor } from "./color";
+import { colord, isValidColor } from "./color";
 import { sortStops } from "./gradient";
 
 /**
@@ -7,6 +7,18 @@ import { sortStops } from "./gradient";
  */
 function sanitizeColor(color: string): string {
   return isValidColor(color) ? color : "transparent";
+}
+
+/**
+ * Create a zero-alpha version of a color string.
+ * Used for mesh gradient blending to avoid black-fringing artifacts
+ * that occur when interpolating toward `transparent` (which is `rgba(0,0,0,0)`).
+ */
+function toZeroAlpha(color: string): string {
+  const c = colord(color);
+  if (!c.isValid()) return "transparent";
+  const { r, g, b } = c.toRgb();
+  return `rgba(${r}, ${g}, ${b}, 0)`;
 }
 
 /**
@@ -47,11 +59,15 @@ export function toCSS(value: ColorPickerValue): string {
       return `conic-gradient(from ${value.angle ?? 0}deg at ${value.centerX ?? 50}% ${value.centerY ?? 50}%, ${stopsCSS})`;
 
     case "mesh": {
-      // Mesh gradients are simulated as layered radial gradients
+      // Mesh gradients are simulated as layered radial gradients.
+      // Each blob fades to a zero-alpha version of its own color (not `transparent`)
+      // to prevent black-fringing artifacts caused by interpolating toward rgba(0,0,0,0).
       const layers = value.stops
         .map(
-          (stop) =>
-            `radial-gradient(circle at ${stop.x ?? 50}% ${stop.y ?? 50}%, ${sanitizeColor(stop.color)} 0%, transparent 50%)`
+          (stop) => {
+            const color = sanitizeColor(stop.color);
+            return `radial-gradient(circle at ${stop.x ?? 50}% ${stop.y ?? 50}%, ${color} 0%, ${toZeroAlpha(color)} 50%)`;
+          }
         );
       if (value.baseColor) {
         layers.push(sanitizeColor(value.baseColor));

@@ -144,8 +144,8 @@ describe("css utilities", () => {
         ],
       };
       const result = toCSS(gradient);
-      expect(result).toContain("radial-gradient(circle at 25% 25%, red 0%, transparent 50%)");
-      expect(result).toContain("radial-gradient(circle at 75% 75%, blue 0%, transparent 50%)");
+      expect(result).toContain("radial-gradient(circle at 25% 25%, red 0%, rgba(255, 0, 0, 0) 50%)");
+      expect(result).toContain("radial-gradient(circle at 75% 75%, blue 0%, rgba(0, 0, 255, 0) 50%)");
     });
 
     it("appends baseColor as the last background layer for mesh gradients", () => {
@@ -158,8 +158,8 @@ describe("css utilities", () => {
         ],
       };
       const result = toCSS(gradient);
-      expect(result).toContain("radial-gradient(circle at 25% 25%, red 0%, transparent 50%)");
-      expect(result).toContain("radial-gradient(circle at 75% 75%, blue 0%, transparent 50%)");
+      expect(result).toContain("radial-gradient(circle at 25% 25%, red 0%, rgba(255, 0, 0, 0) 50%)");
+      expect(result).toContain("radial-gradient(circle at 75% 75%, blue 0%, rgba(0, 0, 255, 0) 50%)");
       // baseColor should be the last layer
       expect(result).toMatch(/, #ffffff$/);
     });
@@ -173,7 +173,20 @@ describe("css utilities", () => {
       };
       const result = toCSS(gradient);
       expect(result).not.toContain("#ffffff");
-      expect(result).toBe("radial-gradient(circle at 25% 25%, red 0%, transparent 50%)");
+      expect(result).toBe("radial-gradient(circle at 25% 25%, red 0%, rgba(255, 0, 0, 0) 50%)");
+    });
+
+    it("uses zero-alpha stop color instead of transparent to avoid black fringing", () => {
+      const gradient: GradientValue = {
+        type: "mesh",
+        stops: [
+          { id: "1", color: "#ff8800", position: 0, x: 50, y: 50 },
+        ],
+      };
+      const result = toCSS(gradient);
+      // Should use rgba(255, 136, 0, 0) instead of "transparent" (rgba(0,0,0,0))
+      expect(result).toContain("rgba(255, 136, 0, 0) 50%");
+      expect(result).not.toContain("transparent");
     });
 
     it("sorts stops by position before generating CSS", () => {
