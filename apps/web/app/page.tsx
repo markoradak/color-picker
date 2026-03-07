@@ -81,6 +81,35 @@ function QuickPicker() {
   );
 }`;
 
+const TOKENS_EXAMPLE = `import {
+  ColorPicker,
+  ColorPickerArea,
+  ColorPickerHueSlider,
+  ColorPickerInput,
+} from "@markoradak/color-picker";
+
+// Pass named tokens — the input shows a badge when the color matches
+const tokens = {
+  primary: "#3b82f6",
+  danger: "#ef4444",
+  success: "#22c55e",
+  warning: "#f59e0b",
+};
+
+function MyColorPicker() {
+  const [color, setColor] = useState("#3b82f6");
+
+  return (
+    // autoTokens auto-detects CSS custom properties (enabled by default).
+    // Set autoTokens={false} to disable auto-detection and use only manual tokens.
+    <ColorPicker value={color} onValueChange={setColor} tokens={tokens}>
+      <ColorPickerArea />
+      <ColorPickerHueSlider />
+      <ColorPickerInput enableTokenSearch />
+    </ColorPicker>
+  );
+}`;
+
 const FEATURES = [
   {
     title: "Compound Components",
@@ -106,6 +135,11 @@ const FEATURES = [
     title: "Eye Dropper",
     description:
       "Native browser color sampling via the EyeDropper API with graceful fallback when unsupported.",
+  },
+  {
+    title: "Color Tokens",
+    description:
+      "Named color tokens with automatic matching, searchable dropdown, and keyboard navigation. Pass your own tokens or let autoTokens detect CSS custom properties automatically.",
   },
   {
     title: "Preset Swatches",
@@ -146,11 +180,11 @@ const FEATURES = [
 
 
 const API_COMPONENTS = [
-  { name: "ColorPicker", description: "Root provider and context" },
+  { name: "ColorPicker", description: "Root provider and context. Accepts tokens and autoTokens props." },
   { name: "ColorPickerArea", description: "Saturation/brightness 2D area" },
   { name: "ColorPickerHueSlider", description: "Hue selection slider" },
   { name: "ColorPickerAlphaSlider", description: "Opacity slider" },
-  { name: "ColorPickerInput", description: "Color value text input" },
+  { name: "ColorPickerInput", description: "Color value text input with token badge and search" },
   { name: "ColorPickerFormatToggle", description: "HEX/RGB/HSL switcher" },
   { name: "ColorPickerEyeDropper", description: "Native color sampling" },
   { name: "ColorPickerSwatches", description: "Preset color swatches" },
@@ -261,6 +295,17 @@ export default function Home() {
               type switching, and angle controls.
             </p>
             <CodeBlock code={GRADIENT_EXAMPLE} />
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-sm font-semibold">Color Tokens</h3>
+            <p className="mb-4 text-sm text-[#666]">
+              Pass named color tokens to the root provider. The input shows a
+              badge when the current color matches a token and a searchable
+              dropdown to browse all tokens. CSS custom properties are
+              auto-detected by default — set autoTokens={"{false}"} to disable.
+            </p>
+            <CodeBlock code={TOKENS_EXAMPLE} />
           </div>
 
           <div>

@@ -217,6 +217,14 @@ function generatePresetCode(options: PlaygroundOptions, style: StyleMode): strin
   if (options.variant === "popover" && options.triggerMode === "input") {
     props.push(`triggerMode="input"`);
   }
+  if (options.enableTokens) {
+    props.push(`tokens={{ primary: "#3b82f6", danger: "#ef4444", success: "#22c55e" }}`);
+    if (!options.enableTokenSearch) {
+      props.push(`enableTokenSearch={false}`);
+    }
+  } else {
+    props.push(`autoTokens={false}`);
+  }
 
   const propsStr = props.map((p) => `      ${p}`).join("\n");
   const allImports = [importLine, ...extraImports].join("\n");
@@ -296,7 +304,10 @@ function generateComposableCode(options: PlaygroundOptions, style: StyleMode): s
   parts.push(`    <ColorPickerArea${cls} />`);
   parts.push(`    <ColorPickerHueSlider${cls} />`);
   if (options.showAlpha) parts.push(`    <ColorPickerAlphaSlider${cls} />`);
-  if (options.showInput) parts.push(`    <ColorPickerInput${cls} />`);
+  if (options.showInput) {
+    const tokenSearchProp = options.enableTokens && !options.enableTokenSearch ? ` enableTokenSearch={false}` : "";
+    parts.push(`    <ColorPickerInput${cls}${tokenSearchProp} />`);
+  }
   if (options.showEyeDropper) parts.push(`    <ColorPickerEyeDropper${cls} />`);
 
   if (options.showSwatches) {
@@ -310,27 +321,32 @@ function generateComposableCode(options: PlaygroundOptions, style: StyleMode): s
 
   const innerJsx = parts.join("\n");
 
+  const rootExtraProps = options.enableTokens ? " tokens={tokens}" : " autoTokens={false}";
   let jsx: string;
   if (options.variant === "popover") {
     const triggerTag = options.triggerMode === "input"
       ? `<ColorPickerInputTrigger${cls} />`
       : `<ColorPickerTrigger${cls} />`;
-    jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}>
+    jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}${rootExtraProps}>
     ${triggerTag}
     <ColorPickerContent${cls}>
 ${innerJsx}
     </ColorPickerContent>
   </ColorPicker>`;
   } else {
-    jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}>
+    jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}${rootExtraProps}>
 ${innerJsx}
   </ColorPicker>`;
   }
 
+  const tokensConst = options.enableTokens
+    ? `\n  const tokens = { primary: "#3b82f6", danger: "#ef4444", success: "#22c55e" };\n`
+    : "";
+
   return `${importLine}${typeLine}
 
 function MyColorPicker() {
-  ${stateLine}
+  ${stateLine}${tokensConst}
 
   return (
 ${jsx}
@@ -376,12 +392,13 @@ ${I}</ColorPickerAlphaSlider>`);
   }
 
   if (options.showInput) {
+    const tokenSearchProp = options.enableTokens && !options.enableTokenSearch ? `\n${I}  enableTokenSearch={false}` : "";
     parts.push(`${I}<ColorPickerInput
 ${I}  className="${tw.input}"
 ${I}  classNames={{
 ${I}    formatToggle: "${tw.inputFormatToggle}",
 ${I}    field: "${tw.inputField}",
-${I}  }}
+${I}  }}${tokenSearchProp}
 ${I}/>`);
   }
 
@@ -445,7 +462,8 @@ ${I}/>`);
     />`;
     }
 
-    jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}>
+    const rootExtraProps = options.enableTokens ? " tokens={tokens}" : " autoTokens={false}";
+    jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}${rootExtraProps}>
 ${trigger}
     <ColorPickerContent
       className="${tw.content}"
@@ -454,15 +472,20 @@ ${innerJsx}
     </ColorPickerContent>
   </ColorPicker>`;
   } else {
-    jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}>
+    const rootExtraProps = options.enableTokens ? " tokens={tokens}" : " autoTokens={false}";
+    jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}${rootExtraProps}>
 ${innerJsx}
   </ColorPicker>`;
   }
 
+  const tokensConst = options.enableTokens
+    ? `\n  const tokens = { primary: "#3b82f6", danger: "#ef4444", success: "#22c55e" };\n`
+    : "";
+
   return `${importLine}${typeLine}
 
 function MyColorPicker() {
-  ${stateLine}
+  ${stateLine}${tokensConst}
 
   return (
 ${jsx}
@@ -521,7 +544,7 @@ export function PlaygroundClient() {
     showSwatches: true,
     showInput: true,
     enableGradient: true,
-    enableTokens: false,
+    enableTokens: true,
     enableTokenSearch: true,
     swatchColors: DEFAULT_SWATCHES,
   });
@@ -756,7 +779,7 @@ function InlinePicker({
 
   return (
     <div className="w-72">
-      <ColorPicker value={value} onValueChange={onValueChange} tokens={options.enableTokens ? DEMO_TOKENS : undefined}>
+      <ColorPicker value={value} onValueChange={onValueChange} tokens={options.enableTokens ? DEMO_TOKENS : undefined} autoTokens={options.enableTokens ? undefined : false}>
         <div className="flex flex-col gap-[14.4px]">
           {options.enableGradient && (
             <ColorPickerModeSelector className={styles.modeSelector}>
@@ -828,7 +851,7 @@ function PopoverPicker({
   const isGradientMode = typeof value !== "string";
 
   return (
-    <ColorPicker value={value} onValueChange={onValueChange} tokens={options.enableTokens ? DEMO_TOKENS : undefined}>
+    <ColorPicker value={value} onValueChange={onValueChange} tokens={options.enableTokens ? DEMO_TOKENS : undefined} autoTokens={options.enableTokens ? undefined : false}>
       {options.triggerMode === "input" ? (
         <div className="w-72">
           <ColorPickerInputTrigger

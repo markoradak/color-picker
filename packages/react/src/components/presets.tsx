@@ -39,6 +39,7 @@ export function ColorPickerControls({
   enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
+  enableTokenSearch = true,
   swatches,
   swatchColumns = 8,
   gradientSwatches,
@@ -48,6 +49,7 @@ export function ColorPickerControls({
   enableModeSelector?: boolean;
   enableEyeDropper?: boolean;
   enableFormatToggle?: boolean;
+  enableTokenSearch?: boolean;
   swatches?: string[];
   swatchColumns?: number;
   gradientSwatches?: import("../types").GradientValue[];
@@ -118,6 +120,7 @@ export function ColorPickerControls({
           <div className="flex items-center gap-2">
             <ColorPickerInput
               enableFormatToggle={enableFormatToggle}
+              enableTokenSearch={enableTokenSearch}
               className="flex items-center gap-1"
               classNames={{
                 formatToggle: "shrink-0 select-none rounded-md border border-zinc-300 bg-white px-2 h-8 text-xs font-medium outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-700",
@@ -175,6 +178,7 @@ export function ColorPickerPopover({
   enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
+  enableTokenSearch = true,
   swatches,
   swatchColumns = 8,
   gradientSwatches,
@@ -196,6 +200,7 @@ export function ColorPickerPopover({
         <ColorPickerInputTrigger
           enableFormatToggle={enableFormatToggle}
           enableEyeDropper={enableEyeDropper}
+          enableTokenSearch={enableTokenSearch}
           className="inline-flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-1.5 text-left outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
           classNames={{
             thumbnail: "h-7 w-7 shrink-0 rounded-md",
@@ -254,6 +259,7 @@ export function ColorPickerPopover({
           enableModeSelector={enableModeSelector}
           enableEyeDropper={enableEyeDropper}
           enableFormatToggle={enableFormatToggle}
+          enableTokenSearch={enableTokenSearch}
           swatches={swatches}
           swatchColumns={swatchColumns}
           gradientSwatches={gradientSwatches}
@@ -279,6 +285,7 @@ export function ColorPickerInline({
   enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
+  enableTokenSearch = true,
   swatches,
   swatchColumns = 8,
   gradientSwatches,
@@ -310,6 +317,7 @@ export function ColorPickerInline({
           enableModeSelector={enableModeSelector}
           enableEyeDropper={enableEyeDropper}
           enableFormatToggle={enableFormatToggle}
+          enableTokenSearch={enableTokenSearch}
           swatches={swatches}
           swatchColumns={swatchColumns}
           gradientSwatches={gradientSwatches}

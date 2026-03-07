@@ -321,6 +321,8 @@ export interface ColorPickerPresetProps {
   enableEyeDropper?: boolean;
   /** Show the color format toggle button. Default: true */
   enableFormatToggle?: boolean;
+  /** Show the type-to-filter search in the token dropdown. Default: true */
+  enableTokenSearch?: boolean;
   /** Map of semantic token names to color values. Token names can be used as `value`. */
   tokens?: ColorTokens;
   /** Auto-detect CSS custom property color tokens. Default: true (detect all). Set to false to disable, or { prefix: "--brand-" } to filter. */
