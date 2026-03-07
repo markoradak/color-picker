@@ -210,7 +210,6 @@ function generatePresetCode(options: PlaygroundOptions, style: StyleMode): strin
   if (!options.enableGradient) props.push("enableGradient={false}");
   if (!options.showAlpha) props.push("enableAlpha={false}");
   if (!options.showEyeDropper) props.push("enableEyeDropper={false}");
-  if (!options.showInput) props.push("enableFormatToggle={false}");
   if (!options.showSwatches) {
     props.push(`enableSwatches={false}`);
   }
@@ -226,11 +225,18 @@ function generatePresetCode(options: PlaygroundOptions, style: StyleMode): strin
   const propsStr = props.map((p) => `      ${p}`).join("\n");
   const allImports = [importLine, ...extraImports].join("\n");
 
+  // When showInput is off, add a comment in the generated code explaining
+  // that preset components always render the input and the composable API
+  // should be used to omit it.
+  const inputComment = !options.showInput
+    ? `\n  // Preset components always include the input.\n  // Use the composable API to omit <ColorPickerInput /> entirely.\n`
+    : "";
+
   return `${allImports}${typeLine}
 
 function MyColorPicker() {
   ${stateLine}
-
+${inputComment}
   return (
     <${component}
 ${propsStr}

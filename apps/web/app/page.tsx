@@ -13,7 +13,6 @@ const COMPOUND_EXAMPLE = `import {
   ColorPickerInput,
   ColorPickerEyeDropper,
   ColorPickerModeSelector,
-  ColorPickerGradientEditor,
   ColorPickerTrigger,
   ColorPickerContent,
 } from "@markoradak/color-picker";
@@ -178,26 +177,42 @@ const FEATURES = [
 
 const API_COMPONENTS = [
   { name: "ColorPicker", description: "Root provider and context. Accepts tokens and autoTokens props." },
+  { name: "ColorPickerProvider", description: "Headless provider without Radix Popover (for custom layouts)" },
+  { name: "ColorPickerTrigger", description: "Popover trigger button" },
+  { name: "ColorPickerInputTrigger", description: "Input-style trigger with inline editing" },
+  { name: "ColorPickerContent", description: "Popover content wrapper" },
   { name: "ColorPickerArea", description: "Saturation/brightness 2D area" },
   { name: "ColorPickerHueSlider", description: "Hue selection slider" },
   { name: "ColorPickerAlphaSlider", description: "Opacity slider" },
   { name: "ColorPickerInput", description: "Color value text input with token badge and search" },
-  { name: "ColorPickerFormatToggle", description: "HEX/RGB/HSL switcher" },
-  { name: "ColorPickerEyeDropper", description: "Native color sampling" },
-  { name: "ColorPickerSwatches", description: "Preset color swatches" },
-  { name: "ColorPickerTrigger", description: "Popover trigger button" },
-  { name: "ColorPickerInputTrigger", description: "Input-style trigger" },
-  { name: "ColorPickerContent", description: "Popover content wrapper" },
-  { name: "ColorPickerModeSelector", description: "Solid/gradient toggle" },
-  {
-    name: "ColorPickerGradientEditor",
-    description: "Gradient preview and stop editor",
-  },
-  {
-    name: "ColorPickerGradientSwatches",
-    description: "Preset gradient swatches",
-  },
-  { name: "GradientPreview", description: "Standalone gradient preview" },
+  { name: "ColorPickerFormatToggle", description: "HEX/RGB/HSL format switcher" },
+  { name: "ColorPickerEyeDropper", description: "Native color sampling via the EyeDropper API" },
+  { name: "ColorPickerSwatches", description: "Preset color swatches grid" },
+  { name: "ColorPickerModeSelector", description: "Solid/gradient mode toggle" },
+  { name: "ColorPickerGradientEditor", description: "Gradient preview and stop editor" },
+  { name: "ColorPickerGradientSwatches", description: "Preset gradient swatches grid" },
+  { name: "ColorPickerControls", description: "Pre-composed controls for use inside presets" },
+  { name: "GradientPreview", description: "Standalone gradient preview component" },
+  { name: "GradientStops", description: "Standalone gradient stop dots" },
+  { name: "TokenList", description: "Searchable token dropdown list" },
+];
+
+const API_HOOKS = [
+  { name: "useColorPicker", description: "Core color picker state management hook" },
+  { name: "useGradient", description: "Gradient editor state management hook" },
+  { name: "useColorPickerContext", description: "Access color picker context from any child component" },
+  { name: "usePointerDrag", description: "Pointer drag interaction hook for custom controls" },
+  { name: "useAutoTokens", description: "Auto-detect CSS custom property color tokens" },
+];
+
+const API_UTILITIES = [
+  { name: "toCSS", description: "Convert a ColorPickerValue to a CSS string" },
+  { name: "fromCSS", description: "Parse a CSS color or gradient string into a ColorPickerValue" },
+  { name: "isGradient / isSolidColor", description: "Type guards for narrowing ColorPickerValue" },
+  { name: "parseColor / formatColor", description: "Parse and format colors between HEX, RGB, and HSL" },
+  { name: "toHSVA / fromHSVA", description: "Convert between color strings and internal HSVA representation" },
+  { name: "createGradientStop / addStop / removeStop", description: "Gradient stop manipulation helpers" },
+  { name: "createDefaultGradient", description: "Create a default gradient value by type" },
 ];
 
 export default function Home() {
@@ -320,8 +335,10 @@ export default function Home() {
       <hr className="border-[#e5e5e5] dark:border-[#2a2a2a]" />
       <section className="py-16 sm:py-24">
         <h2 className="mb-10 text-xl font-bold sm:text-2xl">
-          Component Reference
+          API Reference
         </h2>
+
+        <h3 className="mb-4 text-sm font-semibold">Components</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -338,6 +355,52 @@ export default function Home() {
                 >
                   <td className="py-2.5 pr-8 font-medium">{c.name}</td>
                   <td className="py-2.5 text-[#666]">{c.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className="mb-4 mt-10 text-sm font-semibold">Hooks</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#e5e5e5] text-left dark:border-[#2a2a2a]">
+                <th className="pb-3 pr-8 font-semibold">Hook</th>
+                <th className="pb-3 font-semibold">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {API_HOOKS.map((h) => (
+                <tr
+                  key={h.name}
+                  className="border-b border-[#e5e5e5] dark:border-[#2a2a2a]"
+                >
+                  <td className="py-2.5 pr-8 font-medium">{h.name}</td>
+                  <td className="py-2.5 text-[#666]">{h.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h3 className="mb-4 mt-10 text-sm font-semibold">Utilities</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#e5e5e5] text-left dark:border-[#2a2a2a]">
+                <th className="pb-3 pr-8 font-semibold">Utility</th>
+                <th className="pb-3 font-semibold">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {API_UTILITIES.map((u) => (
+                <tr
+                  key={u.name}
+                  className="border-b border-[#e5e5e5] dark:border-[#2a2a2a]"
+                >
+                  <td className="py-2.5 pr-8 font-medium">{u.name}</td>
+                  <td className="py-2.5 text-[#666]">{u.description}</td>
                 </tr>
               ))}
             </tbody>
