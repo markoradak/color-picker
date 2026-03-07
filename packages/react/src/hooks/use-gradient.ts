@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GradientValue } from "../types";
 import {
   addStop,
@@ -28,9 +28,17 @@ export function useGradient(options: UseGradientOptions) {
   }
   const gradient = value ?? defaultGradientRef.current;
 
+  // Keep a ref to the current gradient so callbacks can read the latest
+  // value without listing `gradient` in their dependency arrays. This
+  // prevents all callbacks from getting new references on every render.
+  const gradientRef = useRef(gradient);
+  gradientRef.current = gradient;
+
   const [activeStopId, setActiveStopId] = useState<string | null>(
     gradient.stops[0]?.id ?? null
   );
+  const activeStopIdRef = useRef(activeStopId);
+  activeStopIdRef.current = activeStopId;
 
   // When the parent replaces the gradient (e.g., selecting a swatch),
   // the new stops have different IDs. Detect stale activeStopId and reset.
@@ -48,106 +56,107 @@ export function useGradient(options: UseGradientOptions) {
     [onValueChange]
   );
 
+  // All callbacks read from gradientRef.current instead of closing over
+  // `gradient`, so their references remain stable across renders.
   const handleAddStop = useCallback(
     (color: string, position: number) => {
-      const updated = addStop(gradient, color, position);
+      const g = gradientRef.current;
+      const updated = addStop(g, color, position);
       update(updated);
-      // Select the newly added stop
       const newStop = updated.stops.find(
-        (s) => !gradient.stops.some((gs) => gs.id === s.id)
+        (s) => !g.stops.some((gs) => gs.id === s.id)
       );
       if (newStop) {
         setActiveStopId(newStop.id);
       }
     },
-    [gradient, update]
+    [update]
   );
 
   const handleAddStopWithCoordinates = useCallback(
     (color: string, position: number, x: number, y: number) => {
-      const updated = addStopWithCoordinates(gradient, color, position, x, y);
+      const g = gradientRef.current;
+      const updated = addStopWithCoordinates(g, color, position, x, y);
       update(updated);
-      // Select the newly added stop
       const newStop = updated.stops.find(
-        (s) => !gradient.stops.some((gs) => gs.id === s.id)
+        (s) => !g.stops.some((gs) => gs.id === s.id)
       );
       if (newStop) {
         setActiveStopId(newStop.id);
       }
     },
-    [gradient, update]
+    [update]
   );
 
   const handleRemoveStop = useCallback(
     (stopId: string) => {
-      const updated = removeStop(gradient, stopId);
+      const updated = removeStop(gradientRef.current, stopId);
       update(updated);
-      // If we removed the active stop, select the first one
-      if (activeStopId === stopId) {
+      if (activeStopIdRef.current === stopId) {
         setActiveStopId(updated.stops[0]?.id ?? null);
       }
     },
-    [gradient, update, activeStopId]
+    [update]
   );
 
   const updateStopColor = useCallback(
     (stopId: string, color: string) => {
-      const updated = updateStop(gradient, stopId, { color });
+      const updated = updateStop(gradientRef.current, stopId, { color });
       update(updated);
     },
-    [gradient, update]
+    [update]
   );
 
   const updateStopPosition = useCallback(
     (stopId: string, position: number) => {
-      const updated = updateStop(gradient, stopId, { position });
+      const updated = updateStop(gradientRef.current, stopId, { position });
       update(updated);
     },
-    [gradient, update]
+    [update]
   );
 
   const updateStopCoordinates = useCallback(
     (stopId: string, x: number, y: number) => {
-      const updated = updateStop(gradient, stopId, { x, y });
+      const updated = updateStop(gradientRef.current, stopId, { x, y });
       update(updated);
     },
-    [gradient, update]
+    [update]
   );
 
   const setGradientType = useCallback(
     (type: GradientValue["type"]) => {
-      update({ ...gradient, type, startPoint: undefined, endPoint: undefined });
+      update({ ...gradientRef.current, type, startPoint: undefined, endPoint: undefined });
     },
-    [gradient, update]
+    [update]
   );
 
   const setAngle = useCallback(
     (angle: number) => {
-      update({ ...gradient, angle, startPoint: undefined, endPoint: undefined });
+      update({ ...gradientRef.current, angle, startPoint: undefined, endPoint: undefined });
     },
-    [gradient, update]
+    [update]
   );
 
   const setCenter = useCallback(
     (centerX: number, centerY: number) => {
-      update({ ...gradient, centerX, centerY, startPoint: undefined, endPoint: undefined });
+      update({ ...gradientRef.current, centerX, centerY, startPoint: undefined, endPoint: undefined });
     },
-    [gradient, update]
+    [update]
   );
 
   const setBaseColor = useCallback(
     (color: string) => {
-      update({ ...gradient, baseColor: color });
+      update({ ...gradientRef.current, baseColor: color });
     },
-    [gradient, update]
+    [update]
   );
 
   const handleMoveStop = useCallback(
     (stopId: string, direction: "forward" | "backward" | "front" | "back") => {
-      const updated = moveStopUtil(gradient, stopId, direction);
+      const updated = moveStopUtil(gradientRef.current, stopId, direction);
       update(updated);
     },
-    [gradient, update]
+    [update]
   );
 
   const replaceGradient = useCallback(
@@ -159,11 +168,11 @@ export function useGradient(options: UseGradientOptions) {
 
   const activeStop = gradient.stops.find((s) => s.id === activeStopId) ?? null;
 
-  return {
+  return useMemo(() => ({
     gradient,
     activeStopId,
     activeStop,
-    setActiveStopId: setActiveStopId,
+    setActiveStopId,
     addStop: handleAddStop,
     addStopWithCoordinates: handleAddStopWithCoordinates,
     removeStop: handleRemoveStop,
@@ -176,5 +185,11 @@ export function useGradient(options: UseGradientOptions) {
     setBaseColor,
     moveStop: handleMoveStop,
     replaceGradient,
-  };
+  }), [
+    gradient, activeStopId, activeStop,
+    handleAddStop, handleAddStopWithCoordinates, handleRemoveStop,
+    updateStopColor, updateStopPosition, updateStopCoordinates,
+    setGradientType, setAngle, setCenter, setBaseColor,
+    handleMoveStop, replaceGradient,
+  ]);
 }

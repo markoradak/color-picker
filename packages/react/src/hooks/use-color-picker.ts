@@ -174,7 +174,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
     [cssValue, tokenReverseMap]
   );
 
-  return {
+  return useMemo(() => ({
     value: currentValue,
     hsva,
     format,
@@ -191,5 +191,9 @@ export function useColorPicker(options: UseColorPickerOptions) {
     updateValue,
     matchedToken,
     tokens,
-  };
+  }), [
+    currentValue, hsva, format, formattedValue, cssValue, isGradientMode,
+    setHue, setSaturationValue, setAlpha, setColorFromString, syncHSVA,
+    setFormat, toggleFormat, updateValue, matchedToken, tokens,
+  ]);
 }
