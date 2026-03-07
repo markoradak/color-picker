@@ -320,6 +320,11 @@
   opacity: 1;
 }
 
+[data-cp-part="eye-dropper"] [data-cp-el="check"] {
+  width: 1rem;
+  height: 1rem;
+}
+
 [data-cp-part="eye-dropper"]:hover:not(:disabled) {
   background-color: var(--cp-hover-bg);
 }

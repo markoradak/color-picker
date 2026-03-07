@@ -257,6 +257,7 @@ export interface ColorPickerInputTriggerProps {
     eyeDropper?: string;
     eyeDropperIcon?: string;
     eyeDropperSpinner?: string;
+    eyeDropperCheck?: string;
     tokenBadge?: string;
     tokenIcon?: string;
     tokenSearch?: string;

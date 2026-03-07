@@ -59,6 +59,7 @@ export const styles = {
   eyeDropperClassNames: {
     icon: "h-3.5 w-3.5",
     spinner: "h-3.5 w-3.5 animate-spin",
+    check: "h-3.5 w-3.5",
   },
 
   swatches: "gap-1",
@@ -107,6 +108,7 @@ export const styles = {
       "inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded opacity-60 outline-none hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30",
     eyeDropperIcon: "h-3 w-3",
     eyeDropperSpinner: "h-3 w-3 animate-spin",
+    eyeDropperCheck: "h-3 w-3",
     tokenBadge:
       "right-1.5 top-1/2 -translate-y-1/2 cursor-pointer outline-none transition-[opacity,transform] duration-150 data-[matched]:select-none data-[matched]:rounded-full data-[matched]:border data-[matched]:border-zinc-300 data-[matched]:bg-zinc-100 data-[matched]:px-1.5 data-[matched]:py-0.5 data-[matched]:text-[10px] data-[matched]:font-medium data-[matched]:leading-none data-[matched]:dark:border-zinc-600 data-[matched]:dark:bg-zinc-700 data-[matched]:dark:text-zinc-100 not-data-[matched]:opacity-60 not-data-[matched]:hover:opacity-100 data-[editing]:opacity-20 data-[editing]:hover:opacity-80",
     tokenIcon: "h-3.5 w-3.5",
