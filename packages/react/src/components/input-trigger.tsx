@@ -88,7 +88,7 @@ export function ColorPickerInputTrigger({
     } else {
       setInputValue(formattedValue);
     }
-  }, [inputValue, formattedValue, setColorFromString]);
+  }, [inputValue, formattedValue, setColorFromString, tokens]);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

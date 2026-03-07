@@ -57,7 +57,7 @@ export const ColorPickerInput = forwardRef<
       // Revert to last valid value
       setInputValue(formattedValue);
     }
-  }, [inputValue, formattedValue, setColorFromString]);
+  }, [inputValue, formattedValue, setColorFromString, tokens]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

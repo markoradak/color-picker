@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { GradientValue } from "../types";
 import {
   addStop,
@@ -34,13 +34,12 @@ export function useGradient(options: UseGradientOptions) {
 
   // When the parent replaces the gradient (e.g., selecting a swatch),
   // the new stops have different IDs. Detect stale activeStopId and reset.
-  const prevValueRef = useRef(value);
-  if (value !== prevValueRef.current) {
-    prevValueRef.current = value;
+  // Uses useEffect (not render-phase mutation) for Concurrent Mode safety.
+  useEffect(() => {
     if (value && !value.stops.some((s) => s.id === activeStopId)) {
       setActiveStopId(value.stops[0]?.id ?? null);
     }
-  }
+  }, [value, activeStopId]);
 
   const update = useCallback(
     (newGradient: GradientValue) => {

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AutoTokensConfig, ColorFormat, ColorPickerValue, ColorTokens, HSVA } from "../types";
 import { detectFormat, formatColor, fromHSVA, isValidColor, resolveToken, toHSVA } from "../utils/color";
 import { isGradient } from "../utils/css";
@@ -42,29 +42,34 @@ export function useColorPicker(options: UseColorPickerOptions) {
     return detectFormat(resolved);
   });
 
-  // Track whether the current value change was initiated internally.
-  // When we update HSVA via setHue/setSaturationValue/setAlpha, the hex
-  // round-trip (HSVA→hex→HSVA) can lose hue information at s=0 or v=0.
-  // We skip the controlled-value HSVA sync for our own updates.
-  const isInternalUpdateRef = useRef(false);
+  // Track the expected next controlled value to skip HSVA sync for our own
+  // updates. When we update HSVA via setHue/setSaturationValue/setAlpha, the
+  // hex round-trip (HSVA→hex→HSVA) can lose hue information at s=0 or v=0.
+  // Storing the expected value (not just a boolean flag) provides precise
+  // identity matching and avoids misattribution in batched React flushes.
+  const expectedNextValueRef = useRef<ColorPickerValue | null>(null);
 
-  // Sync external controlled value to internal HSVA
-  const prevControlledRef = useRef(controlledValue);
-  if (controlledValue !== prevControlledRef.current) {
-    prevControlledRef.current = controlledValue;
-    if (isInternalUpdateRef.current) {
-      // Skip HSVA sync for our own updates — HSVA is already correct
-      isInternalUpdateRef.current = false;
-    } else if (typeof controlledValue === "string") {
+  // Sync external controlled value to internal HSVA.
+  // Uses useEffect (not render-phase mutation) for Concurrent Mode safety —
+  // renders can be discarded, so state mutations must happen in effects.
+  useEffect(() => {
+    if (controlledValue === undefined) return;
+    if (controlledValue === expectedNextValueRef.current) {
+      // This change came from our own updateValue — HSVA is already correct
+      expectedNextValueRef.current = null;
+      return;
+    }
+    expectedNextValueRef.current = null;
+    if (typeof controlledValue === "string") {
       const newHSVA = toHSVA(resolveToken(controlledValue, tokens));
       hsvaRef.current = newHSVA;
       setHSVA(newHSVA);
     }
-  }
+  }, [controlledValue, tokens]);
 
   const updateValue = useCallback(
     (newValue: ColorPickerValue) => {
-      isInternalUpdateRef.current = true;
+      expectedNextValueRef.current = newValue;
       if (!isControlled) {
         setInternalValue(newValue);
       }
