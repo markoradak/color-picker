@@ -66,7 +66,7 @@ export function useTokenDropdown({
       const target = e.target as Node;
       if (
         tokenDropdownRef.current?.contains(target) ||
-        (target as Element).closest?.('[data-cp-el="token-search"]') ||
+        tokenSearchWrapperRef.current?.contains(target) ||
         tokenBadgeRef.current?.contains(target)
       ) {
         return;

@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { ColorPickerEyeDropperProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 
@@ -50,6 +50,10 @@ export const ColorPickerEyeDropper = forwardRef<
   const [showCheck, setShowCheck] = useState(false);
   const checkTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const supported = useEyeDropperSupported();
+
+  useEffect(() => {
+    return () => clearTimeout(checkTimerRef.current);
+  }, []);
 
   const handleClick = useCallback(async () => {
     if (disabled || !supported) return;

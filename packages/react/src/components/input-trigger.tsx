@@ -131,6 +131,10 @@ export function ColorPickerInputTrigger({
   const [showCheck, setShowCheck] = useState(false);
   const checkTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  useEffect(() => {
+    return () => clearTimeout(checkTimerRef.current);
+  }, []);
+
   const handleEyeDropper = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -238,7 +242,6 @@ export function ColorPickerInputTrigger({
           disabled={disabled}
           aria-label="Open color picker"
           tabIndex={-1}
-          className="sr-only"
           style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", borderWidth: 0 }}
         />
 
