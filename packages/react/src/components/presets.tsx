@@ -24,6 +24,18 @@ import { ColorPickerGradientEditor } from "./gradient-editor";
 import { ColorPickerModeSelector, ColorPickerModeSelectorItem } from "./mode-selector";
 import { ColorPickerGradientSwatches, ColorPickerGradientSwatch } from "./gradient-swatches";
 
+/** Default preset swatches shown when no `swatches` prop is provided. */
+const DEFAULT_PRESET_SWATCHES = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#06b6d4",
+  "#3b82f6",
+  "#8b5cf6",
+  "#ec4899",
+];
+
 /**
  * Shared inner controls rendered by both popover and inline presets.
  * Conditionally renders each section based on the enable* flags.
@@ -35,12 +47,13 @@ import { ColorPickerGradientSwatches, ColorPickerGradientSwatch } from "./gradie
  */
 export function ColorPickerControls({
   enableAlpha = true,
-  enableGradient = false,
+  enableGradient = true,
   enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
   enableTokenSearch = true,
-  swatches,
+  enableSwatches = true,
+  swatches = DEFAULT_PRESET_SWATCHES,
   swatchColumns = 8,
   gradientSwatches,
 }: {
@@ -50,6 +63,7 @@ export function ColorPickerControls({
   enableEyeDropper?: boolean;
   enableFormatToggle?: boolean;
   enableTokenSearch?: boolean;
+  enableSwatches?: boolean;
   swatches?: string[];
   swatchColumns?: number;
   gradientSwatches?: import("../types").GradientValue[];
@@ -85,7 +99,7 @@ export function ColorPickerControls({
               popoverContent: "z-50 flex w-80 flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
             }}
           />
-          {gradientSwatches && gradientSwatches.length > 0 && (
+          {enableSwatches && gradientSwatches && gradientSwatches.length > 0 && (
             <ColorPickerGradientSwatches
               values={gradientSwatches}
               className="mt-0.5 gap-1"
@@ -141,7 +155,7 @@ export function ColorPickerControls({
               />
             )}
           </div>
-          {swatches && swatches.length > 0 && (
+          {enableSwatches && swatches && swatches.length > 0 && (
             <ColorPickerSwatches
               values={swatches}
               columns={swatchColumns}
@@ -174,12 +188,13 @@ export function ColorPickerPopover({
   defaultValue,
   disabled = false,
   enableAlpha = true,
-  enableGradient = false,
+  enableGradient = true,
   enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
   enableTokenSearch = true,
-  swatches,
+  enableSwatches = true,
+  swatches = DEFAULT_PRESET_SWATCHES,
   swatchColumns = 8,
   gradientSwatches,
   tokens,
@@ -260,6 +275,7 @@ export function ColorPickerPopover({
           enableEyeDropper={enableEyeDropper}
           enableFormatToggle={enableFormatToggle}
           enableTokenSearch={enableTokenSearch}
+          enableSwatches={enableSwatches}
           swatches={swatches}
           swatchColumns={swatchColumns}
           gradientSwatches={gradientSwatches}
@@ -281,12 +297,13 @@ export function ColorPickerInline({
   defaultValue,
   disabled = false,
   enableAlpha = true,
-  enableGradient = false,
+  enableGradient = true,
   enableModeSelector,
   enableEyeDropper = true,
   enableFormatToggle = true,
   enableTokenSearch = true,
-  swatches,
+  enableSwatches = true,
+  swatches = DEFAULT_PRESET_SWATCHES,
   swatchColumns = 8,
   gradientSwatches,
   tokens,
@@ -318,6 +335,7 @@ export function ColorPickerInline({
           enableEyeDropper={enableEyeDropper}
           enableFormatToggle={enableFormatToggle}
           enableTokenSearch={enableTokenSearch}
+          enableSwatches={enableSwatches}
           swatches={swatches}
           swatchColumns={swatchColumns}
           gradientSwatches={gradientSwatches}

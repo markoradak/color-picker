@@ -313,7 +313,7 @@ export interface ColorPickerPresetProps {
   disabled?: boolean;
   /** Show alpha/opacity slider. Default: true */
   enableAlpha?: boolean;
-  /** Show the gradient editor controls (only when value is a GradientValue). Default: false */
+  /** Show the gradient editor controls (only when value is a GradientValue). Default: true */
   enableGradient?: boolean;
   /** Show the solid/gradient mode selector. Default: true when enableGradient is true */
   enableModeSelector?: boolean;
@@ -327,7 +327,9 @@ export interface ColorPickerPresetProps {
   tokens?: ColorTokens;
   /** Auto-detect CSS custom property color tokens. Default: true (detect all). Set to false to disable, or { prefix: "--brand-" } to filter. */
   autoTokens?: AutoTokensConfig;
-  /** Preset swatch colors to display (solid mode) */
+  /** Show preset swatches. Default: true */
+  enableSwatches?: boolean;
+  /** Preset swatch colors to display (solid mode). Defaults to a built-in palette when omitted. */
   swatches?: string[];
   /** Number of columns for the swatch grid. Default: 8 */
   swatchColumns?: number;

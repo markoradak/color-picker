@@ -74,9 +74,6 @@ function QuickPicker() {
     <ColorPickerInline
       value={color}
       onValueChange={setColor}
-      enableGradient
-      enableAlpha
-      swatches={["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"]}
     />
   );
 }`;

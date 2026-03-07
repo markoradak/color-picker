@@ -207,23 +207,20 @@ function generatePresetCode(options: PlaygroundOptions, style: StyleMode): strin
     `onValueChange={${setterVar}}`,
   ];
 
-  if (options.enableGradient) props.push("enableGradient");
+  if (!options.enableGradient) props.push("enableGradient={false}");
   if (!options.showAlpha) props.push("enableAlpha={false}");
   if (!options.showEyeDropper) props.push("enableEyeDropper={false}");
   if (!options.showInput) props.push("enableFormatToggle={false}");
-  if (options.showSwatches) {
-    props.push(`swatches={["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"]}`);
+  if (!options.showSwatches) {
+    props.push(`enableSwatches={false}`);
   }
   if (options.variant === "popover" && options.triggerMode === "input") {
     props.push(`triggerMode="input"`);
   }
-  if (options.enableTokens) {
-    props.push(`tokens={{ primary: "#3b82f6", danger: "#ef4444", success: "#22c55e" }}`);
-    if (!options.enableTokenSearch) {
-      props.push(`enableTokenSearch={false}`);
-    }
-  } else {
+  if (!options.enableTokens) {
     props.push(`autoTokens={false}`);
+  } else if (!options.enableTokenSearch) {
+    props.push(`enableTokenSearch={false}`);
   }
 
   const propsStr = props.map((p) => `      ${p}`).join("\n");
@@ -321,7 +318,7 @@ function generateComposableCode(options: PlaygroundOptions, style: StyleMode): s
 
   const innerJsx = parts.join("\n");
 
-  const rootExtraProps = options.enableTokens ? " tokens={tokens}" : " autoTokens={false}";
+  const rootExtraProps = options.enableTokens ? "" : " autoTokens={false}";
   let jsx: string;
   if (options.variant === "popover") {
     const triggerTag = options.triggerMode === "input"
@@ -339,14 +336,10 @@ ${innerJsx}
   </ColorPicker>`;
   }
 
-  const tokensConst = options.enableTokens
-    ? `\n  const tokens = { primary: "#3b82f6", danger: "#ef4444", success: "#22c55e" };\n`
-    : "";
-
   return `${importLine}${typeLine}
 
 function MyColorPicker() {
-  ${stateLine}${tokensConst}
+  ${stateLine}
 
   return (
 ${jsx}
@@ -413,8 +406,8 @@ ${I}/>`);
   }
 
   if (options.showSwatches) {
-    parts.push(`${I}<ColorPickerSwatches values={["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"]} className="${tw.swatches}">
-${I}  {colors.map((c) => (
+    parts.push(`${I}<ColorPickerSwatches values={swatches} className="${tw.swatches}">
+${I}  {swatches.map((c) => (
 ${I}    <ColorPickerSwatch key={c} value={c} className="${tw.swatch}" />
 ${I}  ))}
 ${I}</ColorPickerSwatches>`);
@@ -462,7 +455,7 @@ ${I}/>`);
     />`;
     }
 
-    const rootExtraProps = options.enableTokens ? " tokens={tokens}" : " autoTokens={false}";
+    const rootExtraProps = options.enableTokens ? "" : " autoTokens={false}";
     jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}${rootExtraProps}>
 ${trigger}
     <ColorPickerContent
@@ -472,20 +465,20 @@ ${innerJsx}
     </ColorPickerContent>
   </ColorPicker>`;
   } else {
-    const rootExtraProps = options.enableTokens ? " tokens={tokens}" : " autoTokens={false}";
+    const rootExtraProps = options.enableTokens ? "" : " autoTokens={false}";
     jsx = `  <ColorPicker value={${valueVar}} onValueChange={${setterVar}}${rootExtraProps}>
 ${innerJsx}
   </ColorPicker>`;
   }
 
-  const tokensConst = options.enableTokens
-    ? `\n  const tokens = { primary: "#3b82f6", danger: "#ef4444", success: "#22c55e" };\n`
+  const swatchConst = options.showSwatches
+    ? `\n  const swatches = ["#ef4444", "#22c55e", "#3b82f6", "#8b5cf6"];\n`
     : "";
 
   return `${importLine}${typeLine}
 
 function MyColorPicker() {
-  ${stateLine}${tokensConst}
+  ${stateLine}${swatchConst}
 
   return (
 ${jsx}
