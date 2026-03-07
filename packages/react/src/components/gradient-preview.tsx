@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { useColorPickerContext } from "./color-picker-context";
 import { ColorPickerProvider } from "./color-picker-provider";
@@ -127,7 +127,10 @@ function positionFromCoords(
  * Renders the gradient as a CSS background on a square element, with
  * absolutely positioned dots for each gradient stop.
  */
-export function GradientPreview({ className, classNames }: GradientPreviewProps) {
+export const GradientPreview = forwardRef<
+  HTMLDivElement,
+  GradientPreviewProps
+>(function GradientPreview({ className, classNames, ...rest }, ref) {
   const { gradient: gradientCtx, disabled, swatches } = useColorPickerContext();
   const {
     gradient: gradientValue,
@@ -417,10 +420,12 @@ export function GradientPreview({ className, classNames }: GradientPreviewProps)
 
   return (
     <div
+      ref={ref}
       data-cp-part="gradient-preview"
       data-disabled={disabled ? "" : undefined}
+      {...rest}
       className={className}
-      style={{ position: "relative" }}
+      style={{ position: "relative", ...rest.style }}
     >
       {/* Checkerboard background for alpha visibility */}
       <div
@@ -624,4 +629,4 @@ export function GradientPreview({ className, classNames }: GradientPreviewProps)
       )}
     </div>
   );
-}
+});

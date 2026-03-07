@@ -18,19 +18,27 @@ const DEFAULT_SWATCH_COLORS = [
  * Individual color swatch button.
  * Reads context for active state and renders a checkmark when matched.
  */
-export function ColorPickerSwatch({ value, className, style }: ColorPickerSwatchProps) {
+export const ColorPickerSwatch = forwardRef<
+  HTMLButtonElement,
+  ColorPickerSwatchProps
+>(function ColorPickerSwatch({ value, className, style, onClick, ...rest }, ref) {
   const { hsva, setColorFromString, disabled } = useColorPickerContext();
   const currentColor = fromHSVA(hsva).toLowerCase();
   const isActive = value.toLowerCase() === currentColor;
   const checkColor = getContrastColor(value);
 
-  const handleClick = useCallback(() => {
-    if (disabled) return;
-    setColorFromString(value);
-  }, [value, setColorFromString, disabled]);
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled) return;
+      setColorFromString(value);
+      onClick?.(e);
+    },
+    [value, setColorFromString, disabled, onClick]
+  );
 
   return (
     <button
+      ref={ref}
       type="button"
       onClick={handleClick}
       disabled={disabled}
@@ -38,6 +46,7 @@ export function ColorPickerSwatch({ value, className, style }: ColorPickerSwatch
       aria-pressed={isActive}
       data-cp-el="swatch"
       data-active={isActive ? "" : undefined}
+      {...rest}
       className={className}
       style={{ ...style, backgroundColor: value }}
     >
@@ -58,7 +67,7 @@ export function ColorPickerSwatch({ value, className, style }: ColorPickerSwatch
       )}
     </button>
   );
-}
+});
 
 /**
  * Grid of preset color swatch buttons.
@@ -78,6 +87,7 @@ export const ColorPickerSwatches = forwardRef<
   className,
   swatchClassName,
   children,
+  ...rest
 }, ref) {
   const { disabled, setSwatches } = useColorPickerContext();
 
@@ -93,10 +103,12 @@ export const ColorPickerSwatches = forwardRef<
       aria-label="Color swatches"
       data-cp-part="swatches"
       data-disabled={disabled ? "" : undefined}
+      {...rest}
       className={className}
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
+        ...rest.style,
       }}
     >
       {children ?? values.map((color) => (

@@ -27,66 +27,71 @@ function getActiveMode(value: unknown): ColorPickerMode {
  * Individual mode selector button.
  * Reads context for active state and handles mode transitions.
  */
-export function ColorPickerModeSelectorItem({ value: mode, className }: ColorPickerModeSelectorItemProps) {
+export const ColorPickerModeSelectorItem = forwardRef<
+  HTMLButtonElement,
+  ColorPickerModeSelectorItemProps
+>(function ColorPickerModeSelectorItem({ value: mode, className, onClick, ...rest }, ref) {
   const { value, hsva, disabled, gradient, updateValue } = useColorPickerContext();
   const activeMode = getActiveMode(value);
   const isActive = mode === activeMode;
 
   const label = MODES.find((m) => m.value === mode)?.label ?? mode;
 
-  const handleClick = () => {
-    if (mode === activeMode) return;
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (mode !== activeMode) {
+        if (mode === "solid") {
+          // Gradient -> Solid: extract color from active stop or first stop
+          if (isGradient(value as string | GradientValue)) {
+            const grad = value as GradientValue;
+            const stop = gradient.activeStop ?? grad.stops[0];
+            updateValue(stop?.color ?? fromHSVA(hsva));
+          }
+        } else if (activeMode === "solid") {
+          // Solid -> Gradient: create gradient using current color
+          const currentColor = fromHSVA(hsva);
+          updateValue(createDefaultGradientFromColor(mode, currentColor));
+        } else {
+          // Gradient A -> Gradient B: change type, keep stops
+          if (isGradient(value as string | GradientValue)) {
+            const grad = value as GradientValue;
+            const updated: GradientValue = { ...grad, type: mode };
 
-    if (mode === "solid") {
-      // Gradient -> Solid: extract color from active stop or first stop
-      if (isGradient(value as string | GradientValue)) {
-        const grad = value as GradientValue;
-        const stop = gradient.activeStop ?? grad.stops[0];
-        updateValue(stop?.color ?? fromHSVA(hsva));
+            if (mode === "linear" || mode === "conic") {
+              updated.angle = updated.angle ?? (mode === "linear" ? 90 : 0);
+            }
+            if (mode === "radial" || mode === "conic") {
+              updated.centerX = updated.centerX ?? 50;
+              updated.centerY = updated.centerY ?? 50;
+            }
+
+            updateValue(updated);
+          }
+        }
       }
-      return;
-    }
-
-    if (activeMode === "solid") {
-      // Solid -> Gradient: create gradient using current color
-      const currentColor = fromHSVA(hsva);
-      updateValue(createDefaultGradientFromColor(mode, currentColor));
-      return;
-    }
-
-    // Gradient A -> Gradient B: change type, keep stops
-    if (isGradient(value as string | GradientValue)) {
-      const grad = value as GradientValue;
-      const updated: GradientValue = { ...grad, type: mode };
-
-      if (mode === "linear" || mode === "conic") {
-        updated.angle = updated.angle ?? (mode === "linear" ? 90 : 0);
-      }
-      if (mode === "radial" || mode === "conic") {
-        updated.centerX = updated.centerX ?? 50;
-        updated.centerY = updated.centerY ?? 50;
-      }
-
-      updateValue(updated);
-    }
-  };
+      onClick?.(e);
+    },
+    [mode, activeMode, value, hsva, gradient, updateValue, onClick]
+  );
 
   return (
     <button
+      ref={ref}
       type="button"
       role="radio"
       aria-checked={isActive}
       tabIndex={isActive ? 0 : -1}
-      onClick={handleClick}
       disabled={disabled}
       data-cp-el="mode-button"
       data-active={isActive ? "" : undefined}
+      {...rest}
+      onClick={handleClick}
       className={className}
     >
       {label}
     </button>
   );
-}
+});
 
 /**
  * Unified mode selector: Solid | Linear | Radial | Conic | Mesh.
@@ -101,7 +106,7 @@ export function ColorPickerModeSelectorItem({ value: mode, className }: ColorPic
 export const ColorPickerModeSelector = forwardRef<
   HTMLDivElement,
   ColorPickerModeSelectorProps
->(function ColorPickerModeSelector({ className, children }, ref) {
+>(function ColorPickerModeSelector({ className, children, ...rest }, ref) {
   const { disabled } = useColorPickerContext();
   const groupRef = useRef<HTMLDivElement>(null);
 
@@ -142,10 +147,14 @@ export const ColorPickerModeSelector = forwardRef<
       }}
       data-cp-part="mode-selector"
       data-disabled={disabled ? "" : undefined}
-      className={className}
       role="radiogroup"
       aria-label="Color picker mode"
-      onKeyDown={handleKeyDown}
+      {...rest}
+      onKeyDown={(e) => {
+        handleKeyDown(e);
+        rest.onKeyDown?.(e);
+      }}
+      className={className}
     >
       {children ?? MODES.map((mode) => (
         <ColorPickerModeSelectorItem key={mode.value} value={mode.value} />

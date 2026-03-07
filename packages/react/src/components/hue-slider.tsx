@@ -11,21 +11,29 @@ const HUE_GRADIENT =
 /**
  * Renders the rainbow gradient track for the hue slider.
  */
-export function ColorPickerHueSliderTrack({ className }: ColorPickerHueSliderTrackProps) {
+export const ColorPickerHueSliderTrack = forwardRef<
+  HTMLDivElement,
+  ColorPickerHueSliderTrackProps
+>(function ColorPickerHueSliderTrack({ className, ...rest }, ref) {
   return (
     <div
+      ref={ref}
       data-cp-el="track"
       className={className}
-      style={{ position: "absolute", inset: 0, background: HUE_GRADIENT }}
+      {...rest}
+      style={{ position: "absolute", inset: 0, background: HUE_GRADIENT, ...rest.style }}
       aria-hidden="true"
     />
   );
-}
+});
 
 /**
  * Renders the draggable thumb indicator positioned by hue value.
  */
-export function ColorPickerHueSliderThumb({ className }: ColorPickerHueSliderThumbProps) {
+export const ColorPickerHueSliderThumb = forwardRef<
+  HTMLDivElement,
+  ColorPickerHueSliderThumbProps
+>(function ColorPickerHueSliderThumb({ className, ...rest }, ref) {
   const { hsva } = useColorPickerContext();
 
   const thumbPosition = (hsva.h / 360) * 100;
@@ -36,12 +44,15 @@ export function ColorPickerHueSliderThumb({ className }: ColorPickerHueSliderThu
 
   return (
     <div
+      ref={ref}
+      {...rest}
       style={{
         position: "absolute",
         top: "50%",
         left: `${thumbPosition}%`,
         transform: "translate(-50%, -50%)",
         pointerEvents: "none",
+        ...rest.style,
       }}
       aria-hidden="true"
     >
@@ -52,7 +63,7 @@ export function ColorPickerHueSliderThumb({ className }: ColorPickerHueSliderThu
       />
     </div>
   );
-}
+});
 
 /**
  * Horizontal (or vertical) hue slider with a rainbow gradient background.
@@ -65,7 +76,7 @@ export function ColorPickerHueSliderThumb({ className }: ColorPickerHueSliderThu
 export const ColorPickerHueSlider = forwardRef<
   HTMLDivElement,
   ColorPickerSliderProps
->(function ColorPickerHueSlider({ className, children }, ref) {
+>(function ColorPickerHueSlider({ className, children, ...rest }, ref) {
   const { hsva, setHue, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -112,13 +123,20 @@ export const ColorPickerHueSlider = forwardRef<
       aria-valuenow={Math.round(hsva.h)}
       aria-valuetext={`${Math.round(hsva.h)} degrees`}
       tabIndex={disabled ? -1 : 0}
-      onPointerDown={handlePointerDown}
-      onKeyDown={handleKeyDown}
+      {...rest}
+      onPointerDown={(e) => {
+        handlePointerDown(e);
+        rest.onPointerDown?.(e);
+      }}
+      onKeyDown={(e) => {
+        handleKeyDown(e);
+        rest.onKeyDown?.(e);
+      }}
       data-cp-part="hue-slider"
       data-disabled={disabled ? "" : undefined}
       data-dragging={isDragging ? "" : undefined}
       className={className}
-      style={{ position: "relative" }}
+      style={{ position: "relative", ...rest.style }}
     >
       {children ?? (
         <>

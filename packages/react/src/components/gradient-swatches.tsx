@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { forwardRef, useCallback, useMemo } from "react";
 import type { ColorPickerGradientSwatchesProps, ColorPickerGradientSwatchProps, GradientValue } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
 import { toCSS } from "../utils/css";
@@ -46,7 +46,10 @@ const DEFAULT_GRADIENT_SWATCHES: GradientValue[] = [
  * Individual gradient swatch button.
  * Reads context for active state.
  */
-export function ColorPickerGradientSwatch({ value, className, style }: ColorPickerGradientSwatchProps) {
+export const ColorPickerGradientSwatch = forwardRef<
+  HTMLButtonElement,
+  ColorPickerGradientSwatchProps
+>(function ColorPickerGradientSwatch({ value, className, style, onClick, ...rest }, ref) {
   const { value: pickerValue, updateValue, disabled } = useColorPickerContext();
 
   const css = toCSS(value);
@@ -63,13 +66,18 @@ export function ColorPickerGradientSwatch({ value, className, style }: ColorPick
     );
   }, [pickerValue, value]);
 
-  const handleClick = useCallback(() => {
-    if (disabled) return;
-    updateValue(value);
-  }, [value, updateValue, disabled]);
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled) return;
+      updateValue(value);
+      onClick?.(e);
+    },
+    [value, updateValue, disabled, onClick]
+  );
 
   return (
     <button
+      ref={ref}
       type="button"
       onClick={handleClick}
       disabled={disabled}
@@ -77,11 +85,12 @@ export function ColorPickerGradientSwatch({ value, className, style }: ColorPick
       aria-pressed={isActive}
       data-cp-el="swatch"
       data-active={isActive ? "" : undefined}
+      {...rest}
       className={className}
       style={{ ...style, background: css }}
     />
   );
-}
+});
 
 /**
  * Grid of preset gradient swatch buttons.

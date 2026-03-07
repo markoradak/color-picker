@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import type { GradientStopsProps } from "../types";
 import { useColorPickerContext } from "./color-picker-context";
@@ -15,7 +15,10 @@ import { clamp } from "../utils/position";
  * draggable stop markers along the bottom edge. Each stop marker
  * opens a popover with a mini color picker for editing the stop's color.
  */
-export function GradientStops({ className, classNames }: GradientStopsProps) {
+export const GradientStops = forwardRef<
+  HTMLDivElement,
+  GradientStopsProps
+>(function GradientStops({ className, classNames, ...rest }, ref) {
   const { gradient, disabled } = useColorPickerContext();
   const {
     gradient: gradientValue,
@@ -137,10 +140,12 @@ export function GradientStops({ className, classNames }: GradientStopsProps) {
 
   return (
     <div
+      ref={ref}
       data-cp-part="gradient-stops"
       data-disabled={disabled ? "" : undefined}
+      {...rest}
       className={className}
-      style={{ position: "relative" }}
+      style={{ position: "relative", ...rest.style }}
     >
       {/* Gradient bar */}
       <div
@@ -236,4 +241,4 @@ export function GradientStops({ className, classNames }: GradientStopsProps) {
       </div>
     </div>
   );
-}
+});

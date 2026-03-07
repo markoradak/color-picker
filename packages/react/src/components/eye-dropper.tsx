@@ -44,7 +44,7 @@ function useEyeDropperSupported(): boolean {
 export const ColorPickerEyeDropper = forwardRef<
   HTMLButtonElement,
   ColorPickerEyeDropperProps
->(function ColorPickerEyeDropper({ className, classNames }, ref) {
+>(function ColorPickerEyeDropper({ className, classNames, ...rest }, ref) {
   const { setColorFromString, disabled } = useColorPickerContext();
   const [isPicking, setIsPicking] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
@@ -88,12 +88,16 @@ export const ColorPickerEyeDropper = forwardRef<
     <button
       ref={ref}
       type="button"
-      onClick={handleClick}
       disabled={disabled || isPicking}
       aria-label={showCheck ? "Color picked" : isPicking ? "Picking color..." : "Pick a color from the screen"}
       data-cp-part="eye-dropper"
       data-disabled={disabled ? "" : undefined}
       data-picking={isPicking ? "" : undefined}
+      {...rest}
+      onClick={(e) => {
+        handleClick();
+        rest.onClick?.(e);
+      }}
       className={className}
     >
       <span data-cp-el="icon-wrapper" style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>

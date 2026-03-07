@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import type { ColorTokens } from "../types";
 
 /** Props for the shared TokenList component. */
@@ -35,7 +35,10 @@ export interface TokenListProps {
  * Supports full keyboard navigation: Arrow Up/Down to move between items,
  * Home/End to jump to first/last, Escape to close.
  */
-export function TokenList({ tokens, matchedToken, onSelect, onClose, search, disabled, className, classNames }: TokenListProps) {
+export const TokenList = forwardRef<
+  HTMLDivElement,
+  TokenListProps
+>(function TokenList({ tokens, matchedToken, onSelect, onClose, search, disabled, className, classNames }, ref) {
   const allEntries = Object.entries(tokens);
   const entries = search
     ? allEntries.filter(([name]) => name.toLowerCase().includes(search.toLowerCase()))
@@ -128,6 +131,7 @@ export function TokenList({ tokens, matchedToken, onSelect, onClose, search, dis
 
   return (
     <div
+      ref={ref}
       role="listbox"
       aria-label="Color tokens"
       data-cp-part="token-list"
@@ -182,4 +186,4 @@ export function TokenList({ tokens, matchedToken, onSelect, onClose, search, dis
       })}
     </div>
   );
-}
+});

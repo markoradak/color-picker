@@ -43,7 +43,10 @@ export function ColorPickerAreaGradient({ className }: ColorPickerAreaGradientPr
 /**
  * Renders the draggable indicator dot positioned by saturation/value.
  */
-export function ColorPickerAreaThumb({ className }: ColorPickerAreaThumbProps) {
+export const ColorPickerAreaThumb = forwardRef<
+  HTMLDivElement,
+  ColorPickerAreaThumbProps
+>(function ColorPickerAreaThumb({ className, ...rest }, ref) {
   const { hsva } = useColorPickerContext();
 
   const indicatorX = hsva.s;
@@ -52,12 +55,15 @@ export function ColorPickerAreaThumb({ className }: ColorPickerAreaThumbProps) {
 
   return (
     <div
+      ref={ref}
+      {...rest}
       style={{
         position: "absolute",
         left: `${indicatorX}%`,
         top: `${indicatorY}%`,
         transform: "translate(-50%, -50%)",
         pointerEvents: "none",
+        ...rest.style,
       }}
       aria-hidden="true"
     >
@@ -68,7 +74,7 @@ export function ColorPickerAreaThumb({ className }: ColorPickerAreaThumbProps) {
       />
     </div>
   );
-}
+});
 
 /**
  * 2D saturation/value picker area.
@@ -88,7 +94,7 @@ export function ColorPickerAreaThumb({ className }: ColorPickerAreaThumbProps) {
 export const ColorPickerArea = forwardRef<
   HTMLDivElement,
   ColorPickerAreaProps
->(function ColorPickerArea({ className, children }, ref) {
+>(function ColorPickerArea({ className, children, ...rest }, ref) {
   const { hsva, setSaturationValue, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -145,13 +151,20 @@ export const ColorPickerArea = forwardRef<
       aria-valuenow={Math.round(hsva.s)}
       aria-valuetext={`Saturation ${Math.round(hsva.s)}%, Brightness ${Math.round(hsva.v)}%`}
       tabIndex={disabled ? -1 : 0}
-      onPointerDown={handlePointerDown}
-      onKeyDown={handleKeyDown}
+      {...rest}
+      onPointerDown={(e) => {
+        handlePointerDown(e);
+        rest.onPointerDown?.(e);
+      }}
+      onKeyDown={(e) => {
+        handleKeyDown(e);
+        rest.onKeyDown?.(e);
+      }}
       data-cp-part="area"
       data-disabled={disabled ? "" : undefined}
       data-dragging={isDragging ? "" : undefined}
       className={className}
-      style={{ backgroundColor: hueBackground, position: "relative" }}
+      style={{ backgroundColor: hueBackground, position: "relative", ...rest.style }}
     >
       {children ?? (
         <>

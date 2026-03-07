@@ -21,7 +21,7 @@ import { GradientPreview } from "./gradient-preview";
 export const ColorPickerGradientEditor = forwardRef<
   HTMLDivElement,
   ColorPickerGradientEditorProps
->(function ColorPickerGradientEditor({ className, classNames }, ref) {
+>(function ColorPickerGradientEditor({ className, classNames, ...rest }, ref) {
   const { isGradientMode } = useColorPickerContext();
 
   if (!isGradientMode) {
@@ -32,6 +32,7 @@ export const ColorPickerGradientEditor = forwardRef<
     <div
       ref={ref}
       data-cp-part="gradient-editor"
+      {...rest}
       className={className}
     >
       <GradientPreview

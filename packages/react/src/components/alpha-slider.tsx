@@ -9,7 +9,10 @@ import { CHECKERBOARD_STYLE } from "./shared";
 /**
  * Renders the checkerboard + alpha gradient track for the alpha slider.
  */
-export function ColorPickerAlphaSliderTrack({ className }: ColorPickerAlphaSliderTrackProps) {
+export const ColorPickerAlphaSliderTrack = forwardRef<
+  HTMLDivElement,
+  ColorPickerAlphaSliderTrackProps
+>(function ColorPickerAlphaSliderTrack({ className, ...rest }, ref) {
   const { hsva } = useColorPickerContext();
 
   const solidColor = useMemo(
@@ -23,9 +26,11 @@ export function ColorPickerAlphaSliderTrack({ className }: ColorPickerAlphaSlide
     <>
       {/* Checkerboard background */}
       <div
+        ref={ref}
         data-cp-el="checkerboard"
         className={className}
-        style={{ position: "absolute", inset: 0, ...CHECKERBOARD_STYLE }}
+        {...rest}
+        style={{ position: "absolute", inset: 0, ...CHECKERBOARD_STYLE, ...rest.style }}
         aria-hidden="true"
       />
       {/* Color gradient overlay */}
@@ -37,12 +42,15 @@ export function ColorPickerAlphaSliderTrack({ className }: ColorPickerAlphaSlide
       />
     </>
   );
-}
+});
 
 /**
  * Renders the draggable thumb indicator positioned by alpha value.
  */
-export function ColorPickerAlphaSliderThumb({ className }: ColorPickerAlphaSliderThumbProps) {
+export const ColorPickerAlphaSliderThumb = forwardRef<
+  HTMLDivElement,
+  ColorPickerAlphaSliderThumbProps
+>(function ColorPickerAlphaSliderThumb({ className, ...rest }, ref) {
   const { hsva } = useColorPickerContext();
 
   const thumbPosition = hsva.a * 100;
@@ -53,12 +61,15 @@ export function ColorPickerAlphaSliderThumb({ className }: ColorPickerAlphaSlide
 
   return (
     <div
+      ref={ref}
+      {...rest}
       style={{
         position: "absolute",
         top: "50%",
         left: `${thumbPosition}%`,
         transform: "translate(-50%, -50%)",
         pointerEvents: "none",
+        ...rest.style,
       }}
       aria-hidden="true"
     >
@@ -69,7 +80,7 @@ export function ColorPickerAlphaSliderThumb({ className }: ColorPickerAlphaSlide
       />
     </div>
   );
-}
+});
 
 /**
  * Horizontal alpha/opacity slider with a checkerboard background
@@ -82,7 +93,7 @@ export function ColorPickerAlphaSliderThumb({ className }: ColorPickerAlphaSlide
 export const ColorPickerAlphaSlider = forwardRef<
   HTMLDivElement,
   ColorPickerSliderProps
->(function ColorPickerAlphaSlider({ className, children }, ref) {
+>(function ColorPickerAlphaSlider({ className, children, ...rest }, ref) {
   const { hsva, setAlpha, disabled } = useColorPickerContext();
 
   const { isDragging, handlePointerDown } = usePointerDrag({
@@ -129,13 +140,20 @@ export const ColorPickerAlphaSlider = forwardRef<
       aria-valuenow={Math.round(hsva.a * 100)}
       aria-valuetext={`${Math.round(hsva.a * 100)}%`}
       tabIndex={disabled ? -1 : 0}
-      onPointerDown={handlePointerDown}
-      onKeyDown={handleKeyDown}
+      {...rest}
+      onPointerDown={(e) => {
+        handlePointerDown(e);
+        rest.onPointerDown?.(e);
+      }}
+      onKeyDown={(e) => {
+        handleKeyDown(e);
+        rest.onKeyDown?.(e);
+      }}
       data-cp-part="alpha-slider"
       data-disabled={disabled ? "" : undefined}
       data-dragging={isDragging ? "" : undefined}
       className={className}
-      style={{ position: "relative" }}
+      style={{ position: "relative", ...rest.style }}
     >
       {children ?? (
         <>

@@ -1,10 +1,10 @@
 # State
 
-**Active**: None
-**File**: --
-**Phase**: --
-**Status**: Complete
-**Updated**: 2026-03-07
+**Active**: 02_DEEP_FIXES
+**File**: tasks/plans/PLAN_02_DEEP_FIXES.md
+**Phase**: 1
+**Status**: In Progress
+**Updated**: 2026-03-07T00:00:00Z
 
 ---
 
@@ -14,6 +14,7 @@
 |---|------|------|--------|----------|
 | 00 | INITIAL | PLAN_00_INITIAL.md | Complete | 50/50 tasks |
 | 01 | FIXES | PLAN_01_FIXES.md | Complete | 37/37 tasks |
+| 02 | DEEP_FIXES | PLAN_02_DEEP_FIXES.md | In Progress | 0/39 tasks |
 
 ---
 
@@ -199,3 +200,84 @@
 | 10.2 Fix preset code generation for showInput | Complete |
 | 10.3 Remove dead import from code example | Complete |
 | 10.4 Add missing components to reference table | Complete |
+
+### PLAN_02_DEEP_FIXES
+
+#### Phase 1: Critical Bugs
+
+| Task | Status |
+|------|--------|
+| Fix render-phase state mutations in useColorPicker and useGradient | Pending |
+| Fix stale tokens closure in commitValue | Pending |
+| Fix isInternalUpdateRef fragility in useColorPicker | Pending |
+
+#### Phase 2: Performance
+
+| Task | Status |
+|------|--------|
+| Fix context re-render cascade during drag | Pending |
+| Memoize useColorPicker return values | Pending |
+
+#### Phase 3: API Completeness
+
+| Task | Status |
+|------|--------|
+| Add HTML props spreading to all components | Pending |
+| Add forwardRef to 14 exported components | Pending |
+| Remove dead orientation prop from types | Pending |
+| Add event handler composition utility | Pending |
+
+#### Phase 4: Type Safety
+
+| Task | Status |
+|------|--------|
+| Convert GradientValue to discriminated union | Pending |
+| Create separate MeshGradientStop type | Pending |
+| Move startPoint/endPoint out of GradientValue | Pending |
+| Extract shared TokenListClassNames interface | Pending |
+
+#### Phase 5: Accessibility
+
+| Task | Status |
+|------|--------|
+| Add aria-orientation to slider elements | Pending |
+| Add aria-expanded to gradient stop triggers | Pending |
+| Add keyboard access to gradient context menu | Pending |
+| Add keyboard equivalent for adding gradient stops | Pending |
+| Add aria-label to InputTrigger group | Pending |
+
+#### Phase 6: CSS Parsing & Utils
+
+| Task | Status |
+|------|--------|
+| Support two-position CSS stops | Pending |
+| Handle repeating-*-gradient in fromCSS | Pending |
+| Fix getRelativePosition axis independence | Pending |
+| Make updateStop sort after position change | Pending |
+| Replace stopIdCounter with consistent ID generation | Pending |
+| Cancel requestAnimationFrame on unmount in useTokenDropdown | Pending |
+
+#### Phase 7: Build & Config
+
+| Task | Status |
+|------|--------|
+| Add publishConfig to package.json | Pending |
+| Add LICENSE file | Pending |
+| Fix exports map types condition | Pending |
+| Remove internal utils from barrel exports | Pending |
+| Remove ^build dep from test task in turbo.json | Pending |
+| Add @layer cp wrapping to styles.css | Pending |
+| DRY up dark mode variable duplication | Pending |
+
+#### Phase 8: Tests
+
+| Task | Status |
+|------|--------|
+| Add useColorPicker tests | Pending |
+| Add useGradient tests | Pending |
+| Add usePointerDrag tests | Pending |
+| Add useTokenDropdown tests | Pending |
+| Add sanitizeColor and createDefaultGradientFromColor tests | Pending |
+| Add keyboard interaction tests for sliders | Pending |
+| Add TokenList component tests | Pending |
+| Add pointer drag interaction test pattern | Pending |

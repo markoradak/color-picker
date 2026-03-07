@@ -16,18 +16,22 @@ const FORMAT_LABELS: Record<ColorFormat, string> = {
 export const ColorPickerFormatToggle = forwardRef<
   HTMLButtonElement,
   ColorPickerFormatToggleProps
->(function ColorPickerFormatToggle({ className }, ref) {
+>(function ColorPickerFormatToggle({ className, ...rest }, ref) {
   const { format, toggleFormat, disabled } = useColorPickerContext();
 
   return (
     <button
       ref={ref}
       type="button"
-      onClick={toggleFormat}
       disabled={disabled}
       aria-label={`Color format: ${FORMAT_LABELS[format]}. Click to change.`}
       data-cp-part="format-toggle"
       data-disabled={disabled ? "" : undefined}
+      {...rest}
+      onClick={(e) => {
+        toggleFormat();
+        rest.onClick?.(e);
+      }}
       className={className}
     >
       {FORMAT_LABELS[format]}

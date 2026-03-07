@@ -94,8 +94,8 @@ export interface ColorPickerProps {
 /**
  * Props for the ColorPicker.Area component.
  */
-export interface ColorPickerAreaProps {
-  className?: string;
+export interface ColorPickerAreaProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children" | "defaultValue"> {
   children?: React.ReactNode;
 }
 
@@ -111,16 +111,15 @@ export interface ColorPickerAreaGradientProps {
  * Props for the ColorPickerAreaThumb sub-component.
  * Renders the draggable indicator dot positioned by saturation/value.
  */
-export interface ColorPickerAreaThumbProps {
-  className?: string;
+export interface ColorPickerAreaThumbProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children"> {
 }
 
 /**
  * Props for slider components (Hue, Alpha).
  */
-export interface ColorPickerSliderProps {
-  className?: string;
-  orientation?: "horizontal" | "vertical";
+export interface ColorPickerSliderProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children" | "defaultValue"> {
   children?: React.ReactNode;
 }
 
@@ -128,32 +127,32 @@ export interface ColorPickerSliderProps {
  * Props for the ColorPickerHueSliderTrack sub-component.
  * Renders the rainbow gradient track.
  */
-export interface ColorPickerHueSliderTrackProps {
-  className?: string;
+export interface ColorPickerHueSliderTrackProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children"> {
 }
 
 /**
  * Props for the ColorPickerHueSliderThumb sub-component.
  * Renders the draggable thumb indicator positioned by hue.
  */
-export interface ColorPickerHueSliderThumbProps {
-  className?: string;
+export interface ColorPickerHueSliderThumbProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children"> {
 }
 
 /**
  * Props for the ColorPickerAlphaSliderTrack sub-component.
  * Renders the checkerboard + alpha gradient track.
  */
-export interface ColorPickerAlphaSliderTrackProps {
-  className?: string;
+export interface ColorPickerAlphaSliderTrackProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children"> {
 }
 
 /**
  * Props for the ColorPickerAlphaSliderThumb sub-component.
  * Renders the draggable thumb indicator positioned by alpha.
  */
-export interface ColorPickerAlphaSliderThumbProps {
-  className?: string;
+export interface ColorPickerAlphaSliderThumbProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children"> {
 }
 
 /**
@@ -186,10 +185,10 @@ export interface ColorPickerInputProps {
 /**
  * Props for the ColorPicker.Swatches component.
  */
-export interface ColorPickerSwatchesProps {
+export interface ColorPickerSwatchesProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children" | "defaultValue"> {
   values?: string[];
   columns?: number;
-  className?: string;
   swatchClassName?: string;
   children?: React.ReactNode;
 }
@@ -198,10 +197,9 @@ export interface ColorPickerSwatchesProps {
  * Props for the ColorPickerSwatch sub-component.
  * Renders an individual color swatch button.
  */
-export interface ColorPickerSwatchProps {
+export interface ColorPickerSwatchProps
+  extends Omit<React.ComponentPropsWithoutRef<"button">, "value" | "children"> {
   value: string;
-  className?: string;
-  style?: React.CSSProperties;
 }
 
 /**
@@ -219,10 +217,9 @@ export interface ColorPickerGradientSwatchesProps {
  * Props for the ColorPickerGradientSwatch sub-component.
  * Renders an individual gradient swatch button.
  */
-export interface ColorPickerGradientSwatchProps {
+export interface ColorPickerGradientSwatchProps
+  extends Omit<React.ComponentPropsWithoutRef<"button">, "value" | "children"> {
   value: GradientValue;
-  className?: string;
-  style?: React.CSSProperties;
 }
 
 /**
@@ -244,8 +241,8 @@ export interface ColorPickerTriggerProps {
  * An input-style trigger where the thumbnail opens the popover,
  * while the text input, format toggle, and eye dropper are interactive inline.
  */
-export interface ColorPickerInputTriggerProps {
-  className?: string;
+export interface ColorPickerInputTriggerProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children" | "defaultValue"> {
   /** Show the format toggle button inline. Default: true */
   enableFormatToggle?: boolean;
   /** Show the eye dropper button inline (auto-hidden if browser unsupported). Default: true */
@@ -378,8 +375,8 @@ export type ColorPickerInlineProps = ColorPickerPresetProps;
 /**
  * Props for the ColorPickerModeSelector component.
  */
-export interface ColorPickerModeSelectorProps {
-  className?: string;
+export interface ColorPickerModeSelectorProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children" | "defaultValue"> {
   children?: React.ReactNode;
 }
 
@@ -387,25 +384,25 @@ export interface ColorPickerModeSelectorProps {
  * Props for the ColorPickerModeSelectorItem sub-component.
  * Renders an individual mode button.
  */
-export interface ColorPickerModeSelectorItemProps {
+export interface ColorPickerModeSelectorItemProps
+  extends Omit<React.ComponentPropsWithoutRef<"button">, "value" | "children"> {
   value: ColorPickerMode;
-  className?: string;
 }
 
 /**
  * Props for the ColorPickerFormatToggle component.
  * Button that cycles through color formats (HEX, RGB, HSL).
  */
-export interface ColorPickerFormatToggleProps {
-  className?: string;
+export interface ColorPickerFormatToggleProps
+  extends Omit<React.ComponentPropsWithoutRef<"button">, "children"> {
 }
 
 /**
  * Props for the ColorPickerEyeDropper component.
  * Button that activates the browser's EyeDropper API to sample a color from the screen.
  */
-export interface ColorPickerEyeDropperProps {
-  className?: string;
+export interface ColorPickerEyeDropperProps
+  extends Omit<React.ComponentPropsWithoutRef<"button">, "children"> {
   /** Class names for inner elements. */
   classNames?: {
     icon?: string;
@@ -418,8 +415,8 @@ export interface ColorPickerEyeDropperProps {
  * Props for the ColorPickerGradientEditor component.
  * Self-contained gradient editing UI with preview and stop manipulation.
  */
-export interface ColorPickerGradientEditorProps {
-  className?: string;
+export interface ColorPickerGradientEditorProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children" | "defaultValue"> {
   /** Class names for inner elements. */
   classNames?: {
     preview?: string;
@@ -435,8 +432,8 @@ export interface ColorPickerGradientEditorProps {
  * Props for the GradientPreview component.
  * All-in-one gradient editor preview with stop dots and manipulation.
  */
-export interface GradientPreviewProps {
-  className?: string;
+export interface GradientPreviewProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children" | "defaultValue"> {
   /** Class names for inner elements. */
   classNames?: {
     stopDot?: string;
@@ -451,8 +448,8 @@ export interface GradientPreviewProps {
  * Props for the GradientStops component.
  * Horizontal gradient stop bar with draggable stop markers.
  */
-export interface GradientStopsProps {
-  className?: string;
+export interface GradientStopsProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children" | "defaultValue"> {
   /** Class names for inner elements. */
   classNames?: {
     bar?: string;

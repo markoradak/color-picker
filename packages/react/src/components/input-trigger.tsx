@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import * as Popover from "@radix-ui/react-popover";
 import type { ColorPickerInputTriggerProps } from "../types";
@@ -40,13 +40,17 @@ function useIsEyeDropperSupported(): boolean {
  * opens the popover while keeping input focus. The format toggle and eye
  * dropper buttons perform their actions without opening the popover.
  */
-export function ColorPickerInputTrigger({
+export const ColorPickerInputTrigger = forwardRef<
+  HTMLDivElement,
+  ColorPickerInputTriggerProps
+>(function ColorPickerInputTrigger({
   className,
   classNames,
   enableFormatToggle = true,
   enableEyeDropper = true,
   enableTokenSearch = true,
-}: ColorPickerInputTriggerProps) {
+  ...rest
+}, ref) {
   const {
     hsva,
     formattedValue,
@@ -230,11 +234,16 @@ export function ColorPickerInputTrigger({
   return (
     <Popover.Anchor asChild>
       <div
+        ref={ref}
         role="group"
         data-cp-part="input-trigger"
         data-disabled={disabled ? "" : undefined}
         data-cp-anchor=""
-        onClick={handleContainerClick}
+        {...rest}
+        onClick={(e) => {
+          handleContainerClick();
+          rest.onClick?.(e);
+        }}
         className={className}
       >
         {/* Hidden trigger for Radix -- keeps popover wired for keyboard/a11y */}
@@ -515,4 +524,4 @@ export function ColorPickerInputTrigger({
       </div>
     </Popover.Anchor>
   );
-}
+});
