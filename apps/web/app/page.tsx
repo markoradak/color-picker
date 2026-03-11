@@ -110,12 +110,12 @@ const FEATURES = [
   {
     title: "Compound Components",
     description:
-      "Radix-style composable API. Pick only the parts you need and arrange them however you want.",
+      "Radix-style composable API with forwardRef on all components and full HTML props spreading. Pick only the parts you need and arrange them however you want.",
   },
   {
     title: "Gradient Editor",
     description:
-      "Linear, radial, conic, and mesh gradients with interactive stop editing, angle controls, and type switching.",
+      "Linear, radial, conic, and mesh gradients with interactive stop editing, angle controls, type switching, and a discriminated union type system.",
   },
   {
     title: "Solid Colors",
@@ -160,17 +160,12 @@ const FEATURES = [
   {
     title: "Accessible",
     description:
-      "Full keyboard navigation, ARIA labels, and screen reader support. Built on Radix UI primitives.",
+      "Full keyboard navigation, ARIA labels, screen reader support, and reduced-motion respect. Built on Radix UI primitives. Concurrent Mode safe.",
   },
   {
     title: "Tree-shakeable",
     description:
-      "ESM + CJS dual builds. Import only what you use. Only CSS files have side effects.",
-  },
-  {
-    title: "Utilities",
-    description:
-      "toCSS, fromCSS, parseColor, formatColor, and more. Use them standalone or with the components.",
+      "ESM + CJS dual builds with optimized re-render performance. Import only what you use. Only CSS files have side effects.",
   },
 ];
 
@@ -178,41 +173,59 @@ const FEATURES = [
 const API_COMPONENTS = [
   { name: "ColorPicker", description: "Root provider and context. Accepts tokens and autoTokens props." },
   { name: "ColorPickerProvider", description: "Headless provider without Radix Popover (for custom layouts)" },
-  { name: "ColorPickerTrigger", description: "Popover trigger button" },
-  { name: "ColorPickerInputTrigger", description: "Input-style trigger with inline editing" },
-  { name: "ColorPickerContent", description: "Popover content wrapper" },
+  { name: "ColorPickerTrigger", description: "Popover trigger button with color swatch" },
+  { name: "ColorPickerInputTrigger", description: "Input-style trigger with inline editing and token badge" },
+  { name: "ColorPickerContent", description: "Popover content wrapper with portal support" },
+  { name: "ColorPickerModeSelector", description: "Solid/gradient mode radio group toggle" },
+  { name: "ColorPickerModeSelectorItem", description: "Individual mode option (solid, linear, radial, conic, mesh)" },
   { name: "ColorPickerArea", description: "Saturation/brightness 2D area" },
+  { name: "ColorPickerAreaGradient", description: "Area background gradient layer (sub-component)" },
+  { name: "ColorPickerAreaThumb", description: "Area draggable thumb (sub-component)" },
   { name: "ColorPickerHueSlider", description: "Hue selection slider" },
-  { name: "ColorPickerAlphaSlider", description: "Opacity slider" },
+  { name: "ColorPickerHueSliderTrack", description: "Hue slider rainbow track (sub-component)" },
+  { name: "ColorPickerHueSliderThumb", description: "Hue slider draggable thumb (sub-component)" },
+  { name: "ColorPickerAlphaSlider", description: "Opacity slider with checkerboard pattern" },
+  { name: "ColorPickerAlphaSliderTrack", description: "Alpha slider gradient track (sub-component)" },
+  { name: "ColorPickerAlphaSliderThumb", description: "Alpha slider draggable thumb (sub-component)" },
   { name: "ColorPickerInput", description: "Color value text input with token badge and search" },
   { name: "ColorPickerFormatToggle", description: "HEX/RGB/HSL format switcher" },
   { name: "ColorPickerEyeDropper", description: "Native color sampling via the EyeDropper API" },
   { name: "ColorPickerSwatches", description: "Preset color swatches grid" },
-  { name: "ColorPickerModeSelector", description: "Solid/gradient mode toggle" },
+  { name: "ColorPickerSwatch", description: "Individual color swatch button (sub-component)" },
   { name: "ColorPickerGradientEditor", description: "Gradient preview and stop editor" },
   { name: "ColorPickerGradientSwatches", description: "Preset gradient swatches grid" },
-  { name: "ColorPickerControls", description: "Pre-composed controls for use inside presets" },
-  { name: "GradientPreview", description: "Standalone gradient preview component" },
-  { name: "GradientStops", description: "Standalone gradient stop dots" },
-  { name: "TokenList", description: "Searchable token dropdown list" },
+  { name: "ColorPickerGradientSwatch", description: "Individual gradient swatch button (sub-component)" },
+  { name: "GradientPreview", description: "Standalone gradient preview with angle/position controls" },
+  { name: "GradientStops", description: "Standalone gradient stop bar with draggable markers" },
+  { name: "TokenList", description: "Searchable token dropdown list with keyboard navigation" },
+  { name: "ColorPickerPopover", description: "Pre-composed popover preset with all controls (from /presets)" },
+  { name: "ColorPickerInline", description: "Pre-composed inline preset with all controls (from /presets)" },
+  { name: "ColorPickerControls", description: "Shared inner layout used by both presets (from /presets)" },
 ];
 
 const API_HOOKS = [
-  { name: "useColorPicker", description: "Core color picker state management hook" },
-  { name: "useGradient", description: "Gradient editor state management hook" },
+  { name: "useColorPicker", description: "Core color picker state management with HSVA internals and controlled/uncontrolled support" },
+  { name: "useGradient", description: "Gradient editor state — type switching, stop CRUD, active stop tracking" },
   { name: "useColorPickerContext", description: "Access color picker context from any child component" },
-  { name: "usePointerDrag", description: "Pointer drag interaction hook for custom controls" },
-  { name: "useAutoTokens", description: "Auto-detect CSS custom property color tokens" },
+  { name: "usePointerDrag", description: "Pointer drag interaction hook for building custom controls" },
+  { name: "useTokenDropdown", description: "Shared dropdown state machine for token search, keyboard navigation, and click-outside dismissal" },
+  { name: "useAutoTokens", description: "Auto-detect CSS custom property color tokens (SSR-safe, post-mount)" },
 ];
 
 const API_UTILITIES = [
-  { name: "toCSS", description: "Convert a ColorPickerValue to a CSS string" },
-  { name: "fromCSS", description: "Parse a CSS color or gradient string into a ColorPickerValue" },
-  { name: "isGradient / isSolidColor", description: "Type guards for narrowing ColorPickerValue" },
+  { name: "toCSS / fromCSS", description: "Convert between ColorPickerValue and CSS strings (supports all gradient types)" },
+  { name: "isGradient / isSolidColor", description: "Type guards for narrowing ColorPickerValue discriminated union" },
   { name: "parseColor / formatColor", description: "Parse and format colors between HEX, RGB, and HSL" },
+  { name: "detectFormat / isValidColor", description: "Detect color format and validate color strings" },
   { name: "toHSVA / fromHSVA", description: "Convert between color strings and internal HSVA representation" },
-  { name: "createGradientStop / addStop / removeStop", description: "Gradient stop manipulation helpers" },
-  { name: "createDefaultGradient", description: "Create a default gradient value by type" },
+  { name: "getContrastColor", description: "Get accessible text color (black or white) for a given background" },
+  { name: "resolveToken / findMatchingToken", description: "Resolve token names to values and find tokens matching a color" },
+  { name: "getCSSColorTokens", description: "Extract color tokens from CSS custom properties on the page" },
+  { name: "createGradientStop / createMeshGradientStop", description: "Create gradient stop objects with auto-generated IDs" },
+  { name: "addStop / removeStop / updateStop / moveStop", description: "Gradient stop CRUD and repositioning helpers" },
+  { name: "sortStops / interpolateColorAt", description: "Sort stops by position and interpolate colors at a given point" },
+  { name: "createDefaultGradient / createDefaultGradientFromColor", description: "Create default gradient values by type, optionally from an existing color" },
+  { name: "clamp / getRelativePosition / angleFromPosition", description: "Position math utilities for custom control implementations" },
 ];
 
 export default function Home() {
@@ -226,7 +239,8 @@ export default function Home() {
           </h1>
           <p className="text-[#666]">
             Compound-component React color picker and gradient editor.
-            Composable, accessible, tree-shakeable.
+            Composable, accessible, tree-shakeable. forwardRef and HTML
+            props on all components.
           </p>
 
           <CodeBlock code={INSTALL_CODE} language="bash" />
