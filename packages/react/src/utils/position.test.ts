@@ -158,7 +158,7 @@ describe("position utilities", () => {
       expect(result.y).toBe(1);
     });
 
-    it("returns 0,0 when element has zero width", () => {
+    it("returns 0 for zero-width axis but valid position for the other axis", () => {
       const element = {
         getBoundingClientRect: () => ({
           left: 100,
@@ -178,10 +178,10 @@ describe("position utilities", () => {
         element
       );
       expect(result.x).toBe(0);
-      expect(result.y).toBe(0);
+      expect(result.y).toBe(0.5);
     });
 
-    it("returns 0,0 when element has zero height", () => {
+    it("returns 0 for zero-height axis but valid position for the other axis", () => {
       const element = {
         getBoundingClientRect: () => ({
           left: 100,
@@ -200,7 +200,7 @@ describe("position utilities", () => {
         { clientX: 200, clientY: 150 },
         element
       );
-      expect(result.x).toBe(0);
+      expect(result.x).toBe(0.5);
       expect(result.y).toBe(0);
     });
 

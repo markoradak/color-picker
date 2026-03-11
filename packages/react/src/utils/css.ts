@@ -1,6 +1,6 @@
 import type { ColorPickerValue, GradientValue, MeshGradientStop, SolidColor } from "../types";
 import { colord, isValidColor } from "./color";
-import { sortStops } from "./gradient";
+import { generateStopId, sortStops } from "./gradient";
 
 /**
  * Sanitize a color string, returning "transparent" for invalid values.
@@ -90,10 +90,10 @@ export function toCSS(value: ColorPickerValue): string {
 /**
  * Parse a comma-separated list of CSS color stops, handling commas
  * inside color functions like `rgb(...)` and `hsl(...)`.
- * Returns an array of `{ color, position }` strings.
+ * Returns an array of `{ color, position }` objects.
  */
 function parseColorStops(stopsStr: string): Array<{ color: string; position: number }> {
-  const stops: Array<{ color: string; position: number }> = [];
+  const segments: string[] = [];
   let depth = 0;
   let current = "";
 
@@ -102,8 +102,7 @@ function parseColorStops(stopsStr: string): Array<{ color: string; position: num
     else if (ch === ")") depth--;
 
     if (ch === "," && depth === 0) {
-      const parsed = parseSingleStop(current.trim());
-      if (parsed) stops.push(parsed);
+      segments.push(current.trim());
       current = "";
     } else {
       current += ch;
@@ -111,20 +110,40 @@ function parseColorStops(stopsStr: string): Array<{ color: string; position: num
   }
 
   // Last segment
-  const parsed = parseSingleStop(current.trim());
-  if (parsed) stops.push(parsed);
+  segments.push(current.trim());
 
-  return stops;
+  return segments.flatMap((segment) => {
+    const parsed = parseSingleStop(segment);
+    return parsed ?? [];
+  });
 }
 
 /**
- * Parse a single stop segment like `#ff0000 50%` or `rgb(0,0,0) 0%`.
+ * Parse a single stop segment like `#ff0000 50%`, `rgb(0,0,0) 0%`,
+ * or a two-position shorthand like `red 20% 40%` (which expands to
+ * two stops at the same color with positions 20 and 40).
+ *
+ * Returns a single stop, an array of two stops (for two-position syntax), or null.
  */
-function parseSingleStop(segment: string): { color: string; position: number } | null {
+function parseSingleStop(segment: string): { color: string; position: number } | { color: string; position: number }[] | null {
   if (!segment) return null;
 
-  // Match an optional trailing percentage: `<color> <number>%`
-  const percentMatch = segment.match(/^(.+?)\s+([\d.]+)%\s*$/);
+  // Match two-position syntax: `<color> <number>% <number>%`
+  const twoPositionMatch = segment.match(/^(.+?)\s+(-?[\d.]+)%\s+(-?[\d.]+)%\s*$/);
+  if (twoPositionMatch) {
+    const color = twoPositionMatch[1]!.trim();
+    const pos1 = parseFloat(twoPositionMatch[2]!);
+    const pos2 = parseFloat(twoPositionMatch[3]!);
+    if (isValidColor(color) && !isNaN(pos1) && !isNaN(pos2)) {
+      return [
+        { color, position: pos1 },
+        { color, position: pos2 },
+      ];
+    }
+  }
+
+  // Match a single trailing percentage: `<color> <number>%`
+  const percentMatch = segment.match(/^(.+?)\s+(-?[\d.]+)%\s*$/);
   if (percentMatch) {
     const color = percentMatch[1]!.trim();
     const position = parseFloat(percentMatch[2]!);
@@ -175,8 +194,6 @@ function distributePositions(stops: Array<{ color: string; position: number }>):
   return stops;
 }
 
-let stopIdCounter = 0;
-
 /**
  * Parse a CSS gradient string into a structured ColorPickerValue.
  * Supports `linear-gradient`, `radial-gradient`, and `conic-gradient`.
@@ -185,24 +202,27 @@ let stopIdCounter = 0;
 export function fromCSS(css: string): ColorPickerValue {
   const trimmed = css.trim();
 
+  // Strip `repeating-` prefix so repeating variants are parsed as their base type
+  const normalized = trimmed.startsWith("repeating-") ? trimmed.slice("repeating-".length) : trimmed;
+
   // If it doesn't look like a gradient, return as solid color
   if (
-    !trimmed.startsWith("linear-gradient") &&
-    !trimmed.startsWith("radial-gradient") &&
-    !trimmed.startsWith("conic-gradient")
+    !normalized.startsWith("linear-gradient") &&
+    !normalized.startsWith("radial-gradient") &&
+    !normalized.startsWith("conic-gradient")
   ) {
     return trimmed;
   }
 
   // Extract the content inside the outermost parentheses
-  const openParen = trimmed.indexOf("(");
-  const closeParen = trimmed.lastIndexOf(")");
+  const openParen = normalized.indexOf("(");
+  const closeParen = normalized.lastIndexOf(")");
   if (openParen === -1 || closeParen === -1 || closeParen <= openParen) {
     return trimmed;
   }
 
-  const prefix = trimmed.slice(0, openParen).trim();
-  const inner = trimmed.slice(openParen + 1, closeParen).trim();
+  const prefix = normalized.slice(0, openParen).trim();
+  const inner = normalized.slice(openParen + 1, closeParen).trim();
 
   if (prefix === "linear-gradient") {
     return parseLinearGradient(inner);
@@ -224,8 +244,8 @@ function parseLinearGradient(inner: string): ColorPickerValue {
   let angle = 90; // default
   let stopsStr = inner;
 
-  // Check for an angle like `90deg,` or `180deg,`
-  const angleMatch = inner.match(/^\s*([\d.]+)deg\s*,\s*/);
+  // Check for an angle like `90deg,` or `-45deg,`
+  const angleMatch = inner.match(/^\s*(-?[\d.]+)deg\s*,\s*/);
   if (angleMatch) {
     angle = parseFloat(angleMatch[1]!);
     stopsStr = inner.slice(angleMatch[0].length);
@@ -243,7 +263,7 @@ function parseLinearGradient(inner: string): ColorPickerValue {
 
   const distributed = distributePositions(rawStops);
   const stops = distributed.map((s) => ({
-    id: `stop-${(++stopIdCounter).toString(36)}`,
+    id: generateStopId(),
     color: s.color,
     position: s.position,
   }));
@@ -310,7 +330,7 @@ function parseRadialGradient(inner: string): ColorPickerValue {
 
   const distributed = distributePositions(rawStops);
   const stops = distributed.map((s) => ({
-    id: `stop-${(++stopIdCounter).toString(36)}`,
+    id: generateStopId(),
     color: s.color,
     position: s.position,
   }));
@@ -332,16 +352,16 @@ function parseConicGradient(inner: string): ColorPickerValue {
   let centerY = 50;
   let stopsStr = inner;
 
-  // Match `from 45deg at 50% 50%,`
-  const fullMatch = inner.match(/^\s*from\s+([\d.]+)deg\s+at\s+([\d.]+)%\s+([\d.]+)%\s*,\s*/i);
+  // Match `from 45deg at 50% 50%,` or `from -45deg at 50% 50%,`
+  const fullMatch = inner.match(/^\s*from\s+(-?[\d.]+)deg\s+at\s+([\d.]+)%\s+([\d.]+)%\s*,\s*/i);
   if (fullMatch) {
     angle = parseFloat(fullMatch[1]!);
     centerX = parseFloat(fullMatch[2]!);
     centerY = parseFloat(fullMatch[3]!);
     stopsStr = inner.slice(fullMatch[0].length);
   } else {
-    // Match `from 45deg,` without at-position
-    const angleMatch = inner.match(/^\s*from\s+([\d.]+)deg\s*,\s*/i);
+    // Match `from 45deg,` or `from -45deg,` without at-position
+    const angleMatch = inner.match(/^\s*from\s+(-?[\d.]+)deg\s*,\s*/i);
     if (angleMatch) {
       angle = parseFloat(angleMatch[1]!);
       stopsStr = inner.slice(angleMatch[0].length);
@@ -353,7 +373,7 @@ function parseConicGradient(inner: string): ColorPickerValue {
 
   const distributed = distributePositions(rawStops);
   const stops = distributed.map((s) => ({
-    id: `stop-${(++stopIdCounter).toString(36)}`,
+    id: generateStopId(),
     color: s.color,
     position: s.position,
   }));

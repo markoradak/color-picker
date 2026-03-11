@@ -7,16 +7,17 @@ export function clamp(value: number, min: number, max: number): number {
 
 /**
  * Get the normalized (0-1) position of a pointer event relative to an element.
+ * Each axis is guarded independently — a zero-width element still returns
+ * a valid y position (and vice versa).
  */
 export function getRelativePosition(
   event: { clientX: number; clientY: number },
   element: HTMLElement
 ): { x: number; y: number } {
   const rect = element.getBoundingClientRect();
-  if (rect.width === 0 || rect.height === 0) return { x: 0, y: 0 };
   return {
-    x: clamp((event.clientX - rect.left) / rect.width, 0, 1),
-    y: clamp((event.clientY - rect.top) / rect.height, 0, 1),
+    x: rect.width === 0 ? 0 : clamp((event.clientX - rect.left) / rect.width, 0, 1),
+    y: rect.height === 0 ? 0 : clamp((event.clientY - rect.top) / rect.height, 0, 1),
   };
 }
 

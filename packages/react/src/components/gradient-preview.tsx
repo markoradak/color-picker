@@ -150,6 +150,8 @@ export const GradientPreview = forwardRef<
   } = gradientCtx;
 
   const previewRef = useRef<HTMLDivElement>(null);
+  const gradientValueRef = useRef(gradientValue);
+  gradientValueRef.current = gradientValue;
   const draggingStopId = useRef<string | null>(null);
   const didDragRef = useRef(false);
   const dragListenersRef = useRef<{
@@ -246,8 +248,9 @@ export const GradientPreview = forwardRef<
         didDragRef.current = true;
         const { mx, my } = coords;
         const sid = draggingStopId.current;
+        const gv = gradientValueRef.current;
 
-        if (gradientValue.type === "mesh") {
+        if (gv.type === "mesh") {
           updateStopCoordinates(sid, clamp(mx, 0, 100), clamp(my, 0, 100));
         } else if (isEndpoint && anchorPoint) {
           const sp = isFirstStop ? { x: mx, y: my } : anchorPoint;
@@ -257,20 +260,20 @@ export const GradientPreview = forwardRef<
           const ddy = ep.y - sp.y;
           const len = Math.sqrt(ddx * ddx + ddy * ddy);
           const fallbackAngle =
-            (gradientValue.type === "linear" || gradientValue.type === "conic")
-              ? gradientValue.angle
+            (gv.type === "linear" || gv.type === "conic")
+              ? gv.angle
               : 0;
           const newAngle =
             len > 1
               ? (((Math.atan2(ddy, ddx) * 180) / Math.PI + 90) % 360 + 360) % 360
               : fallbackAngle;
 
-          if (gradientValue.type === "linear") {
+          if (gv.type === "linear") {
             const newRad = ((newAngle - 90) * Math.PI) / 180;
             const ndx = Math.cos(newRad);
             const ndy = Math.sin(newRad);
 
-            const newStops = gradientValue.stops.map((s) => {
+            const newStops = gv.stops.map((s) => {
               const t = stopProportions?.get(s.id) ?? 0.5;
               const vx = sp.x + t * ddx;
               const vy = sp.y + t * ddy;
@@ -279,34 +282,34 @@ export const GradientPreview = forwardRef<
             });
 
             replaceGradient({
-              ...gradientValue,
+              ...gv,
               angle: Math.round(newAngle),
               startPoint: { x: round2(sp.x), y: round2(sp.y) },
               endPoint: { x: round2(ep.x), y: round2(ep.y) },
               stops: newStops,
             });
-          } else if (gradientValue.type === "radial") {
-            const newStops = gradientValue.stops.map((s) => {
+          } else if (gv.type === "radial") {
+            const newStops = gv.stops.map((s) => {
               const t = stopProportions?.get(s.id) ?? 0.5;
               return { ...s, position: round2(t * len * 2) };
             });
 
             replaceGradient({
-              ...gradientValue,
+              ...gv,
               centerX: round2(sp.x),
               centerY: round2(sp.y),
               startPoint: { x: round2(sp.x), y: round2(sp.y) },
               endPoint: { x: round2(ep.x), y: round2(ep.y) },
               stops: newStops,
             });
-          } else if (gradientValue.type === "conic") {
-            const newStops = gradientValue.stops.map((s) => {
+          } else if (gv.type === "conic") {
+            const newStops = gv.stops.map((s) => {
               const t = stopProportions?.get(s.id) ?? 0.5;
               return { ...s, position: round2(t * len * 2) };
             });
 
             replaceGradient({
-              ...gradientValue,
+              ...gv,
               angle: Math.round(newAngle),
               centerX: round2(sp.x),
               centerY: round2(sp.y),
@@ -316,7 +319,7 @@ export const GradientPreview = forwardRef<
             });
           }
         } else {
-          const newPos = positionFromCoords(mx, my, gradientValue);
+          const newPos = positionFromCoords(mx, my, gv);
           updateStopPosition(sid, newPos);
         }
       };

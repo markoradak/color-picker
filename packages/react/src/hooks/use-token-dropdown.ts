@@ -51,6 +51,16 @@ export function useTokenDropdown({
   const tokenBadgeRef = useRef<HTMLButtonElement>(null);
   const tokenSearchInputRef = useRef<HTMLInputElement>(null);
   const tokenSearchWrapperRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+
+  // Cancel pending rAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
 
   // Auto-focus the search input when dropdown opens
   useEffect(() => {
@@ -81,7 +91,10 @@ export function useTokenDropdown({
   const closeTokenDropdown = useCallback(() => {
     setTokenListOpen(false);
     setTokenSearch("");
-    requestAnimationFrame(() => tokenBadgeRef.current?.focus());
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      tokenBadgeRef.current?.focus();
+    });
   }, []);
 
   const handleTokenSelect = useCallback(

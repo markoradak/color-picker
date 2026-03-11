@@ -113,7 +113,6 @@ export const ColorPickerEyeDropper = forwardRef<
           strokeLinejoin="round"
           aria-hidden="true"
           style={{
-            transition: "opacity 0.2s ease, transform 0.2s ease",
             opacity: !isPicking && !showCheck ? 1 : 0,
             transform: !isPicking && !showCheck ? "scale(1)" : "scale(0.5)",
           }}
@@ -127,7 +126,6 @@ export const ColorPickerEyeDropper = forwardRef<
           style={{
             position: "absolute",
             display: "inline-flex",
-            transition: "opacity 0.2s ease, transform 0.2s ease",
             opacity: isPicking ? 1 : 0,
             transform: isPicking ? "scale(1)" : "scale(0.5)",
           }}
@@ -164,7 +162,6 @@ export const ColorPickerEyeDropper = forwardRef<
           aria-hidden="true"
           style={{
             position: "absolute",
-            transition: "opacity 0.2s ease, transform 0.2s ease",
             opacity: showCheck ? 1 : 0,
             transform: showCheck ? "scale(1)" : "scale(0.8)",
           }}

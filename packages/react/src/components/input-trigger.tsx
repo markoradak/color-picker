@@ -24,11 +24,15 @@ function isEyeDropperSupported(): boolean {
 
 const emptySubscribe = () => () => {};
 
+function getServerSnapshot() {
+  return false;
+}
+
 function useIsEyeDropperSupported(): boolean {
   return useSyncExternalStore(
     emptySubscribe,
-    () => isEyeDropperSupported(),
-    () => false,
+    isEyeDropperSupported,
+    getServerSnapshot,
   );
 }
 
@@ -459,7 +463,6 @@ export const ColorPickerInputTrigger = forwardRef<
                 aria-hidden="true"
                 style={{
                   width: "1em", height: "1em",
-                  transition: "opacity 0.2s ease, transform 0.2s ease",
                   opacity: !isPicking && !showCheck ? 1 : 0,
                   transform: !isPicking && !showCheck ? "scale(1)" : "scale(0.5)",
                 }}
@@ -473,7 +476,6 @@ export const ColorPickerInputTrigger = forwardRef<
                 style={{
                   position: "absolute",
                   display: "inline-flex",
-                  transition: "opacity 0.2s ease, transform 0.2s ease",
                   opacity: isPicking ? 1 : 0,
                   transform: isPicking ? "scale(1)" : "scale(0.5)",
                 }}
@@ -512,7 +514,6 @@ export const ColorPickerInputTrigger = forwardRef<
                 style={{
                   position: "absolute",
                   width: "1em", height: "1em",
-                  transition: "opacity 0.2s ease, transform 0.2s ease",
                   opacity: showCheck ? 1 : 0,
                   transform: showCheck ? "scale(1)" : "scale(0.8)",
                 }}

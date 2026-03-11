@@ -157,7 +157,7 @@ function collectFromRules(
   for (const rule of Array.from(rules)) {
     if (rule instanceof CSSStyleRule) {
       // Match selectors that target the root: :root, html, or compound selectors containing them
-      if (/(^|[\s,])(:root|html)([\s,:{[>+~]|$)/i.test(rule.selectorText)) {
+      if (/(^|[\s,])(:root|html)([\s,.:{[>+~]|$)/i.test(rule.selectorText)) {
         for (const prop of Array.from(rule.style)) {
           if (!prop.startsWith("--")) continue;
           if (prefix) {

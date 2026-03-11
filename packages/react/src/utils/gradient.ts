@@ -4,7 +4,7 @@ import { colord } from "./color";
 /**
  * Generate a unique ID for a gradient stop.
  */
-function generateStopId(): string {
+export function generateStopId(): string {
   return `stop-${Math.random().toString(36).slice(2, 10)}`;
 }
 
@@ -100,6 +100,8 @@ export function removeStop(
 
 /**
  * Update a stop's properties.
+ * When the `position` field is updated, the stops array is re-sorted
+ * to maintain ascending position order (consistent with `addStop`).
  */
 export function updateStop(
   gradient: GradientValue,
@@ -114,11 +116,12 @@ export function updateStop(
       ),
     };
   }
+  const updatedStops = gradient.stops.map((s) =>
+    s.id === stopId ? { ...s, ...updates } : s
+  );
   return {
     ...gradient,
-    stops: gradient.stops.map((s) =>
-      s.id === stopId ? { ...s, ...updates } : s
-    ),
+    stops: updates.position !== undefined ? sortStops(updatedStops) : updatedStops,
   } as GradientValue;
 }
 
