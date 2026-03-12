@@ -1,13 +1,59 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { GradientValue, MeshGradientStop } from "../types";
+import type { GradientStop, GradientValue, MeshGradientStop } from "../types";
+import { colord } from "../utils/color";
 import {
   addStop,
   addStopWithCoordinates,
   createDefaultGradient,
+  createGradientStop,
+  interpolateColorAt,
   moveStop as moveStopUtil,
   removeStop,
+  sortStops,
   updateStop,
 } from "../utils/gradient";
+
+/** Default 2D positions for mesh gradient stops (spread across the preview area). */
+const DEFAULT_MESH_XY: { x: number; y: number }[] = [
+  { x: 25, y: 25 },
+  { x: 65, y: 80 },
+  { x: 80, y: 50 },
+  { x: 25, y: 75 },
+  { x: 50, y: 25 },
+];
+
+/**
+ * Strip mesh x/y fields, redistribute positions evenly across 0-100,
+ * and composite semi-transparent stops against the base color.
+ *
+ * Mesh stops often use transparency for the radial blob effect. When converting
+ * to a 1D gradient, we blend each stop with the base color to match the visual
+ * appearance. If the base color is itself transparent (or absent), the stop's
+ * original transparent value is kept as-is.
+ */
+function meshStopsToGradientStops(meshStops: MeshGradientStop[], baseColor?: string): GradientStop[] {
+  const base = baseColor ? colord(baseColor) : null;
+  const baseIsOpaque = base !== null && base.alpha() > 0;
+
+  return meshStops.map(({ x: _x, y: _y, ...rest }, i, arr) => {
+    const c = colord(rest.color);
+    let color = rest.color;
+
+    if (c.alpha() < 1) {
+      if (baseIsOpaque) {
+        // Composite: mix stop color (at full opacity) with base, weighted by stop alpha
+        color = base!.mix(colord(rest.color).alpha(1), c.alpha()).toHex();
+      }
+      // else: base is transparent/absent — keep original transparent value
+    }
+
+    return {
+      ...rest,
+      color,
+      position: arr.length <= 1 ? 0 : Math.round((i / (arr.length - 1)) * 100),
+    };
+  });
+}
 
 /**
  * Construct a new GradientValue with a different type, preserving compatible fields.
@@ -19,7 +65,7 @@ function changeGradientType(current: GradientValue, newType: GradientValue["type
       return {
         type: "linear",
         stops: current.type === "mesh"
-          ? current.stops.map(({ x: _x, y: _y, ...rest }) => rest)
+          ? meshStopsToGradientStops(current.stops, current.baseColor)
           : current.stops,
         angle: (current.type === "linear" || current.type === "conic") ? current.angle : 90,
       };
@@ -27,7 +73,7 @@ function changeGradientType(current: GradientValue, newType: GradientValue["type
       return {
         type: "radial",
         stops: current.type === "mesh"
-          ? current.stops.map(({ x: _x, y: _y, ...rest }) => rest)
+          ? meshStopsToGradientStops(current.stops, current.baseColor)
           : current.stops,
         centerX: (current.type === "radial" || current.type === "conic") ? current.centerX : 50,
         centerY: (current.type === "radial" || current.type === "conic") ? current.centerY : 50,
@@ -36,22 +82,59 @@ function changeGradientType(current: GradientValue, newType: GradientValue["type
       return {
         type: "conic",
         stops: current.type === "mesh"
-          ? current.stops.map(({ x: _x, y: _y, ...rest }) => rest)
+          ? meshStopsToGradientStops(current.stops, current.baseColor)
           : current.stops,
         angle: (current.type === "linear" || current.type === "conic") ? current.angle : 0,
         centerX: (current.type === "radial" || current.type === "conic") ? current.centerX : 50,
         centerY: (current.type === "radial" || current.type === "conic") ? current.centerY : 50,
       };
-    case "mesh":
+    case "mesh": {
+      // Ensure at least 3 stops for mesh gradients by interpolating if needed
+      let stops: GradientStop[] = current.type === "mesh"
+        ? current.stops
+        : [...current.stops];
+
+      while (stops.length < 3 && stops.length >= 2) {
+        const sorted = sortStops(stops);
+        let maxGap = -1;
+        let insertAfter = 0;
+        for (let i = 0; i < sorted.length - 1; i++) {
+          const gap = sorted[i + 1]!.position - sorted[i]!.position;
+          if (gap > maxGap) {
+            maxGap = gap;
+            insertAfter = i;
+          }
+        }
+        const left = sorted[insertAfter]!;
+        const right = sorted[insertAfter + 1]!;
+        const midPos = Math.round((left.position + right.position) / 2);
+        const midColor = interpolateColorAt(sorted, midPos);
+        stops = sortStops([...stops, createGradientStop(midColor, midPos)]);
+      }
+
+      // Assign default x/y coordinates for stops that don't already have them
+      const meshStops: MeshGradientStop[] = stops.map((s, i) => ({
+        ...s,
+        x: "x" in s && typeof s.x === "number" ? s.x : (DEFAULT_MESH_XY[i % DEFAULT_MESH_XY.length]!).x,
+        y: "y" in s && typeof s.y === "number" ? s.y : (DEFAULT_MESH_XY[i % DEFAULT_MESH_XY.length]!).y,
+      })) as MeshGradientStop[];
+
+      // Preserve existing mesh baseColor; for non-mesh sources, default to
+      // white unless any stop is transparent (user likely wants transparency).
+      let baseColor: string | undefined;
+      if (current.type === "mesh") {
+        baseColor = current.baseColor;
+      } else {
+        const hasTransparency = current.stops.some((s) => colord(s.color).alpha() < 1);
+        baseColor = hasTransparency ? undefined : "#ffffff";
+      }
+
       return {
         type: "mesh",
-        stops: current.stops.map((s, i) => ({
-          ...s,
-          x: "x" in s && typeof s.x === "number" ? s.x : (i / Math.max(1, current.stops.length - 1)) * 80 + 10,
-          y: "y" in s && typeof s.y === "number" ? s.y : (i / Math.max(1, current.stops.length - 1)) * 80 + 10,
-        })) as MeshGradientStop[],
-        baseColor: current.type === "mesh" ? current.baseColor : undefined,
+        stops: meshStops,
+        baseColor,
       };
+    }
   }
 }
 

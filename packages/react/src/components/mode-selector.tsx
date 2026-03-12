@@ -31,7 +31,7 @@ export const ColorPickerModeSelectorItem = forwardRef<
   HTMLButtonElement,
   ColorPickerModeSelectorItemProps
 >(function ColorPickerModeSelectorItem({ value: mode, className, onClick, ...rest }, ref) {
-  const { value, hsva, disabled, gradient, updateValue } = useColorPickerContext();
+  const { value, hsva, disabled, gradient, updateValue, setColorFromString } = useColorPickerContext();
   const activeMode = getActiveMode(value);
   const isActive = mode === activeMode;
 
@@ -41,11 +41,10 @@ export const ColorPickerModeSelectorItem = forwardRef<
     (e: React.MouseEvent<HTMLButtonElement>) => {
       if (mode !== activeMode) {
         if (mode === "solid") {
-          // Gradient -> Solid: extract color from active stop or first stop
+          // Gradient -> Solid: extract color from first stop
           if (isGradient(value as string | GradientValue)) {
             const grad = value as GradientValue;
-            const stop = gradient.activeStop ?? grad.stops[0];
-            updateValue(stop?.color ?? fromHSVA(hsva));
+            setColorFromString(grad.stops[0]?.color ?? fromHSVA(hsva));
           }
         } else if (activeMode === "solid") {
           // Solid -> Gradient: create gradient using current color
@@ -60,7 +59,7 @@ export const ColorPickerModeSelectorItem = forwardRef<
       }
       onClick?.(e);
     },
-    [mode, activeMode, value, hsva, gradient, updateValue, onClick]
+    [mode, activeMode, value, hsva, gradient, updateValue, setColorFromString, onClick]
   );
 
   return (
