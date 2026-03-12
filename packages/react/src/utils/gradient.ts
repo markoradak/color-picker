@@ -234,15 +234,18 @@ export function createDefaultGradientFromColor(
         centerY: 50,
         stops: [createGradientStop(color, 0), createGradientStop("#ffffff", 100)],
       };
-    case "mesh":
+    case "mesh": {
+      const midColor = colord(color).mix(colord("#ffffff"), 0.5).toHex();
       return {
         type: "mesh",
         baseColor: "#ffffff",
         stops: [
           createMeshGradientStop(color, 0, 25, 25),
-          createMeshGradientStop("#ffffff", 100, 75, 75),
+          createMeshGradientStop(midColor, 50, 65, 80),
+          createMeshGradientStop("#ffffff", 100, 80, 50),
         ],
       };
+    }
   }
 }
 
@@ -280,7 +283,8 @@ export function createDefaultGradient(
         baseColor: "#ffffff",
         stops: [
           createMeshGradientStop("#000000", 0, 25, 25),
-          createMeshGradientStop("#ffffff", 100, 75, 75),
+          createMeshGradientStop("#808080", 50, 65, 80),
+          createMeshGradientStop("#ffffff", 100, 80, 50),
         ],
       };
   }

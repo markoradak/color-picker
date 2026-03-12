@@ -129,7 +129,7 @@ describe("gradient utilities", () => {
     it("adds a stop with x and y coordinates", () => {
       const gradient = createDefaultGradient("mesh");
       const updated = addStopWithCoordinates(gradient, "#ff0000", 50, 30, 70);
-      expect(updated.stops.length).toBe(3);
+      expect(updated.stops.length).toBe(4);
       const newStop = updated.stops.find((s) => s.color === "#ff0000");
       expect(newStop).toBeDefined();
       expect(newStop!.x).toBe(30);
@@ -423,10 +423,13 @@ describe("gradient utilities", () => {
     it("creates a mesh gradient with x, y coordinates", () => {
       const g = createDefaultGradient("mesh");
       expect(g.type).toBe("mesh");
+      expect(g.stops.length).toBe(3);
       expect(g.stops[0]!.x).toBe(25);
       expect(g.stops[0]!.y).toBe(25);
-      expect(g.stops[1]!.x).toBe(75);
-      expect(g.stops[1]!.y).toBe(75);
+      expect(g.stops[1]!.x).toBe(65);
+      expect(g.stops[1]!.y).toBe(80);
+      expect(g.stops[2]!.x).toBe(80);
+      expect(g.stops[2]!.y).toBe(50);
     });
 
     it("defaults to linear when no type specified", () => {
@@ -435,13 +438,13 @@ describe("gradient utilities", () => {
       expect(g.angle).toBe(90);
     });
 
-    it("always creates two stops (black and white)", () => {
+    it("always creates stops with black and white endpoints", () => {
       const types = ["linear", "radial", "conic", "mesh"] as const;
       for (const type of types) {
         const g = createDefaultGradient(type);
-        expect(g.stops.length).toBe(2);
+        expect(g.stops.length).toBeGreaterThanOrEqual(2);
         expect(g.stops[0]!.color).toBe("#000000");
-        expect(g.stops[1]!.color).toBe("#ffffff");
+        expect(g.stops[g.stops.length - 1]!.color).toBe("#ffffff");
       }
     });
 
