@@ -56,6 +56,15 @@ describe("color utilities", () => {
       expect(isValidColor("hsla(120, 50%, 50%, 0.5)")).toBe(true);
     });
 
+    it("validates oklch colors", () => {
+      expect(isValidColor("oklch(63.7% 0.259 29.23)")).toBe(true);
+      expect(isValidColor("oklch(50% 0.15 180)")).toBe(true);
+    });
+
+    it("validates oklch with alpha", () => {
+      expect(isValidColor("oklch(63.7% 0.259 29.23 / 0.5)")).toBe(true);
+    });
+
     it("validates rgb with clamped-out-of-range values", () => {
       // colord parses these as valid even though 300 > 255
       expect(isValidColor("rgb(300, 0, 0)")).toBe(true);
@@ -93,6 +102,15 @@ describe("color utilities", () => {
     it("is case-insensitive", () => {
       expect(detectFormat("RGB(255, 0, 0)")).toBe("rgb");
       expect(detectFormat("HSL(0, 100%, 50%)")).toBe("hsl");
+    });
+
+    it("detects oklch format", () => {
+      expect(detectFormat("oklch(63.7% 0.259 29.23)")).toBe("oklch");
+      expect(detectFormat("OKLCH(50% 0.15 180)")).toBe("oklch");
+    });
+
+    it("detects oklch with alpha", () => {
+      expect(detectFormat("oklch(63.7% 0.259 29.23 / 0.5)")).toBe("oklch");
     });
   });
 
@@ -134,6 +152,38 @@ describe("color utilities", () => {
 
     it("converts hsl to rgb", () => {
       expect(formatColor("hsl(120, 100%, 50%)", "rgb")).toBe("rgb(0, 255, 0)");
+    });
+
+    it("converts hex to oklch", () => {
+      const result = formatColor("#ff0000", "oklch");
+      expect(result).toMatch(/^oklch\(/);
+      // Red should have high chroma and hue around 29
+      expect(result).toContain("%");
+    });
+
+    it("converts oklch to hex", () => {
+      const result = formatColor("oklch(62.8% 0.2577 29.23)", "hex");
+      expect(result).toMatch(/^#[0-9a-f]{6}$/i);
+    });
+
+    it("converts oklch to rgb", () => {
+      const result = formatColor("oklch(62.8% 0.2577 29.23)", "rgb");
+      expect(result).toMatch(/^rgba?\(/);
+    });
+
+    it("preserves alpha when converting to oklch", () => {
+      const result = formatColor("rgba(255, 0, 0, 0.5)", "oklch");
+      expect(result).toMatch(/\/\s*0\.5\)$/);
+    });
+
+    it("roundtrips oklch through hex with reasonable accuracy", () => {
+      const oklch = "oklch(63.7% 0.259 29.23)";
+      const hex = formatColor(oklch, "hex");
+      const backToOklch = formatColor(hex, "oklch");
+      // Extract lightness from both
+      const origL = parseFloat(oklch.match(/oklch\((\d+\.?\d*)%/)?.[1] ?? "0");
+      const roundL = parseFloat(backToOklch.match(/oklch\((\d+\.?\d*)%/)?.[1] ?? "0");
+      expect(Math.abs(origL - roundL)).toBeLessThan(1);
     });
   });
 
@@ -221,6 +271,19 @@ describe("color utilities", () => {
     it("returns white for arbitrary non-color string", () => {
       const hsva = toHSVA("not-a-color-at-all");
       expect(hsva).toEqual({ h: 0, s: 0, v: 100, a: 1 });
+    });
+
+    it("converts oklch input to HSVA", () => {
+      // oklch red-ish color
+      const hsva = toHSVA("oklch(62.8% 0.2577 29.23)");
+      expect(hsva.s).toBeGreaterThan(50);
+      expect(hsva.v).toBeGreaterThan(50);
+      expect(hsva.a).toBe(1);
+    });
+
+    it("preserves alpha from oklch input", () => {
+      const hsva = toHSVA("oklch(62.8% 0.2577 29.23 / 0.5)");
+      expect(hsva.a).toBeCloseTo(0.5);
     });
   });
 

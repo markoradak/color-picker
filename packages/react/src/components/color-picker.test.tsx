@@ -185,13 +185,24 @@ describe("ColorPicker compound component", () => {
       expect(toggle.textContent).toBe("HSL");
     });
 
-    it("cycles back to HEX from HSL", () => {
+    it("cycles from HSL to OKLCH on fourth click", () => {
       renderInlinePicker("#ff0000");
       const toggle = screen.getByRole("button", { name: /color format/i });
 
       fireEvent.click(toggle); // HEX -> RGB
       fireEvent.click(toggle); // RGB -> HSL
-      fireEvent.click(toggle); // HSL -> HEX
+      fireEvent.click(toggle); // HSL -> OKLCH
+      expect(toggle.textContent).toBe("OKLCH");
+    });
+
+    it("cycles back to HEX from OKLCH", () => {
+      renderInlinePicker("#ff0000");
+      const toggle = screen.getByRole("button", { name: /color format/i });
+
+      fireEvent.click(toggle); // HEX -> RGB
+      fireEvent.click(toggle); // RGB -> HSL
+      fireEvent.click(toggle); // HSL -> OKLCH
+      fireEvent.click(toggle); // OKLCH -> HEX
       expect(toggle.textContent).toBe("HEX");
     });
 

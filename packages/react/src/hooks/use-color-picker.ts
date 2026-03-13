@@ -140,7 +140,7 @@ export function useColorPicker(options: UseColorPickerOptions) {
 
   const toggleFormat = useCallback(() => {
     setFormat((prev) => {
-      const formats: ColorFormat[] = ["hex", "rgb", "hsl"];
+      const formats: ColorFormat[] = ["hex", "rgb", "hsl", "oklch"];
       const idx = formats.indexOf(prev);
       return formats[(idx + 1) % formats.length]!;
     });

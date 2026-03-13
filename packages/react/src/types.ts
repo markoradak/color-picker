@@ -33,7 +33,7 @@ export type ColorPickerMode = "solid" | GradientType;
 /**
  * Supported color format identifiers.
  */
-export type ColorFormat = "hex" | "rgb" | "hsl";
+export type ColorFormat = "hex" | "rgb" | "hsl" | "oklch";
 
 /**
  * A single gradient stop with a color and position along the gradient axis.

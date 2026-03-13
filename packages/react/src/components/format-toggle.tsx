@@ -6,6 +6,7 @@ const FORMAT_LABELS: Record<ColorFormat, string> = {
   hex: "HEX",
   rgb: "RGB",
   hsl: "HSL",
+  oklch: "OKLCH",
 };
 
 /**

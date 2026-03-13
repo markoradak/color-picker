@@ -9,6 +9,114 @@ extend([namesPlugin, a11yPlugin, mixPlugin]);
 
 export { colord };
 
+// ── OKLCH conversion helpers ────────────────────────────────────────────
+// Based on Björn Ottosson's OKLab specification.
+// https://bottosson.github.io/posts/oklab/
+
+function srgbToLinear(c: number): number {
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function linearToSrgb(c: number): number {
+  return c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+}
+
+interface OKLCH {
+  l: number; // 0-1
+  c: number; // 0-~0.4
+  h: number; // 0-360
+  a: number; // 0-1 (alpha)
+}
+
+function rgbaToOklch(r: number, g: number, b: number, a: number): OKLCH {
+  // sRGB 0-255 → linear
+  const lr = srgbToLinear(r / 255);
+  const lg = srgbToLinear(g / 255);
+  const lb = srgbToLinear(b / 255);
+
+  // Linear sRGB → LMS
+  const l = 0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb;
+  const m = 0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb;
+  const s = 0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb;
+
+  // LMS → OKLab (cube root)
+  const l_ = Math.cbrt(l);
+  const m_ = Math.cbrt(m);
+  const s_ = Math.cbrt(s);
+
+  const L = 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_;
+  const A = 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_;
+  const B = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_;
+
+  // OKLab → OKLCH
+  const C = Math.sqrt(A * A + B * B);
+  let H = (Math.atan2(B, A) * 180) / Math.PI;
+  if (H < 0) H += 360;
+
+  return { l: L, c: C, h: C < 0.0001 ? 0 : H, a };
+}
+
+function oklchToRgba(L: number, C: number, H: number, a: number): { r: number; g: number; b: number; a: number } {
+  // OKLCH → OKLab
+  const hRad = (H * Math.PI) / 180;
+  const A = C * Math.cos(hRad);
+  const B = C * Math.sin(hRad);
+
+  // OKLab → LMS (cube)
+  const l_ = L + 0.3963377774 * A + 0.2158037573 * B;
+  const m_ = L - 0.1055613458 * A - 0.0638541728 * B;
+  const s_ = L - 0.0894841775 * A - 1.2914855480 * B;
+
+  const l = l_ * l_ * l_;
+  const m = m_ * m_ * m_;
+  const s = s_ * s_ * s_;
+
+  // LMS → linear sRGB
+  const lr = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+  const lg = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  const lb = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+
+  // linear → sRGB, clamp 0-255
+  const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(linearToSrgb(v) * 255)));
+
+  return { r: clamp(lr), g: clamp(lg), b: clamp(lb), a };
+}
+
+/** Format OKLCH values to a CSS oklch() string. */
+function formatOklchString(oklch: OKLCH): string {
+  const l = +(oklch.l * 100).toFixed(2);
+  const c = +oklch.c.toFixed(4);
+  const h = +oklch.h.toFixed(2);
+  if (oklch.a < 1) {
+    return `oklch(${l}% ${c} ${h} / ${+oklch.a.toFixed(2)})`;
+  }
+  return `oklch(${l}% ${c} ${h})`;
+}
+
+/** Regex for parsing oklch() CSS strings. */
+const OKLCH_RE =
+  /^oklch\(\s*([+-]?\d*\.?\d+)(%?)\s+([+-]?\d*\.?\d+)\s+([+-]?\d*\.?\d+)(deg|rad|grad|turn)?\s*(?:\/\s*([+-]?\d*\.?\d+)(%)?\s*)?\)$/i;
+
+const ANGLE_FACTORS: Record<string, number> = { deg: 1, rad: 180 / Math.PI, grad: 0.9, turn: 360 };
+
+/**
+ * Parse an oklch() CSS string into RGBA values (0-255).
+ * Returns null if the string is not a valid oklch() function.
+ */
+function parseOklchString(input: string): { r: number; g: number; b: number; a: number } | null {
+  const match = OKLCH_RE.exec(input.trim());
+  if (!match) return null;
+
+  let L = Number(match[1]);
+  if (match[2] === "%") L /= 100; // percentage → 0-1
+  const C = Number(match[3]);
+  let H = Number(match[4]);
+  if (match[5]) H *= ANGLE_FACTORS[match[5]] ?? 1;
+  const a = match[6] !== undefined ? Number(match[6]) / (match[7] ? 100 : 1) : 1;
+
+  return oklchToRgba(L, C, H, a);
+}
+
 /**
  * Parse any supported color string into a colord instance.
  */
@@ -20,7 +128,24 @@ export function parseColor(input: string) {
  * Format a color string into the specified format.
  */
 export function formatColor(input: string, format: ColorFormat): string {
-  const c = colord(input);
+  if (format === "oklch") {
+    // Parse input to RGBA first, then convert to OKLCH
+    const rgba = parseOklchString(input) ?? (() => {
+      const c = colord(input);
+      if (!c.isValid()) return null;
+      const rgb = c.toRgb();
+      return { r: rgb.r, g: rgb.g, b: rgb.b, a: c.alpha() };
+    })();
+    if (!rgba) return input;
+    return formatOklchString(rgbaToOklch(rgba.r, rgba.g, rgba.b, rgba.a));
+  }
+
+  // For non-OKLCH formats, convert OKLCH input to hex first for colord
+  const resolved = parseOklchString(input);
+  const c = resolved
+    ? colord({ r: resolved.r, g: resolved.g, b: resolved.b }).alpha(resolved.a)
+    : colord(input);
+
   switch (format) {
     case "hex":
       return c.toHex();
@@ -38,6 +163,7 @@ export function formatColor(input: string, format: ColorFormat): string {
  */
 export function detectFormat(input: string): ColorFormat {
   const trimmed = input.trim().toLowerCase();
+  if (trimmed.startsWith("oklch")) return "oklch";
   if (trimmed.startsWith("rgb")) return "rgb";
   if (trimmed.startsWith("hsl")) return "hsl";
   return "hex";
@@ -47,6 +173,7 @@ export function detectFormat(input: string): ColorFormat {
  * Check if a string is a valid color.
  */
 export function isValidColor(input: string): boolean {
+  if (parseOklchString(input)) return true;
   return colord(input).isValid();
 }
 
@@ -60,7 +187,11 @@ export function toHSVA(input: string): HSVA {
   if (!isValidColor(input)) {
     return { h: 0, s: 0, v: 100, a: 1 };
   }
-  const c = colord(input);
+  // Handle oklch() input by converting to RGBA first
+  const oklchRgba = parseOklchString(input);
+  const c = oklchRgba
+    ? colord({ r: oklchRgba.r, g: oklchRgba.g, b: oklchRgba.b }).alpha(oklchRgba.a)
+    : colord(input);
   const hsv = c.toHsv();
   return {
     h: hsv.h,
