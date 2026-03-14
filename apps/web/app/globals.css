@@ -36,11 +36,11 @@ body {
   }
 }
 
-[data-radix-popper-content-wrapper] [data-state="open"] {
+[data-radix-popper-content-wrapper] > [data-state="open"] {
   animation: cp-fade-in 150ms ease-out;
 }
 
-[data-radix-popper-content-wrapper] [data-state="closed"] {
+[data-radix-popper-content-wrapper] > [data-state="closed"] {
   animation: cp-fade-out 100ms ease-in;
 }
 

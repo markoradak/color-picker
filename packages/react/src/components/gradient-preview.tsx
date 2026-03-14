@@ -208,7 +208,9 @@ export const GradientPreview = forwardRef<
       didDragRef.current = false;
       setActiveStopId(stopId);
 
-      e.currentTarget.setPointerCapture(e.pointerId);
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const DRAG_THRESHOLD = 3; // px — ignore micro-movements during a click
 
       let isEndpoint = false;
       let isFirstStop = false;
@@ -245,6 +247,11 @@ export const GradientPreview = forwardRef<
       const handleMove = (ev: PointerEvent) => {
         const coords = getPreviewCoords(ev);
         if (!coords || !draggingStopId.current) return;
+        if (!didDragRef.current) {
+          const dx = ev.clientX - startX;
+          const dy = ev.clientY - startY;
+          if (Math.sqrt(dx * dx + dy * dy) < DRAG_THRESHOLD) return;
+        }
         didDragRef.current = true;
         const { mx, my } = coords;
         const sid = draggingStopId.current;

@@ -73,11 +73,13 @@ export const GradientStops = forwardRef<
       didDragRef.current = false;
       setActiveStopId(stopId);
 
-      e.currentTarget.setPointerCapture(e.pointerId);
+      const startX = e.clientX;
+      const DRAG_THRESHOLD = 3; // px — ignore micro-movements during a click
 
       const handleMove = (ev: PointerEvent) => {
         const bar = barRef.current;
         if (!bar || !draggingStopId.current) return;
+        if (!didDragRef.current && Math.abs(ev.clientX - startX) < DRAG_THRESHOLD) return;
         didDragRef.current = true;
         const rect = bar.getBoundingClientRect();
         const position = clamp(((ev.clientX - rect.left) / rect.width) * 100, 0, 100);
