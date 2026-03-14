@@ -524,7 +524,7 @@ const tw = {
   gradientBaseColor: "bottom-2 left-2 z-[2] h-5 w-5 cursor-pointer rounded border border-white/50 shadow-sm outline-none",
   gradientContextMenu: "rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
   gradientContextMenuItem: "block w-full px-3 py-1.5 text-left text-xs outline-none hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
-  gradientPopoverContent: "z-50 flex w-80 flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
+  gradientPopoverContent: "z-50 flex w-64 flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
   gradientSwatches: "mt-0.5 gap-1",
   trigger: "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 p-1 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-zinc-600",
   triggerCheckerboard: "inset-1 rounded-md",
@@ -923,15 +923,19 @@ function PopoverPicker({
             {options.showContrastInfo && (
               <ColorPickerContrastInfo
                 contrastColor={options.contrastColor}
-                className="flex items-center gap-2 text-sm"
+                onContrastColorChange={onContrastColorChange}
+                className="flex items-center gap-1.5 text-xs"
                 classNames={{
                   ratio: "font-mono font-medium tabular-nums text-neutral-700 dark:text-neutral-300",
-                  badge: "inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-semibold leading-none",
+                  badge: "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none",
                 }}
               />
             )}
             <ColorPickerArea className={styles.area}>
               <ColorPickerAreaGradient className={styles.areaGradient} />
+              {options.showContrastInfo && (
+                <ColorPickerContrastLine contrastColor={options.contrastColor} />
+              )}
               <ColorPickerAreaThumb className={styles.areaThumb} />
             </ColorPickerArea>
             <ColorPickerHueSlider className={styles.hueSlider}>

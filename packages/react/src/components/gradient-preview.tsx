@@ -505,7 +505,7 @@ export const GradientPreview = forwardRef<
                 value={gradientValue.baseColor || "#ffffff"}
                 onValueChange={(color) => setBaseColor(color)}
               >
-                <ColorPickerControls swatches={swatches} />
+                <ColorPickerControls enableGradient={false} swatches={swatches} />
               </ColorPickerProvider>
             </Popover.Content>
           </Popover.Portal>
@@ -621,7 +621,7 @@ export const GradientPreview = forwardRef<
                   value={stop.color}
                   onValueChange={(color) => handleStopColorChange(stop.id, color)}
                 >
-                  <ColorPickerControls swatches={swatches} />
+                  <ColorPickerControls enableGradient={false} swatches={swatches} />
                 </ColorPickerProvider>
               </Popover.Content>
             </Popover.Portal>

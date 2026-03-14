@@ -85,7 +85,7 @@ export function ColorPickerControls({
               baseColor: "bottom-2 left-2 z-[2] h-5 w-5 cursor-pointer rounded border border-white/50 shadow-sm outline-none",
               contextMenu: "rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
               contextMenuItem: "block w-full px-3 py-1.5 text-left text-xs outline-none hover:bg-zinc-100 disabled:opacity-50 dark:text-zinc-300 dark:hover:bg-zinc-800",
-              popoverContent: "z-50 flex w-80 flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
+              popoverContent: "z-50 flex w-64 flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
             }}
           />
           {enableSwatches && gradientSwatches && gradientSwatches.length > 0 && (

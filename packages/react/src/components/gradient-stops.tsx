@@ -249,7 +249,7 @@ export const GradientStops = forwardRef<
                     value={stop.color}
                     onValueChange={(color) => handleStopColorChange(stop.id, color)}
                   >
-                    <ColorPickerControls />
+                    <ColorPickerControls enableGradient={false} />
                   </ColorPickerProvider>
                 </Popover.Content>
               </Popover.Portal>
