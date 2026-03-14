@@ -549,7 +549,7 @@ export function PlaygroundClient() {
     enableGradient: true,
     enableTokens: true,
     enableTokenSearch: true,
-    showContrastInfo: false,
+    showContrastInfo: true,
     contrastColor: "#ffffff",
     swatchColors: DEFAULT_SWATCHES,
   });
@@ -677,8 +677,6 @@ export function PlaygroundClient() {
                 onChange={(v) => updateOption("enableTokenSearch", v)}
               />
             )}
-
-            <hr className="border-neutral-200 dark:border-neutral-700" />
 
             <Toggle
               label="Contrast info"
