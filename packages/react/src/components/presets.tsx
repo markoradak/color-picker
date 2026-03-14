@@ -139,7 +139,7 @@ export function ColorPickerControls({
             />
             {enableEyeDropper && (
               <ColorPickerEyeDropper
-                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-zinc-300 bg-white opacity-60 outline-none hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+                className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-zinc-300 bg-white outline-none disabled:cursor-not-allowed disabled:opacity-50 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
                 classNames={{ icon: "h-3.5 w-3.5", spinner: "h-3.5 w-3.5 animate-spin" }}
               />
             )}

@@ -513,7 +513,7 @@ const tw = {
   input: "flex items-center gap-1",
   inputFormatToggle: "shrink-0 select-none rounded-md border border-zinc-300 bg-white px-2 h-8 text-xs font-medium outline-none hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
   inputField: "w-full rounded-md border border-zinc-300 bg-white px-2 h-8 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100",
-  eyeDropper: "inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-zinc-300 bg-white opacity-60 outline-none hover:opacity-100 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
+  eyeDropper: "inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-zinc-300 bg-white outline-none hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
   eyeDropperIcon: "h-3.5 w-3.5",
   eyeDropperSpinner: "h-3.5 w-3.5 animate-spin",
   swatches: "gap-1",
