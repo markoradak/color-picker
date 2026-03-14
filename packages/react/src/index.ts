@@ -14,6 +14,8 @@ export { ColorPickerEyeDropper } from "./components/eye-dropper";
 export { ColorPickerSwatches, ColorPickerSwatch } from "./components/swatches";
 export { ColorPickerGradientEditor } from "./components/gradient-editor";
 export { ColorPickerGradientSwatches, ColorPickerGradientSwatch } from "./components/gradient-swatches";
+export { ColorPickerContrastInfo } from "./components/contrast-info";
+export { ColorPickerContrastLine } from "./components/contrast-line";
 export { GradientPreview } from "./components/gradient-preview";
 export { GradientStops } from "./components/gradient-stops";
 export { TokenList } from "./components/token-list";
@@ -23,7 +25,8 @@ export { ColorPickerPopover, ColorPickerInline, ColorPickerControls } from "./co
 
 // Utilities
 export { toCSS, fromCSS, isGradient, isSolidColor } from "./utils/css";
-export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor, resolveToken, findMatchingToken, getCSSColorTokens } from "./utils/color";
+export { parseColor, formatColor, detectFormat, isValidColor, toHSVA, fromHSVA, getContrastColor, resolveToken, findMatchingToken, getCSSColorTokens, contrastRatio, getWcagLevel, getEffectiveBackgroundColor, hsvLuminance, contrastFromLuminances, colorLuminance } from "./utils/color";
+export type { WcagLevel } from "./utils/color";
 export { createGradientStop, createMeshGradientStop, sortStops, addStop, addStopWithCoordinates, removeStop, updateStop, moveStop, createDefaultGradient, createDefaultGradientFromColor, interpolateColorAt } from "./utils/gradient";
 export { clamp, getRelativePosition, angleFromPosition } from "./utils/position";
 
@@ -62,6 +65,7 @@ export type {
   ColorPickerAlphaSliderThumbProps,
   ColorPickerInputProps,
   ColorPickerFormatToggleProps,
+  ColorPickerContrastInfoProps,
   ColorPickerEyeDropperProps,
   ColorPickerSwatchesProps,
   ColorPickerSwatchProps,
@@ -83,3 +87,4 @@ export type {
   HSVA,
 } from "./types";
 export type { TokenListProps } from "./components/token-list";
+export type { ColorPickerContrastLineProps } from "./components/contrast-line";

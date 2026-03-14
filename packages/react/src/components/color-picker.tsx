@@ -18,6 +18,8 @@ import { ColorPickerGradientEditor } from "./gradient-editor";
 import { ColorPickerModeSelector, ColorPickerModeSelectorItem } from "./mode-selector";
 import { ColorPickerProvider } from "./color-picker-provider";
 import { ColorPickerGradientSwatches, ColorPickerGradientSwatch } from "./gradient-swatches";
+import { ColorPickerContrastInfo } from "./contrast-info";
+import { ColorPickerContrastLine } from "./contrast-line";
 
 // Re-export for backward compatibility
 export { useColorPickerContext } from "./color-picker-context";
@@ -129,3 +131,5 @@ ColorPicker.ModeSelectorItem = ColorPickerModeSelectorItem;
 ColorPicker.GradientSwatches = ColorPickerGradientSwatches;
 ColorPicker.GradientSwatch = ColorPickerGradientSwatch;
 ColorPicker.Provider = ColorPickerProvider;
+ColorPicker.ContrastInfo = ColorPickerContrastInfo;
+ColorPicker.ContrastLine = ColorPickerContrastLine;

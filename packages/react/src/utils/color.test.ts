@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  contrastRatio,
   detectFormat,
   findMatchingToken,
   formatColor,
   fromHSVA,
   getCSSColorTokens,
   getContrastColor,
+  getWcagLevel,
   isValidColor,
   parseColor,
   resolveToken,
@@ -375,6 +377,55 @@ describe("color utilities", () => {
 
     it("returns undefined when tokens is undefined", () => {
       expect(findMatchingToken("#3b82f6")).toBeUndefined();
+    });
+  });
+
+  describe("contrastRatio", () => {
+    it("returns 21 for black on white", () => {
+      expect(contrastRatio("#000000", "#ffffff")).toBeCloseTo(21, 0);
+    });
+
+    it("returns 1 for identical colors", () => {
+      expect(contrastRatio("#ff0000", "#ff0000")).toBeCloseTo(1, 0);
+    });
+
+    it("works with named colors", () => {
+      const ratio = contrastRatio("black", "white");
+      expect(ratio).toBeCloseTo(21, 0);
+    });
+
+    it("works with oklch input", () => {
+      // oklch black vs white equivalent
+      const ratio = contrastRatio("oklch(0% 0 0)", "oklch(100% 0 0)");
+      expect(ratio).toBeGreaterThan(15);
+    });
+
+    it("is symmetric", () => {
+      const a = contrastRatio("#ff0000", "#ffffff");
+      const b = contrastRatio("#ffffff", "#ff0000");
+      expect(a).toBeCloseTo(b, 2);
+    });
+  });
+
+  describe("getWcagLevel", () => {
+    it("returns AAA for ratio >= 7", () => {
+      expect(getWcagLevel(7)).toBe("AAA");
+      expect(getWcagLevel(21)).toBe("AAA");
+    });
+
+    it("returns AA for ratio >= 4.5 and < 7", () => {
+      expect(getWcagLevel(4.5)).toBe("AA");
+      expect(getWcagLevel(6.9)).toBe("AA");
+    });
+
+    it("returns AA18 for ratio >= 3 and < 4.5", () => {
+      expect(getWcagLevel(3)).toBe("AA18");
+      expect(getWcagLevel(4.4)).toBe("AA18");
+    });
+
+    it("returns Fail for ratio < 3", () => {
+      expect(getWcagLevel(2.9)).toBe("Fail");
+      expect(getWcagLevel(1)).toBe("Fail");
     });
   });
 

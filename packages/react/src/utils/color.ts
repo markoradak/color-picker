@@ -249,6 +249,142 @@ export function findMatchingToken(
   return undefined;
 }
 
+// ── Contrast ratio helpers ──────────────────────────────────────────────
+
+/**
+ * WCAG conformance level for a contrast ratio.
+ */
+export type WcagLevel = "AAA" | "AA" | "AA18" | "Fail";
+
+/**
+ * Calculate the WCAG 2.1 contrast ratio between two colors.
+ * Accepts any color format the library supports (hex, rgb, hsl, oklch, named).
+ * Returns a ratio from 1 (identical) to 21 (black vs white).
+ */
+export function contrastRatio(color1: string, color2: string): number {
+  const c1 = oklchOrColord(color1);
+  const c2 = oklchOrColord(color2);
+  return c1.contrast(c2);
+}
+
+/**
+ * Determine the highest WCAG 2.1 conformance level a contrast ratio achieves.
+ * - "AAA"  — ratio >= 7   (normal text, enhanced)
+ * - "AA"   — ratio >= 4.5 (normal text, minimum)
+ * - "AA18" — ratio >= 3   (large text / UI components)
+ * - "Fail" — ratio < 3
+ */
+export function getWcagLevel(ratio: number): WcagLevel {
+  if (ratio >= 7) return "AAA";
+  if (ratio >= 4.5) return "AA";
+  if (ratio >= 3) return "AA18";
+  return "Fail";
+}
+
+/**
+ * Walk up the DOM tree from `element` to find the effective background color.
+ * Skips transparent layers and composites when an opaque background is found.
+ * Falls back to white (`#ffffff`) if no opaque ancestor is found.
+ */
+export function getEffectiveBackgroundColor(element: HTMLElement): string {
+  let current: HTMLElement | null = element;
+
+  while (current) {
+    const bg = getComputedStyle(current).backgroundColor;
+    if (bg && bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)") {
+      const c = colord(bg);
+      if (c.isValid() && c.alpha() > 0) {
+        return c.alpha() >= 1 ? c.toHex() : blendOnWhite(c);
+      }
+    }
+    current = current.parentElement;
+  }
+
+  return "#ffffff";
+}
+
+/** Blend a semi-transparent color onto white to get the effective opaque color. */
+function blendOnWhite(c: ReturnType<typeof colord>): string {
+  const rgb = c.toRgb();
+  const a = c.alpha();
+  const blend = (channel: number) => Math.round(channel * a + 255 * (1 - a));
+  return colord({ r: blend(rgb.r), g: blend(rgb.g), b: blend(rgb.b) }).toHex();
+}
+
+/** Parse a color string (oklch-aware) into a colord instance. */
+function oklchOrColord(input: string): ReturnType<typeof colord> {
+  const rgba = parseOklchString(input);
+  return rgba
+    ? colord({ r: rgba.r, g: rgba.g, b: rgba.b }).alpha(rgba.a)
+    : colord(input);
+}
+
+// ── Fast HSV contrast helpers (no string alloc, used by contrast line) ──
+
+/** Convert a single sRGB channel (0-1) to linear. */
+function srgbChannelToLinear(c: number): number {
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+/** Relative luminance from linear RGB channels (0-1). */
+function luminanceFromLinear(r: number, g: number, b: number): number {
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/**
+ * Compute relative luminance directly from HSV + alpha,
+ * blending onto a white background when alpha < 1.
+ * All inputs in picker-native units: h 0-360, s 0-100, v 0-100, a 0-1.
+ */
+export function hsvLuminance(h: number, s: number, v: number, a: number): number {
+  // HSV → sRGB (0-1)
+  const S = s / 100;
+  const V = v / 100;
+  const C = V * S;
+  const hp = h / 60;
+  const X = C * (1 - Math.abs((hp % 2) - 1));
+  const m = V - C;
+
+  let r: number, g: number, b: number;
+  if (hp < 1)      { r = C; g = X; b = 0; }
+  else if (hp < 2) { r = X; g = C; b = 0; }
+  else if (hp < 3) { r = 0; g = C; b = X; }
+  else if (hp < 4) { r = 0; g = X; b = C; }
+  else if (hp < 5) { r = X; g = 0; b = C; }
+  else             { r = C; g = 0; b = X; }
+
+  r += m; g += m; b += m;
+
+  // Blend onto white when translucent
+  if (a < 1) {
+    r = r * a + 1 * (1 - a);
+    g = g * a + 1 * (1 - a);
+    b = b * a + 1 * (1 - a);
+  }
+
+  return luminanceFromLinear(
+    srgbChannelToLinear(r),
+    srgbChannelToLinear(g),
+    srgbChannelToLinear(b),
+  );
+}
+
+/** WCAG contrast ratio from two luminances. */
+export function contrastFromLuminances(l1: number, l2: number): number {
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/** Compute the relative luminance of any parsed color string. */
+export function colorLuminance(color: string): number {
+  const rgba = parseOklchString(color);
+  const c = rgba
+    ? colord({ r: rgba.r, g: rgba.g, b: rgba.b }).alpha(rgba.a)
+    : colord(color);
+  return c.luminance();
+}
+
 /** Internal prefixes to skip when auto-detecting (library internals, Tailwind internals) */
 const INTERNAL_PREFIXES = ["--cp-", "--tw-"];
 

@@ -24,6 +24,8 @@ import {
   ColorPickerTrigger,
   ColorPickerInputTrigger,
   ColorPickerContent,
+  ColorPickerContrastInfo,
+  ColorPickerContrastLine,
   toCSS,
 } from "@markoradak/color-picker";
 import type { ColorPickerValue } from "@markoradak/color-picker";
@@ -72,6 +74,8 @@ interface PlaygroundOptions {
   enableGradient: boolean;
   enableTokens: boolean;
   enableTokenSearch: boolean;
+  showContrastInfo: boolean;
+  contrastColor: string;
   swatchColors: string[];
 }
 
@@ -545,6 +549,8 @@ export function PlaygroundClient() {
     enableGradient: true,
     enableTokens: true,
     enableTokenSearch: true,
+    showContrastInfo: false,
+    contrastColor: "#ffffff",
     swatchColors: DEFAULT_SWATCHES,
   });
 
@@ -580,12 +586,14 @@ export function PlaygroundClient() {
                 value={value}
                 onValueChange={setValue}
                 options={options}
+                onContrastColorChange={(c) => updateOption("contrastColor", c)}
               />
             ) : (
               <InlinePicker
                 value={value}
                 onValueChange={setValue}
                 options={options}
+                onContrastColorChange={(c) => updateOption("contrastColor", c)}
               />
             )}
           </div>
@@ -669,6 +677,15 @@ export function PlaygroundClient() {
                 onChange={(v) => updateOption("enableTokenSearch", v)}
               />
             )}
+
+            <hr className="border-neutral-200 dark:border-neutral-700" />
+
+            <Toggle
+              label="Contrast info"
+              description="WCAG contrast ratio against a reference color"
+              checked={options.showContrastInfo}
+              onChange={(v) => updateOption("showContrastInfo", v)}
+            />
           </div>
         </div>
       </div>
@@ -769,10 +786,12 @@ function InlinePicker({
   value,
   onValueChange,
   options,
+  onContrastColorChange,
 }: {
   value: ColorPickerValue;
   onValueChange: (v: ColorPickerValue) => void;
   options: PlaygroundOptions;
+  onContrastColorChange: (color: string) => void;
 }) {
   const isGradientMode = typeof value !== "string";
 
@@ -799,8 +818,22 @@ function InlinePicker({
             </>
           ) : (
             <>
+              {options.showContrastInfo && (
+                <ColorPickerContrastInfo
+                  contrastColor={options.contrastColor}
+                  onContrastColorChange={onContrastColorChange}
+                  className="flex items-center gap-1.5 text-xs"
+                  classNames={{
+                    ratio: "font-mono font-medium tabular-nums text-neutral-700 dark:text-neutral-300",
+                    badge: "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none",
+                  }}
+                />
+              )}
               <ColorPickerArea className={styles.area}>
                 <ColorPickerAreaGradient className={styles.areaGradient} />
+                {options.showContrastInfo && (
+                  <ColorPickerContrastLine contrastColor={options.contrastColor} />
+                )}
                 <ColorPickerAreaThumb className={styles.areaThumb} />
               </ColorPickerArea>
               <ColorPickerHueSlider className={styles.hueSlider}>
@@ -842,10 +875,12 @@ function PopoverPicker({
   value,
   onValueChange,
   options,
+  onContrastColorChange,
 }: {
   value: ColorPickerValue;
   onValueChange: (v: ColorPickerValue) => void;
   options: PlaygroundOptions;
+  onContrastColorChange: (color: string) => void;
 }) {
   const isGradientMode = typeof value !== "string";
 
@@ -885,6 +920,16 @@ function PopoverPicker({
           </>
         ) : (
           <>
+            {options.showContrastInfo && (
+              <ColorPickerContrastInfo
+                contrastColor={options.contrastColor}
+                className="flex items-center gap-2 text-sm"
+                classNames={{
+                  ratio: "font-mono font-medium tabular-nums text-neutral-700 dark:text-neutral-300",
+                  badge: "inline-flex items-center rounded px-1.5 py-0.5 text-[11px] font-semibold leading-none",
+                }}
+              />
+            )}
             <ColorPickerArea className={styles.area}>
               <ColorPickerAreaGradient className={styles.areaGradient} />
               <ColorPickerAreaThumb className={styles.areaThumb} />

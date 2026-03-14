@@ -923,3 +923,96 @@
     transition-duration: 0s;
   }
 }
+
+/* ── Contrast Info ─────────────────────────────────────────────────── */
+
+[data-cp-part="contrast-info"] {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--cp-font-family, inherit);
+  font-size: 0.75rem;
+  color: var(--cp-text);
+}
+
+[data-cp-el="contrast-indicator"] {
+  flex-shrink: 0;
+}
+
+[data-cp-el="contrast-ratio"] {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+[data-cp-el="contrast-badge"] {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  border: 1px solid var(--cp-border);
+  background-color: var(--cp-hover-bg, rgba(0, 0, 0, 0.05));
+  color: var(--cp-text);
+}
+
+[data-cp-el="contrast-badge"][data-pass] {
+  color: #16a34a;
+  border-color: #bbf7d0;
+  background-color: #f0fdf4;
+}
+
+[data-cp-el="contrast-badge"][data-level="aaa"][data-pass] {
+  color: #15803d;
+  border-color: #86efac;
+  background-color: #dcfce7;
+}
+
+[data-cp-el="contrast-badge"]:not([data-pass]) {
+  color: #dc2626;
+  border-color: #fecaca;
+  background-color: #fef2f2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    [data-cp-el="contrast-badge"][data-pass] {
+      color: #4ade80;
+      border-color: #166534;
+      background-color: #052e16;
+    }
+
+    [data-cp-el="contrast-badge"][data-level="aaa"][data-pass] {
+      color: #86efac;
+      border-color: #14532d;
+      background-color: #052e16;
+    }
+
+    [data-cp-el="contrast-badge"]:not([data-pass]) {
+      color: #f87171;
+      border-color: #7f1d1d;
+      background-color: #450a0a;
+    }
+  }
+}
+
+.dark {
+  [data-cp-el="contrast-badge"][data-pass] {
+    color: #4ade80;
+    border-color: #166534;
+    background-color: #052e16;
+  }
+
+  [data-cp-el="contrast-badge"][data-level="aaa"][data-pass] {
+    color: #86efac;
+    border-color: #14532d;
+    background-color: #052e16;
+  }
+
+  [data-cp-el="contrast-badge"]:not([data-pass]) {
+    color: #f87171;
+    border-color: #7f1d1d;
+    background-color: #450a0a;
+  }
+}

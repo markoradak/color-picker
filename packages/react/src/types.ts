@@ -440,10 +440,28 @@ export interface ColorPickerModeSelectorItemProps
 
 /**
  * Props for the ColorPickerFormatToggle component.
- * Button that cycles through color formats (HEX, RGB, HSL).
+ * Button that cycles through color formats (HEX, RGB, HSL, OKLCH).
  */
 export interface ColorPickerFormatToggleProps
   extends Omit<React.ComponentPropsWithoutRef<"button">, "children"> {
+}
+
+/**
+ * Props for the ColorPickerContrastInfo component.
+ * Displays the WCAG contrast ratio between the current color and a reference color.
+ */
+export interface ColorPickerContrastInfoProps
+  extends Omit<React.ComponentPropsWithoutRef<"div">, "children"> {
+  /** The background/reference color to compare against. */
+  contrastColor: string;
+  /** Callback when the user changes the contrast color via the indicator. */
+  onContrastColorChange?: (color: string) => void;
+  /** Class names for inner elements. */
+  classNames?: {
+    indicator?: string;
+    ratio?: string;
+    badge?: string;
+  };
 }
 
 /**
