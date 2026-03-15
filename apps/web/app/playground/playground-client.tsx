@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTheme } from "../theme-provider";
 import {
   ColorPicker,
   ColorPickerArea,
@@ -539,6 +540,8 @@ const tw = {
 } as const;
 
 export function PlaygroundClient() {
+  const { theme } = useTheme();
+
   const [options, setOptions] = useState<PlaygroundOptions>({
     variant: "inline",
     triggerMode: "input",
@@ -553,6 +556,14 @@ export function PlaygroundClient() {
     contrastColor: "#ffffff",
     swatchColors: DEFAULT_SWATCHES,
   });
+
+  // Switch contrast color when theme changes
+  useEffect(() => {
+    setOptions((prev) => ({
+      ...prev,
+      contrastColor: theme === "dark" ? "#000000" : "#ffffff",
+    }));
+  }, [theme]);
 
   const [value, setValue] = useState<ColorPickerValue>(DEFAULT_VALUE);
   const [compositionMode, setCompositionMode] = useState<CompositionMode>("preset");

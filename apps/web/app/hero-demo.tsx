@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTheme } from "./theme-provider";
 import {
   ColorPicker,
   ColorPickerArea,
@@ -41,8 +42,13 @@ const DEFAULT_SWATCH_COLORS = [
 ];
 
 export function HeroDemo() {
+  const { theme } = useTheme();
   const [value, setValue] = useState<ColorPickerValue>("#16db89");
   const [contrastColor, setContrastColor] = useState("#ffffff");
+
+  useEffect(() => {
+    setContrastColor(theme === "dark" ? "#000000" : "#ffffff");
+  }, [theme]);
 
   const isGradientMode = typeof value !== "string";
 
