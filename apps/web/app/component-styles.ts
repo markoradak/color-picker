@@ -87,14 +87,14 @@ export const styles = {
     "relative aspect-square rounded-md border border-zinc-200 outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
 
   trigger:
-    "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 p-1 outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-zinc-600",
+    "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 p-1 outline-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-zinc-600 dark:ring-offset-zinc-900",
   triggerClassNames: {
     checkerboard: "inset-1 rounded-md",
     swatch: "h-full w-full rounded-md",
   },
 
   inputTrigger:
-    "inline-flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-1.5 text-left outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-600 dark:bg-zinc-900",
+    "inline-flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-1.5 text-left outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 dark:border-zinc-600 dark:bg-zinc-900 dark:ring-offset-zinc-900",
   inputTriggerClassNames: {
     thumbnail: "h-7 w-7 shrink-0 rounded-md",
     thumbnailCheckerboard: "rounded-md",
