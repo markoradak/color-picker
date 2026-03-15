@@ -30,7 +30,7 @@ describe("ColorPickerContrastInfo", () => {
   it("shows Fail for low contrast (white on white)", () => {
     renderContrastInfo("#ffffff", "#ffffff");
     const badge = document.querySelector('[data-cp-el="contrast-badge"]');
-    expect(badge?.textContent).toContain("Fail");
+    expect(badge?.textContent).toContain("Insufficient");
     expect(badge?.hasAttribute("data-pass")).toBe(false);
   });
 

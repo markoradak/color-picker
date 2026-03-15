@@ -11,7 +11,7 @@ const BADGE_LABELS: Record<WcagLevel, string> = {
   AAA: "AAA",
   AA: "AA",
   AA18: "AA18",
-  Fail: "Fail",
+  Fail: "Insufficient",
 };
 
 /**
