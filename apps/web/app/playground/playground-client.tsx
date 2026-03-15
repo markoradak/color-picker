@@ -108,7 +108,7 @@ function Toggle({
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative mt-0.5 inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
+        className={`relative mt-0.5 inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full outline-none transition-colors focus-visible:ring-2 focus-visible:ring-emerald-500 ${
           checked
             ? "bg-[#16db89]"
             : "bg-neutral-300 dark:bg-neutral-600"
@@ -154,7 +154,7 @@ function SegmentedControl({
               role="radio"
               aria-checked={isActive}
               onClick={() => onChange(opt.value)}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-emerald-500 ${
                 isActive
                   ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100"
                   : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
@@ -501,36 +501,36 @@ ${jsx}
 const tw = {
   content: "z-50 flex w-80 flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
   modeSelector: "flex overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100 p-0.5 dark:border-zinc-700 dark:bg-zinc-800",
-  modeSelectorItem: "min-w-0 flex-1 cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100",
-  area: "relative h-44 w-full cursor-crosshair rounded-lg outline-none",
+  modeSelectorItem: "min-w-0 flex-1 cursor-pointer rounded-md px-1.5 py-1.5 text-center text-xs font-medium outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-emerald-500 data-[active]:bg-white data-[active]:shadow-sm dark:data-[active]:bg-zinc-700 dark:text-zinc-300 dark:data-[active]:text-zinc-100",
+  area: "relative h-44 w-full cursor-crosshair rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
   areaGradient: "rounded-lg",
   areaThumb: "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]",
-  hueSlider: "relative h-3 w-full cursor-pointer rounded-full outline-none",
+  hueSlider: "relative h-3 w-full cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
   hueSliderTrack: "rounded-full",
   hueSliderThumb: "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]",
-  alphaSlider: "relative h-3 w-full cursor-pointer rounded-full outline-none",
+  alphaSlider: "relative h-3 w-full cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
   alphaSliderTrack: "overflow-hidden rounded-full",
   alphaSliderThumb: "h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)]",
   input: "flex items-center gap-1",
-  inputFormatToggle: "shrink-0 select-none rounded-md border border-zinc-300 bg-white px-2 h-8 text-xs font-medium outline-none hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
-  inputField: "w-full rounded-md border border-zinc-300 bg-white px-2 h-8 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100",
-  eyeDropper: "inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-zinc-300 bg-white outline-none hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
+  inputFormatToggle: "shrink-0 select-none rounded-md border border-zinc-300 bg-white px-2 h-8 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
+  inputField: "w-full rounded-md border border-zinc-300 bg-white px-2 h-8 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100",
+  eyeDropper: "inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-zinc-300 bg-white outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
   eyeDropperIcon: "h-3.5 w-3.5",
   eyeDropperSpinner: "h-3.5 w-3.5 animate-spin",
   swatches: "gap-1",
-  swatch: "relative aspect-square rounded-md border border-zinc-200 outline-none data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
+  swatch: "relative aspect-square rounded-md border border-zinc-200 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 data-[active]:ring-1 data-[active]:ring-zinc-900 dark:border-zinc-600 dark:data-[active]:ring-zinc-100",
   gradientEditor: "flex flex-col pb-1",
   gradientPreview: "relative aspect-square w-full cursor-crosshair overflow-hidden rounded-lg",
-  gradientStopDot: "z-[2] h-3 w-3 cursor-pointer rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)] outline-none data-[active]:ring-2 data-[active]:ring-blue-500",
+  gradientStopDot: "z-[2] h-3 w-3 cursor-pointer rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2)] outline-none data-[active]:ring-2 data-[active]:ring-emerald-500",
   gradientBaseColor: "bottom-2 left-2 z-[2] h-5 w-5 cursor-pointer rounded border border-white/50 shadow-sm outline-none",
   gradientContextMenu: "rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
   gradientContextMenuItem: "block w-full px-3 py-1.5 text-left text-xs outline-none hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
   gradientPopoverContent: "z-50 flex w-64 flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900",
   gradientSwatches: "mt-0.5 gap-1",
-  trigger: "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 p-1 outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-zinc-600",
+  trigger: "relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 p-1 outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-zinc-600",
   triggerCheckerboard: "inset-1 rounded-md",
   triggerSwatch: "h-full w-full rounded-md",
-  inputTrigger: "inline-flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-1.5 text-left outline-none focus-within:ring-2 focus-within:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-900",
+  inputTrigger: "inline-flex h-10 w-full cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-1.5 text-left outline-none focus-within:ring-2 focus-within:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-900",
   inputTriggerThumbnail: "h-7 w-7 shrink-0 rounded-md",
   inputTriggerThumbnailCheckerboard: "rounded-md",
   inputTriggerThumbnailSwatch: "rounded-md",
@@ -739,7 +739,7 @@ export function PlaygroundClient() {
                     role="radio"
                     aria-checked={isActive}
                     onClick={() => setCompositionMode(mode)}
-                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-emerald-500 ${
                       isActive
                         ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100"
                         : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
@@ -765,7 +765,7 @@ export function PlaygroundClient() {
                     role="radio"
                     aria-checked={isActive}
                     onClick={() => setStyleMode(mode)}
-                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-emerald-500 ${
                       isActive
                         ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100"
                         : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"

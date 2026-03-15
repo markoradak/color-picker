@@ -248,7 +248,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <a
               href="#playground"
-              className="inline-flex items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-[#0f0f0f] transition-opacity hover:opacity-90"
+              className="inline-flex items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-[#0f0f0f] outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-emerald-500"
             >
               Playground
             </a>
@@ -256,7 +256,7 @@ export default function Home() {
               href="https://github.com/markoradak/color-picker"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-md border border-[#e5e5e5] px-4 py-2 text-sm text-[#666] transition-colors hover:text-accent dark:border-[#2a2a2a]"
+              className="inline-flex items-center rounded-md border border-[#e5e5e5] px-4 py-2 text-sm text-[#666] outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-[#2a2a2a]"
             >
               GitHub
             </a>
@@ -431,7 +431,7 @@ export default function Home() {
             href="https://markoradak.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors hover:text-accent"
+            className="rounded outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             Marko Radak
           </a>
@@ -440,7 +440,7 @@ export default function Home() {
             href="https://github.com/markoradak/color-picker"
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors hover:text-accent"
+            className="rounded outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
             GitHub
           </a>
