@@ -7,6 +7,13 @@
   --font-mono: "Source Code Pro", ui-monospace, SFMono-Regular, "SF Mono",
     Menlo, Consolas, "Liberation Mono", monospace;
   --color-accent: #16db89;
+  --color-ring: var(--color-zinc-400);
+  --color-ring-offset: #ffffff;
+}
+
+.dark {
+  --color-ring: var(--color-zinc-500);
+  --color-ring-offset: #0f0f0f;
 }
 
 body {
