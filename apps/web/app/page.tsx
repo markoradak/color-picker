@@ -2,8 +2,9 @@ import { HeroDemo } from "./hero-demo";
 import { CodeBlock } from "./code-block";
 import { ThemeToggle } from "./theme-toggle";
 import { PlaygroundClient } from "./playground/playground-client";
+import { InstallCommand } from "./install-command";
 
-const INSTALL_CODE = `npm install @markoradak/color-picker`;
+const INSTALL_PKG = `@markoradak/color-picker`;
 
 const COMPOUND_EXAMPLE = `import {
   ColorPicker,
@@ -272,7 +273,7 @@ export default function Home() {
             props on all components.
           </p>
 
-          <CodeBlock code={INSTALL_CODE} language="bash" />
+          <InstallCommand pkg={INSTALL_PKG} />
 
           <div className="flex items-center gap-3">
             <a
