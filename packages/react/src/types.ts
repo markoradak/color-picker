@@ -387,6 +387,10 @@ export interface ColorPickerPresetProps {
   swatchColumns?: number;
   /** Preset gradient swatches to display (gradient mode) */
   gradientSwatches?: GradientValue[];
+  /** Reference color for the WCAG contrast info row (solid mode only). When provided, the contrast row and threshold line are rendered. */
+  contrastColor?: string;
+  /** Callback when the user changes the contrast color via the indicator popover. */
+  onContrastColorChange?: (color: string) => void;
   /** Additional CSS class for the outer wrapper */
   className?: string;
 }
@@ -550,6 +554,10 @@ export interface ColorPickerControlsProps {
   swatchColumns?: number;
   /** Preset gradient swatches to display (gradient mode) */
   gradientSwatches?: GradientValue[];
+  /** Reference color for the WCAG contrast info row (solid mode only). When provided, the contrast row and threshold line are rendered. */
+  contrastColor?: string;
+  /** Callback when the user changes the contrast color via the indicator popover. */
+  onContrastColorChange?: (color: string) => void;
 }
 
 /**

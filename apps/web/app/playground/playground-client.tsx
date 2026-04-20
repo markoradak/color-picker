@@ -226,6 +226,10 @@ function generatePresetCode(options: PlaygroundOptions, style: StyleMode): strin
   } else if (!options.enableTokenSearch) {
     props.push(`enableTokenSearch={false}`);
   }
+  if (options.showContrastInfo) {
+    props.push(`contrastColor="${options.contrastColor}"`);
+    props.push(`onContrastColorChange={(c) => console.log(c)}`);
+  }
 
   const propsStr = props.map((p) => `      ${p}`).join("\n");
   const allImports = [importLine, ...extraImports].join("\n");
@@ -264,6 +268,7 @@ function generateComposableCode(options: PlaygroundOptions, style: StyleMode): s
   if (options.showInput) imports.push("ColorPickerInput");
   if (options.showEyeDropper) imports.push("ColorPickerEyeDropper");
   if (options.showSwatches) imports.push("ColorPickerSwatches", "ColorPickerSwatch");
+  if (options.showContrastInfo) imports.push("ColorPickerContrastInfo", "ColorPickerContrastLine");
   if (options.enableGradient) {
     imports.push("ColorPickerModeSelector", "ColorPickerModeSelectorItem");
     imports.push("ColorPickerGradientEditor");
@@ -309,7 +314,18 @@ function generateComposableCode(options: PlaygroundOptions, style: StyleMode): s
   if (options.enableGradient) {
     parts.push(`    <ColorPickerModeSelector${cls} />`);
   }
-  parts.push(`    <ColorPickerArea${cls} />`);
+  if (options.showContrastInfo) {
+    parts.push(`    <ColorPickerContrastInfo contrastColor="#ffffff"${cls} />`);
+  }
+  if (options.showContrastInfo) {
+    parts.push(`    <ColorPickerArea${cls}>
+      <ColorPickerAreaGradient${cls} />
+      <ColorPickerContrastLine contrastColor="#ffffff" />
+      <ColorPickerAreaThumb${cls} />
+    </ColorPickerArea>`);
+  } else {
+    parts.push(`    <ColorPickerArea${cls} />`);
+  }
   parts.push(`    <ColorPickerHueSlider${cls} />`);
   if (options.showAlpha) parts.push(`    <ColorPickerAlphaSlider${cls} />`);
   if (options.showInput) {
@@ -378,10 +394,29 @@ ${I}  ))}
 ${I}</ColorPickerModeSelector>`);
   }
 
-  parts.push(`${I}<ColorPickerArea className="${tw.area}">
+  if (options.showContrastInfo) {
+    parts.push(`${I}<ColorPickerContrastInfo
+${I}  contrastColor="#ffffff"
+${I}  className="${tw.contrastInfo}"
+${I}  classNames={{
+${I}    ratio: "${tw.contrastRatio}",
+${I}    badge: "${tw.contrastBadge}",
+${I}  }}
+${I}/>`);
+  }
+
+  if (options.showContrastInfo) {
+    parts.push(`${I}<ColorPickerArea className="${tw.area}">
+${I}  <ColorPickerAreaGradient className="${tw.areaGradient}" />
+${I}  <ColorPickerContrastLine contrastColor="#ffffff" />
+${I}  <ColorPickerAreaThumb className="${tw.areaThumb}" />
+${I}</ColorPickerArea>`);
+  } else {
+    parts.push(`${I}<ColorPickerArea className="${tw.area}">
 ${I}  <ColorPickerAreaGradient className="${tw.areaGradient}" />
 ${I}  <ColorPickerAreaThumb className="${tw.areaThumb}" />
 ${I}</ColorPickerArea>`);
+  }
 
   parts.push(`${I}<ColorPickerHueSlider className="${tw.hueSlider}">
 ${I}  <ColorPickerHueSliderTrack className="${tw.hueSliderTrack}" />
@@ -537,6 +572,9 @@ const tw = {
   inputTriggerFormatToggle: "shrink-0 cursor-pointer select-none rounded px-1 text-xs font-medium opacity-50 outline-none hover:opacity-80",
   inputTriggerInput: "w-full cursor-text bg-transparent font-mono text-xs outline-none dark:text-zinc-100",
   inputTriggerEyeDropper: "inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded opacity-60 outline-none hover:opacity-100",
+  contrastInfo: "flex items-center gap-1.5 text-xs",
+  contrastRatio: "font-mono font-medium tabular-nums text-zinc-700 dark:text-zinc-300",
+  contrastBadge: "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none",
 } as const;
 
 export function PlaygroundClient() {

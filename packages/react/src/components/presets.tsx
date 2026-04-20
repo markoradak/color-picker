@@ -23,6 +23,8 @@ import { ColorPickerSwatches, ColorPickerSwatch } from "./swatches";
 import { ColorPickerGradientEditor } from "./gradient-editor";
 import { ColorPickerModeSelector, ColorPickerModeSelectorItem } from "./mode-selector";
 import { ColorPickerGradientSwatches, ColorPickerGradientSwatch } from "./gradient-swatches";
+import { ColorPickerContrastInfo } from "./contrast-info";
+import { ColorPickerContrastLine } from "./contrast-line";
 
 /** Default preset swatches shown when no `swatches` prop is provided. */
 const DEFAULT_PRESET_SWATCHES = [
@@ -56,7 +58,10 @@ export function ColorPickerControls({
   swatches = DEFAULT_PRESET_SWATCHES,
   swatchColumns = 8,
   gradientSwatches,
+  contrastColor,
+  onContrastColorChange,
 }: ColorPickerControlsProps) {
+  const showContrast = contrastColor != null;
   const { isGradientMode } = useColorPickerContext();
   const showModeSelector = enableModeSelector ?? enableGradient;
 
@@ -106,8 +111,22 @@ export function ColorPickerControls({
       ) : (
         // Solid mode: show standard color picker controls
         <>
+          {showContrast && (
+            <ColorPickerContrastInfo
+              contrastColor={contrastColor}
+              onContrastColorChange={onContrastColorChange}
+              className="flex items-center gap-1.5 text-xs"
+              classNames={{
+                ratio: "font-mono font-medium tabular-nums text-zinc-700 dark:text-zinc-300",
+                badge: "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none",
+              }}
+            />
+          )}
           <ColorPickerArea className="relative aspect-[3/2] w-full cursor-crosshair rounded-lg outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
             <ColorPickerAreaGradient className="rounded-lg" />
+            {showContrast && (
+              <ColorPickerContrastLine contrastColor={contrastColor} />
+            )}
             <ColorPickerAreaThumb className="h-4 w-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(0,0,0,0.1)]" />
           </ColorPickerArea>
           <ColorPickerHueSlider className="relative h-3 w-full cursor-pointer rounded-full outline-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50">
@@ -186,6 +205,8 @@ export function ColorPickerPopover({
   swatches = DEFAULT_PRESET_SWATCHES,
   swatchColumns = 8,
   gradientSwatches,
+  contrastColor,
+  onContrastColorChange,
   tokens,
   autoTokens,
   side = "bottom",
@@ -268,6 +289,8 @@ export function ColorPickerPopover({
           swatches={swatches}
           swatchColumns={swatchColumns}
           gradientSwatches={gradientSwatches}
+          contrastColor={contrastColor}
+          onContrastColorChange={onContrastColorChange}
         />
       </ColorPickerContent>
     </ColorPicker>
@@ -295,6 +318,8 @@ export function ColorPickerInline({
   swatches = DEFAULT_PRESET_SWATCHES,
   swatchColumns = 8,
   gradientSwatches,
+  contrastColor,
+  onContrastColorChange,
   tokens,
   autoTokens,
   className,
@@ -328,6 +353,8 @@ export function ColorPickerInline({
           swatches={swatches}
           swatchColumns={swatchColumns}
           gradientSwatches={gradientSwatches}
+          contrastColor={contrastColor}
+          onContrastColorChange={onContrastColorChange}
         />
       </div>
     </ColorPicker>
