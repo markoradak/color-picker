@@ -40,7 +40,7 @@ sh("pnpm -C packages/react test");
 sh("pnpm -C packages/react build");
 
 // Bump version (no npm-managed tag; we manage our own)
-sh(`pnpm -C packages/react version ${bump} --no-git-tag-version`);
+sh(`npm version ${bump} --no-git-tag-version`, { cwd: resolve(repoRoot, "packages/react") });
 
 const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 const version = pkg.version;
