@@ -248,7 +248,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <a
               href="#playground"
-              className="inline-flex items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-[#0f0f0f] outline-none transition-[opacity,box-shadow] hover:opacity-90 ring-offset-2 ring-offset-ring-offset focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex items-center rounded-md bg-accent px-4 py-2 text-sm font-medium text-[#0f0f0f] outline-none transition-[opacity,box-shadow] hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-ring-offset"
             >
               Playground
             </a>
@@ -256,7 +256,7 @@ export default function Home() {
               href="https://github.com/markoradak/color-picker"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-md border border-[#e5e5e5] px-4 py-2 text-sm text-[#666] outline-none transition-[color,box-shadow] hover:text-accent ring-offset-2 ring-offset-ring-offset focus-visible:ring-2 focus-visible:ring-ring dark:border-[#2a2a2a]"
+              className="inline-flex items-center rounded-md border border-[#e5e5e5] px-4 py-2 text-sm text-[#666] outline-none transition-[color,box-shadow] hover:text-accent focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-ring-offset dark:border-[#2a2a2a]"
             >
               GitHub
             </a>
@@ -431,7 +431,7 @@ export default function Home() {
             href="https://markoradak.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded outline-none transition-[color,box-shadow] hover:text-accent ring-offset-2 ring-offset-ring-offset focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded outline-none transition-[color,box-shadow] hover:text-accent focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-ring-offset"
           >
             Marko Radak
           </a>
@@ -440,7 +440,7 @@ export default function Home() {
             href="https://github.com/markoradak/color-picker"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded outline-none transition-[color,box-shadow] hover:text-accent ring-offset-2 ring-offset-ring-offset focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded outline-none transition-[color,box-shadow] hover:text-accent focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-ring-offset"
           >
             GitHub
           </a>

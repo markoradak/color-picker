@@ -22,7 +22,7 @@ export default function PlaygroundPage() {
         <div className="flex items-center gap-3">
           <a
             href="/"
-            className="rounded text-sm text-[#666] outline-none transition-[color,box-shadow] hover:text-accent ring-offset-2 ring-offset-ring-offset focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded text-sm text-[#666] outline-none transition-[color,box-shadow] hover:text-accent focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-ring-offset"
           >
             Home
           </a>
