@@ -909,7 +909,10 @@ function PopoverPicker({
           classNames={styles.triggerClassNames}
         />
       )}
-      <ColorPickerContent className={styles.content} style={{ width: "var(--radix-popper-anchor-width)" }}>
+      <ColorPickerContent
+        className={styles.content}
+        style={options.triggerMode === "input" ? { width: "var(--radix-popper-anchor-width)" } : undefined}
+      >
         {options.enableGradient && (
           <ColorPickerModeSelector className={styles.modeSelector}>
             {(["solid", "linear", "radial", "conic", "mesh"] as const).map((mode) => (
