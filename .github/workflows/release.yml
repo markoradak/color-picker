@@ -31,6 +31,14 @@ jobs:
 
       - run: pnpm -C packages/react build
 
+      # Log the claims GitHub will send to npm (useful when debugging TP mismatches).
+      - name: Print OIDC claims
+        if: runner.debug == '1'
+        run: |
+          TOKEN=$(curl -sSL -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org" | jq -r .value)
+          echo "$TOKEN" | cut -d. -f2 | base64 -d 2>/dev/null | jq .
+
       # Uses OIDC (Trusted Publisher on npmjs.com). No NPM_TOKEN required.
       # `--provenance` is applied automatically when publishing via OIDC.
       - name: Publish to npm
