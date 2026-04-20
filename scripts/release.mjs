@@ -52,14 +52,12 @@ sh(`git add packages/react/package.json`);
 sh(`git commit -m "chore: release ${tag}"`);
 sh(`git tag -a ${tag} -m "Release ${tag}"`);
 
+// Push branch + tag together. --follow-tags pushes annotated tags
+// that point to commits included in the push.
+sh(`git push --follow-tags origin ${branch}`);
+
 console.log(`
-Tagged ${tag}. Review with:
-  git show HEAD
-  git show ${tag}
-
-To publish, push the commit and tag:
-  git push origin ${branch}
-  git push origin ${tag}
-
-The release workflow will build and publish to npm.
+Released ${tag} and pushed to origin/${branch}.
+Watch the publish workflow at:
+  https://github.com/markoradak/color-picker/actions
 `);
