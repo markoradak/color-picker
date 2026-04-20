@@ -30,3 +30,6 @@ coverage/
 
 # Package manager
 *.tgz
+
+# Claude
+tasks/

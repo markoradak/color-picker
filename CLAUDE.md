@@ -1,7 +1,7 @@
 # @markoradak/color-picker
 
 <!-- auto-start: overview -->
-A production-ready compound-component React color picker and gradient editor library (`@markoradak/color-picker`), built as a pnpm monorepo with Turborepo orchestration. The library provides a Radix-style composable API for solid color selection (HEX/RGB/HSL) and gradient editing (linear, radial, conic, mesh). All 8 implementation phases are complete with 234 tests passing, full accessibility support, forwardRef on all components, and CSS custom properties theming.
+A production-ready compound-component React color picker and gradient editor library (`@markoradak/color-picker`), built as a pnpm monorepo with Turborepo orchestration. The library provides a Radix-style composable API for solid color selection (HEX/RGB/HSL) and gradient editing (linear, radial, conic, mesh). All 8 implementation phases are complete with 261 tests passing, full accessibility support, forwardRef on all components, and CSS custom properties theming.
 <!-- auto-end: overview -->
 
 ## Quick Reference
@@ -108,7 +108,7 @@ color-picker/
 
 **Styling**: Tailwind CSS v4 (demo site), CSS custom properties theme API (`styles.css` shipped with library)
 
-**Testing**: Vitest 3.0 + @testing-library/react 16.3 + jsdom (234 tests)
+**Testing**: Vitest 3.0 + @testing-library/react 16.3 + jsdom (261 tests)
 
 **Key Dependencies**:
 - `colord` -- Color parsing, conversion, and manipulation (~1.7kB, with `names` + `a11y` plugins)
@@ -134,7 +134,7 @@ color-picker/
 **Component Architecture**:
 - **Compound component pattern** -- `ColorPicker` is the root provider, sub-components (Area, HueSlider, Input, etc.) consume context
 - Context via `createContext` + `useContext` with a `useColorPickerContext()` hook that throws if used outside provider
-- **All components support `forwardRef`** -- Area, HueSlider, AlphaSlider, Input, Trigger, Content, FormatToggle, EyeDropper, Swatches, ModeSelector, GradientEditor (11 components)
+- **All components support `forwardRef`** -- Area, HueSlider, AlphaSlider, Input, InputTrigger, Trigger, Content, FormatToggle, EyeDropper, Swatches, ModeSelector, GradientEditor, GradientPreview, GradientStops, GradientSwatches, TokenList, ContrastInfo, ContrastLine (18 components)
 - Function components only, no class components
 - Props defined as `interface` (not `type`)
 - JSDoc comments on all public exports
@@ -175,7 +175,7 @@ color-picker/
 - Test files co-located with source: `*.test.ts` / `*.test.tsx` next to source files
 - Vitest with jsdom environment and global test APIs
 - `@testing-library/jest-dom/vitest` setup for DOM matchers
-- 234 tests across utils (color, gradient, css, position), hooks (use-auto-tokens), and components (color-picker, color-picker-provider, gradient-editor, mode-selector)
+- 261 tests across 10 files: utils (color 83, gradient 53, css 34, position 22), hooks (use-auto-tokens 8), and components (color-picker 37, mode-selector 8, contrast-info 6, color-picker-provider 5, gradient-editor 5)
 
 **Audit Fixes Applied**:
 - Stale HSVA closure fix in useColorPicker (ref-based sync)
