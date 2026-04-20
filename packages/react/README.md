@@ -578,6 +578,25 @@ Dark mode is applied automatically via `prefers-color-scheme: dark`. You can als
 - All modern browsers (Chrome, Firefox, Safari, Edge)
 - The EyeDropper button uses the [EyeDropper API](https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper_API) (Chromium-based browsers). It automatically hides in unsupported browsers.
 
+## Development
+
+This package lives in a pnpm + Turborepo monorepo alongside a Next.js demo site. Requires Node 18+ and pnpm 10+.
+
+```
+packages/
+  react/          @markoradak/color-picker — this package
+apps/
+  web/            Next.js demo + playground site
+```
+
+```bash
+pnpm install
+pnpm dev          # tsup --watch + next dev, concurrently
+pnpm build        # build the package, then the demo site
+pnpm test         # 261 tests in packages/react
+pnpm typecheck    # typecheck all workspaces
+```
+
 ## License
 
 MIT
