@@ -234,7 +234,7 @@ export default function Home() {
       {/* Hero */}
       <section className="grid items-start gap-12 py-16 sm:py-24 lg:grid-cols-2 lg:gap-16">
         <div className="flex flex-col gap-6">
-          <h1 className="text-2xl font-bold sm:text-3xl">
+          <h1 className="whitespace-nowrap text-2xl font-bold sm:text-3xl">
             @markoradak/color-picker
           </h1>
           <p className="text-[#666]">
