@@ -7,7 +7,10 @@
     "test": "turbo test",
     "lint": "turbo lint",
     "clean": "turbo clean",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "release:patch": "node scripts/release.mjs patch",
+    "release:minor": "node scripts/release.mjs minor",
+    "release:major": "node scripts/release.mjs major"
   },
   "packageManager": "pnpm@10.18.3",
   "engines": {

@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      # Trusted Publishers requires npm >= 11.5.1.
+      # Node 22 ships with older npm; upgrade in place.
+      - run: npm install -g npm@latest
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm -C packages/react typecheck
+
+      - run: pnpm -C packages/react test
+
+      - run: pnpm -C packages/react build
+
+      # Uses OIDC (Trusted Publisher on npmjs.com). No NPM_TOKEN required.
+      # `--provenance` is applied automatically when publishing via OIDC.
+      - name: Publish to npm
+        run: npm publish --access public
+        working-directory: packages/react
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
