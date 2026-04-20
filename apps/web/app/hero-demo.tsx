@@ -85,7 +85,7 @@ export function HeroDemo() {
               onContrastColorChange={setContrastColor}
               className="flex items-center gap-1.5 text-xs"
               classNames={{
-                ratio: "font-mono font-medium tabular-nums text-neutral-700 dark:text-neutral-300",
+                ratio: "font-mono font-medium tabular-nums text-zinc-700 dark:text-zinc-300",
                 badge: "inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold leading-none",
               }}
             />
