@@ -1,6 +1,6 @@
 {
   "name": "@markoradak/color-picker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A compound-component React color picker and gradient editor",
   "license": "MIT",
   "type": "module",
