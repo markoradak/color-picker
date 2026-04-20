@@ -64,6 +64,25 @@ function MyGradientPicker() {
   );
 }`;
 
+const CONTRAST_EXAMPLE = `import { useState } from "react";
+import { ColorPickerPopover } from "@markoradak/color-picker/presets";
+
+function AccessibleColorPicker() {
+  const [color, setColor] = useState("#16db89");
+  const [bg, setBg] = useState("#ffffff");
+
+  // Pass contrastColor to enable the WCAG readout + threshold curve.
+  // onContrastColorChange lets users swap the reference color via the popover.
+  return (
+    <ColorPickerPopover
+      value={color}
+      onValueChange={setColor}
+      contrastColor={bg}
+      onContrastColorChange={setBg}
+    />
+  );
+}`;
+
 const PRESET_EXAMPLE = `import { ColorPickerInline } from "@markoradak/color-picker/presets";
 
 function QuickPicker() {
@@ -148,6 +167,11 @@ const FEATURES = [
       "Full opacity control with alpha slider. Checkerboard pattern for transparency preview.",
   },
   {
+    title: "WCAG Contrast Checking",
+    description:
+      "Built-in contrast-ratio readout, AA/AAA badge, and a threshold curve drawn across the saturation/brightness area so users can see which colors pass. Exposed as both composable components and a preset prop.",
+  },
+  {
     title: "Pre-composed Presets",
     description:
       "ColorPickerPopover and ColorPickerInline for common layouts. Import from /presets sub-path.",
@@ -188,13 +212,15 @@ const API_COMPONENTS = [
   { name: "ColorPickerAlphaSliderTrack", description: "Alpha slider gradient track (sub-component)" },
   { name: "ColorPickerAlphaSliderThumb", description: "Alpha slider draggable thumb (sub-component)" },
   { name: "ColorPickerInput", description: "Color value text input with token badge and search" },
-  { name: "ColorPickerFormatToggle", description: "HEX/RGB/HSL format switcher" },
+  { name: "ColorPickerFormatToggle", description: "HEX/RGB/HSL/OKLCH format switcher" },
   { name: "ColorPickerEyeDropper", description: "Native color sampling via the EyeDropper API" },
   { name: "ColorPickerSwatches", description: "Preset color swatches grid" },
   { name: "ColorPickerSwatch", description: "Individual color swatch button (sub-component)" },
   { name: "ColorPickerGradientEditor", description: "Gradient preview and stop editor" },
   { name: "ColorPickerGradientSwatches", description: "Preset gradient swatches grid" },
   { name: "ColorPickerGradientSwatch", description: "Individual gradient swatch button (sub-component)" },
+  { name: "ColorPickerContrastInfo", description: "WCAG contrast-ratio readout with level badge and optional reference-color popover" },
+  { name: "ColorPickerContrastLine", description: "SVG overlay for the color area drawing the WCAG threshold curve and failing region" },
   { name: "GradientPreview", description: "Standalone gradient preview with angle/position controls" },
   { name: "GradientStops", description: "Standalone gradient stop bar with draggable markers" },
   { name: "TokenList", description: "Searchable token dropdown list with keyboard navigation" },
@@ -215,14 +241,17 @@ const API_HOOKS = [
 const API_UTILITIES = [
   { name: "toCSS / fromCSS", description: "Convert between ColorPickerValue and CSS strings (supports all gradient types)" },
   { name: "isGradient / isSolidColor", description: "Type guards for narrowing ColorPickerValue discriminated union" },
-  { name: "parseColor / formatColor", description: "Parse and format colors between HEX, RGB, and HSL" },
+  { name: "parseColor / formatColor", description: "Parse and format colors between HEX, RGB, HSL, and OKLCH" },
   { name: "detectFormat / isValidColor", description: "Detect color format and validate color strings" },
   { name: "toHSVA / fromHSVA", description: "Convert between color strings and internal HSVA representation" },
   { name: "getContrastColor", description: "Get accessible text color (black or white) for a given background" },
+  { name: "contrastRatio / getWcagLevel", description: "Compute WCAG 2.1 contrast ratio and classify it as AAA, AA, AA18, or Fail" },
+  { name: "colorLuminance / hsvLuminance / contrastFromLuminances", description: "Lower-level luminance and contrast helpers for building custom accessibility UI" },
+  { name: "getEffectiveBackgroundColor", description: "Walk the DOM to find the first non-transparent background color behind an element" },
   { name: "resolveToken / findMatchingToken", description: "Resolve token names to values and find tokens matching a color" },
   { name: "getCSSColorTokens", description: "Extract color tokens from CSS custom properties on the page" },
   { name: "createGradientStop / createMeshGradientStop", description: "Create gradient stop objects with auto-generated IDs" },
-  { name: "addStop / removeStop / updateStop / moveStop", description: "Gradient stop CRUD and repositioning helpers" },
+  { name: "addStop / addStopWithCoordinates / removeStop / updateStop / moveStop", description: "Gradient stop CRUD and repositioning helpers (addStopWithCoordinates is mesh-only)" },
   { name: "sortStops / interpolateColorAt", description: "Sort stops by position and interpolate colors at a given point" },
   { name: "createDefaultGradient / createDefaultGradientFromColor", description: "Create default gradient values by type, optionally from an existing color" },
   { name: "clamp / getRelativePosition / angleFromPosition", description: "Position math utilities for custom control implementations" },
@@ -332,6 +361,15 @@ export default function Home() {
               auto-detected by default — set autoTokens={"{false}"} to disable.
             </p>
             <CodeBlock code={TOKENS_EXAMPLE} />
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-sm font-semibold">WCAG Contrast Checking</h3>
+            <p className="mb-4 text-sm text-[#666]">
+              Pass a contrastColor to render the contrast-ratio readout, WCAG
+              level badge, and a threshold curve across the color area.
+            </p>
+            <CodeBlock code={CONTRAST_EXAMPLE} />
           </div>
 
           <div>

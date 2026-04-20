@@ -32,8 +32,6 @@ function App() {
     <ColorPickerPopover
       value={color}
       onValueChange={setColor}
-      enableAlpha
-      enableEyeDropper
       swatches={["#ef4444", "#22c55e", "#3b82f6"]}
     />
   );
@@ -53,12 +51,7 @@ function App() {
   const [color, setColor] = useState("#3b82f6");
 
   return (
-    <ColorPickerInline
-      value={color}
-      onValueChange={setColor}
-      enableAlpha
-      enableFormatToggle
-    />
+    <ColorPickerInline value={color} onValueChange={setColor} />
   );
 }
 ```
@@ -200,16 +193,45 @@ Use `ColorPickerInputTrigger` (or `triggerMode="input"` on presets) for an input
 
 ```tsx
 <ColorPicker value={color} onValueChange={setColor}>
-  <ColorPickerInputTrigger
-    enableFormatToggle
-    enableEyeDropper
-    enableTokenSearch
-  />
+  <ColorPickerInputTrigger />
   <ColorPicker.Content>
     {/* ... controls ... */}
   </ColorPicker.Content>
 </ColorPicker>
 ```
+
+### Contrast Checking (WCAG)
+
+Both presets render a contrast-info row and a threshold line across the color area when a `contrastColor` is passed:
+
+```tsx
+<ColorPickerPopover
+  value={color}
+  onValueChange={setColor}
+  contrastColor="#ffffff"
+  onContrastColorChange={setBg}
+/>
+```
+
+For the composable API, place `ColorPickerContrastInfo` where you want the ratio readout and `ColorPickerContrastLine` inside `ColorPickerArea` between the gradient and the thumb:
+
+```tsx
+<ColorPicker value={color} onValueChange={setColor}>
+  <ColorPickerContrastInfo contrastColor="#ffffff" onContrastColorChange={setBg} />
+  <ColorPickerArea>
+    <ColorPickerAreaGradient />
+    <ColorPickerContrastLine contrastColor="#ffffff" />
+    <ColorPickerAreaThumb />
+  </ColorPickerArea>
+  {/* ... */}
+</ColorPicker>
+```
+
+`ColorPickerContrastInfo` shows the current ratio (e.g. `5.23 : 1`) and a WCAG level badge (`AAA`, `AA`, `AA18`, or `Insufficient`). `ColorPickerContrastLine` renders an SVG curve along the 4.5:1 threshold inside the saturation/brightness area, with a dot pattern in the failing region. Pass `threshold={3}` to target AA Large.
+
+### ColorPickerProvider (advanced)
+
+`ColorPickerProvider` is a context-only wrapper (no Radix `Popover.Root`) that manages a single solid color. Use it when you need to embed color-picker controls inside another popover — for example, a per-stop color editor inside the gradient editor's own popover. For standard usage, prefer `ColorPicker`.
 
 ## Styling
 
@@ -291,7 +313,7 @@ All components render `data-cp-part` and `data-cp-el` attributes for CSS targeti
 | `ColorPickerAlphaSliderThumb` | `ColorPicker.AlphaSliderThumb` | Draggable alpha thumb. |
 | `ColorPickerInput` | `ColorPicker.Input` | Text input showing color in current format. Validates on blur/Enter. |
 | `ColorPickerFormatToggle` | `ColorPicker.FormatToggle` | Cycles between HEX, RGB, and HSL display formats. |
-| `ColorPickerEyeDropper` | `ColorPicker.EyeDropper` | Browser EyeDropper API button. Returns null if unsupported. |
+| `ColorPickerEyeDropper` | `ColorPicker.EyeDropper` | Browser EyeDropper API button. Renders nothing in unsupported browsers. |
 | `ColorPickerSwatches` | `ColorPicker.Swatches` | Grid container for preset color swatches. |
 | `ColorPickerSwatch` | `ColorPicker.Swatch` | Individual color swatch button. |
 | `ColorPickerModeSelector` | `ColorPicker.ModeSelector` | Segmented control for switching between solid and gradient modes. |
@@ -299,6 +321,8 @@ All components render `data-cp-part` and `data-cp-el` attributes for CSS targeti
 | `ColorPickerGradientEditor` | `ColorPicker.GradientEditor` | Self-contained gradient editing UI with preview and stop manipulation. |
 | `ColorPickerGradientSwatches` | `ColorPicker.GradientSwatches` | Grid container for preset gradient swatches. |
 | `ColorPickerGradientSwatch` | `ColorPicker.GradientSwatch` | Individual gradient swatch button. |
+| `ColorPickerContrastInfo` | `ColorPicker.ContrastInfo` | WCAG contrast-ratio readout with level badge. Optionally opens a mini picker to change the reference color. |
+| `ColorPickerContrastLine` | `ColorPicker.ContrastLine` | SVG overlay for `ColorPickerArea` that draws the WCAG threshold curve and a dot pattern in the failing region. |
 | `GradientPreview` | - | Lower-level gradient preview with stop dots and drag handles. |
 | `GradientStops` | - | Lower-level horizontal stop bar with draggable markers. |
 | `TokenList` | - | Lower-level searchable token list dropdown. |
@@ -349,6 +373,8 @@ Includes all props from `ColorPickerPresetProps` plus popover-specific options:
 | `swatches` | `string[]` | Built-in palette | Preset swatch colors (solid mode). |
 | `swatchColumns` | `number` | `8` | Grid columns for swatches. |
 | `gradientSwatches` | `GradientValue[]` | - | Preset gradient swatches (gradient mode). |
+| `contrastColor` | `string` | - | Reference color for the WCAG contrast row and threshold line (solid mode). When provided, contrast UI is rendered; omit to hide. |
+| `onContrastColorChange` | `(color: string) => void` | - | Called when the user changes the reference color via the contrast-indicator popover. |
 | `tokens` | `ColorTokens` | - | Map of semantic token names to color values. |
 | `autoTokens` | `AutoTokensConfig` | `true` | Auto-detect CSS custom property tokens. |
 | `side` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Popover placement. |
@@ -377,6 +403,12 @@ Same as `ColorPickerPopover` except without `side`, `align`, `sideOffset`, `trig
 | `toHSVA(input)` | Convert a color string to HSVA. Returns white for invalid input. |
 | `fromHSVA(hsva)` | Convert HSVA values back to a hex string. |
 | `getContrastColor(bg)` | Returns `"black"` or `"white"` for best contrast against the given background. |
+| `contrastRatio(a, b)` | Compute the WCAG 2.1 contrast ratio between two colors (1–21). |
+| `getWcagLevel(ratio)` | Classify a ratio as `"AAA"`, `"AA"`, `"AA18"` (large text), or `"Fail"`. Exported as type `WcagLevel`. |
+| `getEffectiveBackgroundColor(element)` | Walk up the DOM from `element` and return the first non-transparent background color (falls back to white). |
+| `colorLuminance(color)` | Relative luminance of any CSS color string (0–1). |
+| `hsvLuminance(h, s, v, a)` | Relative luminance for HSVA values — useful for computing contrast boundaries across the picker area. |
+| `contrastFromLuminances(l1, l2)` | Contrast ratio from two pre-computed luminances. |
 | `resolveToken(value, tokens)` | Resolve a token name to its color value via the tokens map. Returns the value unchanged if not found. |
 | `findMatchingToken(hex, tokens)` | Find the token name whose resolved color matches the given hex. |
 | `getCSSColorTokens(prefix?)` | Scan the DOM for CSS custom properties that resolve to valid colors. |
@@ -386,10 +418,14 @@ Same as `ColorPickerPopover` except without `side`, `align`, `sideOffset`, `trig
 | `createMeshGradientStop(color, position, x, y)` | Create a mesh gradient stop with 2D coordinates. |
 | `interpolateColorAt(stops, position)` | Interpolate a color at a position along the gradient. |
 | `addStop(gradient, color, position)` | Add a stop to a gradient (returns new gradient). |
+| `addStopWithCoordinates(gradient, color, position, x, y)` | Mesh-only: add a stop with explicit 2D coordinates. |
 | `removeStop(gradient, stopId)` | Remove a stop by ID (returns new gradient). |
 | `updateStop(gradient, stopId, updates)` | Update a stop's color or position (returns new gradient). |
 | `moveStop(gradient, stopId, direction)` | Reorder a stop (mesh only): `"front"`, `"forward"`, `"backward"`, `"back"`. |
 | `sortStops(stops)` | Sort stops by position (returns new array). |
+| `clamp(n, min, max)` | Constrain a number to a range. |
+| `getRelativePosition(event, element)` | Pointer position inside an element normalized to 0–1 on each axis. |
+| `angleFromPosition(cx, cy, x, y)` | Angle in degrees from a center point to an `(x, y)` coordinate. |
 
 ### Hooks
 
@@ -405,7 +441,7 @@ Same as `ColorPickerPopover` except without `side`, `align`, `sideOffset`, `trig
 
 ```ts
 type SolidColor = string;
-type ColorFormat = "hex" | "rgb" | "hsl";
+type ColorFormat = "hex" | "rgb" | "hsl" | "oklch";
 type GradientType = "linear" | "radial" | "conic" | "mesh";
 type ColorPickerMode = "solid" | GradientType;
 type ColorPickerValue = SolidColor | GradientValue;
